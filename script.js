@@ -1,8 +1,8 @@
-// Interatividade e Gerenciamento de Tema para Landing Page Oficial da CRIVO
+﻿// Interatividade e Gerenciamento de Tema para Landing Page Oficial da CRIVOS
 (function() {
   // Inicialização imediata do tema para evitar flash de tela branca
   try {
-    const savedTheme = localStorage.getItem('crivo_web_theme');
+    const savedTheme = localStorage.getItem('crivos_web_theme');
     if (savedTheme === 'dark' || (!savedTheme && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       document.documentElement.setAttribute('data-theme', 'dark');
     }
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.documentElement.removeAttribute('data-theme');
       }
       try {
-        localStorage.setItem('crivo_web_theme', newTheme);
+        localStorage.setItem('crivos_web_theme', newTheme);
       } catch (e) {}
       updateThemeButtonText();
     });
@@ -96,6 +96,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Log de status técnico no console
-  console.log('%c■ CRIVO // SISTEMA OPERACIONAL DE ESTUDOS PÓS-EDITAL', 'color: #D92B2B; font-weight: bold; font-family: monospace;');
+  console.log('%c■ CRIVOS // SISTEMA OPERACIONAL DE ESTUDOS PÓS-EDITAL', 'color: #D92B2B; font-weight: bold; font-family: monospace;');
   console.log('%cDesign System Editorial Suíço + Dark Mode Ativo.', 'color: #111111; font-family: monospace;');
 });

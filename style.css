@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --bg-paper: #F4F4F0;
   --bg-card: #FFFFFF;
   --bg-subtle: #EAEAE4;
@@ -8,10 +8,10 @@
   --ink-inverted: #F4F4F0;
   --border-color: #111111;
   --border-subtle: #D4D4CC;
-  --crivo-red: #D92B2B;
-  --crivo-red-dark: #B71C1C;
-  --crivo-blue: #1D4ED8;
-  --crivo-yellow: #F5B700;
+  --crivos-red: #D92B2B;
+  --crivos-red-dark: #B71C1C;
+  --crivos-blue: #1D4ED8;
+  --crivos-yellow: #F5B700;
   --shadow-hard: 2px 2px 0px #111111;
   --shadow-hard-lg: 4px 4px 0px #111111;
   --shadow-hard-xl: 6px 6px 0px #111111;
@@ -28,10 +28,10 @@
   --ink-inverted: #0D0D0D;
   --border-color: #333333;
   --border-subtle: #262626;
-  --crivo-red: #E53935;
-  --crivo-red-dark: #C62828;
-  --crivo-blue: #3B82F6;
-  --crivo-yellow: #FACC15;
+  --crivos-red: #E53935;
+  --crivos-red-dark: #C62828;
+  --crivos-blue: #3B82F6;
+  --crivos-yellow: #FACC15;
   --shadow-hard: 2px 2px 0px #000000;
   --shadow-hard-lg: 4px 4px 0px #000000;
   --shadow-hard-xl: 6px 6px 0px #000000;
@@ -63,7 +63,7 @@ body {
 }
 
 ::selection {
-  background: var(--crivo-red);
+  background: var(--crivos-red);
   color: #FFFFFF;
 }
 
@@ -89,7 +89,7 @@ p {
 }
 
 /* TOPBAR INSTITUCIONAL */
-.crivo-topbar {
+.crivos-topbar {
   background: var(--bg-dark);
   color: #F4F4F0;
   font-family: 'JetBrains Mono', monospace;
@@ -104,7 +104,7 @@ p {
   gap: 12px;
 }
 
-.crivo-topbar-left {
+.crivos-topbar-left {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -113,7 +113,7 @@ p {
   text-overflow: ellipsis;
 }
 
-.crivo-topbar-right {
+.crivos-topbar-right {
   display: flex;
   align-items: center;
   gap: 16px;
@@ -122,7 +122,7 @@ p {
 }
 
 .sq-red {
-  color: var(--crivo-red);
+  color: var(--crivos-red);
   font-size: 12px;
 }
 
@@ -180,7 +180,7 @@ p {
 .nav-brand-logo {
   width: 14px;
   height: 14px;
-  background: var(--crivo-red);
+  background: var(--crivos-red);
   border: 1px solid var(--border-color);
   flex-shrink: 0;
 }
@@ -315,13 +315,13 @@ p {
 }
 
 .btn-primary {
-  background: var(--crivo-red);
+  background: var(--crivos-red);
   color: #FFFFFF;
   border-color: var(--border-color);
 }
 
 .btn-primary:hover {
-  background: var(--crivo-red-dark);
+  background: var(--crivos-red-dark);
   color: #FFFFFF;
 }
 
@@ -382,7 +382,7 @@ p {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--crivo-red);
+  color: var(--crivos-red);
   margin-bottom: 8px;
   display: inline-block;
 }
@@ -427,7 +427,7 @@ p {
 .pulse-dot {
   width: 7px;
   height: 7px;
-  background: var(--crivo-red);
+  background: var(--crivos-red);
   box-shadow: 0 0 0 2px rgba(217, 43, 43, 0.2);
   animation: pulse 1.8s infinite;
   flex-shrink: 0;
@@ -500,7 +500,7 @@ p {
 }
 
 .hero-guarantee-item span {
-  color: var(--crivo-red);
+  color: var(--crivos-red);
 }
 
 
@@ -526,7 +526,7 @@ p {
 
 .hero-mockup-frame:hover {
   animation-play-state: paused;
-  box-shadow: 8px 8px 0px var(--crivo-red);
+  box-shadow: 8px 8px 0px var(--crivos-red);
 }
 
 @keyframes gentleFloat {
@@ -602,7 +602,7 @@ p {
 .mockup-avatar {
   width: 32px;
   height: 32px;
-  background: var(--crivo-red);
+  background: var(--crivos-red);
   color: #FFFFFF;
   font-family: 'JetBrains Mono', monospace;
   font-size: 11px;
@@ -640,7 +640,7 @@ p {
 .mockup-cd-num {
   font-size: 13px;
   font-weight: 800;
-  color: var(--crivo-red);
+  color: var(--crivos-red);
 }
 
 .mockup-body-grid {
@@ -676,9 +676,9 @@ p {
 }
 
 .mockup-task-item.current {
-  border: 1px solid var(--crivo-red);
+  border: 1px solid var(--crivos-red);
   background: var(--bg-subtle);
-  box-shadow: 2px 2px 0px var(--crivo-red);
+  box-shadow: 2px 2px 0px var(--crivos-red);
 }
 
 .mockup-check {
@@ -689,7 +689,7 @@ p {
 
 .mockup-play {
   font-size: 10px;
-  color: var(--crivo-red);
+  color: var(--crivos-red);
 }
 
 .mockup-task-text {
@@ -720,7 +720,7 @@ p {
   font-family: 'JetBrains Mono', monospace;
   font-size: 18px;
   font-weight: 800;
-  color: var(--crivo-blue);
+  color: var(--crivos-blue);
   line-height: 1.1;
 }
 
@@ -741,7 +741,7 @@ p {
 .mockup-pomo-box span {
   display: block;
   font-size: 9px;
-  color: var(--crivo-red);
+  color: var(--crivos-red);
   font-weight: 700;
 }
 
@@ -941,7 +941,7 @@ p {
 }
 
 .tag-p0 {
-  background: var(--crivo-red);
+  background: var(--crivos-red);
   color: #FFFFFF;
   padding: 1px 4px;
   font-weight: 700;
@@ -970,9 +970,9 @@ p {
 }
 
 .demo-day-card.active {
-  border: 1px solid var(--crivo-red);
+  border: 1px solid var(--crivos-red);
   background: var(--bg-subtle);
-  box-shadow: 2px 2px 0px var(--crivo-red);
+  box-shadow: 2px 2px 0px var(--crivos-red);
 }
 
 .demo-day-head {
@@ -1051,7 +1051,7 @@ p {
   font-family: 'JetBrains Mono', monospace;
   font-size: 12px;
   font-weight: 700;
-  color: var(--crivo-red);
+  color: var(--crivos-red);
 }
 
 .card-tag {
@@ -1081,7 +1081,7 @@ p {
   font-family: 'JetBrains Mono', monospace;
   font-size: 10px;
   font-weight: 700;
-  color: var(--crivo-red);
+  color: var(--crivos-red);
   text-transform: uppercase;
 }
 
@@ -1126,14 +1126,14 @@ p {
 }
 
 .step-card.highlight .step-num-badge {
-  background: var(--crivo-red);
+  background: var(--crivos-red);
 }
 
 .step-subtag {
   font-family: 'JetBrains Mono', monospace;
   font-size: 10px;
   font-weight: 700;
-  color: var(--crivo-red);
+  color: var(--crivos-red);
   text-transform: uppercase;
   margin-bottom: 6px;
   display: block;
@@ -1187,7 +1187,7 @@ p {
 }
 
 .price-card.featured {
-  border: 2px solid var(--crivo-red);
+  border: 2px solid var(--crivos-red);
   box-shadow: var(--shadow-hard-xl);
 }
 
@@ -1195,7 +1195,7 @@ p {
   position: absolute;
   top: -12px;
   left: 20px;
-  background: var(--crivo-red);
+  background: var(--crivos-red);
   color: #FFFFFF;
   border: 1px solid var(--border-color);
   font-family: 'JetBrains Mono', monospace;
@@ -1223,7 +1223,7 @@ p {
   font-family: 'JetBrains Mono', monospace;
   font-size: 11px;
   font-weight: 600;
-  color: var(--crivo-red);
+  color: var(--crivos-red);
   margin-bottom: 20px;
   text-transform: uppercase;
 }
@@ -1253,7 +1253,7 @@ p {
 }
 
 .price-card.featured .price-amount {
-  color: var(--crivo-red);
+  color: var(--crivos-red);
 }
 
 .price-terms {
@@ -1297,7 +1297,7 @@ p {
 }
 
 .price-check {
-  color: var(--crivo-red);
+  color: var(--crivos-red);
   font-weight: 700;
   flex-shrink: 0;
 }
@@ -1350,7 +1350,7 @@ p {
 
 .faq-item[open] .faq-icon {
   transform: rotate(45deg);
-  color: var(--crivo-red);
+  color: var(--crivos-red);
 }
 
 .faq-answer {
@@ -1437,7 +1437,7 @@ p {
 }
 
 .footer-link:hover {
-  color: var(--crivo-red);
+  color: var(--crivos-red);
 }
 
 .footer-bottom {
@@ -1457,11 +1457,11 @@ p {
 /* RESPONSIVIDADE APURADA (MOBILE & TABLET BREAKPOINTS)      */
 /* ======================================================== */
 @media (max-width: 768px) {
-  .crivo-topbar {
+  .crivos-topbar {
     padding: 6px 14px;
     font-size: 10px;
   }
-  .crivo-topbar-right span:not(.theme-toggle-btn) {
+  .crivos-topbar-right span:not(.theme-toggle-btn) {
     display: none;
   }
 
