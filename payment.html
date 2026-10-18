@@ -507,8 +507,8 @@
     const initialTheme = localStorage.getItem('crivos_web_theme') || 'light';
     document.documentElement.setAttribute('data-theme', initialTheme);
 
-    // Chave Pública do Mercado Pago (Substitua pela sua Public Key ou configure no deploy)
-    const MP_PUBLIC_KEY = window.CRIVOS_MP_PUBLIC_KEY || 'TEST-00000000-0000-0000-0000-000000000000';
+    // Chave Pública do Mercado Pago
+    const MP_PUBLIC_KEY = window.CRIVOS_MP_PUBLIC_KEY || 'TEST-4476765927390023-060520-a8fe78b4873b8944f0719177c1cf8366-200773649';
     
     let mp;
     try {
