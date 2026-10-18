@@ -440,6 +440,45 @@
       line-height: 1.5;
     }
 
+    #cardPaymentBrick_container {
+      min-height: 280px;
+      width: 100%;
+      background: var(--card-bg);
+      margin-top: 10px;
+    }
+
+    /* Força estética brutalista suíça em todos os elementos do Brick */
+    #cardPaymentBrick_container * {
+      border-radius: 0px !important;
+      box-sizing: border-box;
+    }
+
+    #cardPaymentBrick_container iframe {
+      border-radius: 0px !important;
+    }
+
+    /* Botão de pagamento do Brick padronizado no estilo CRIVOS */
+    #cardPaymentBrick_container button[type="submit"],
+    #cardPaymentBrick_container .mp-bricks-btn {
+      font-family: 'JetBrains Mono', monospace !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.5px !important;
+      text-transform: uppercase !important;
+      border-radius: 0px !important;
+      background-color: var(--accent-color) !important;
+      color: #FFFFFF !important;
+      border: 1px solid var(--border-color) !important;
+      box-shadow: 2px 2px 0px var(--border-color) !important;
+      cursor: pointer !important;
+      transition: transform 0.1s ease, box-shadow 0.1s ease !important;
+    }
+
+    #cardPaymentBrick_container button[type="submit"]:hover,
+    #cardPaymentBrick_container .mp-bricks-btn:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 3px 3px 0px var(--border-color) !important;
+    }
+
     @media (max-width: 540px) {
       .grid-2 {
         grid-template-columns: 1fr;
@@ -645,6 +684,18 @@
       const next = current === 'dark' ? 'light' : 'dark';
       html.setAttribute('data-theme', next);
       localStorage.setItem('crivos_web_theme', next);
+
+      // Se o terminal de cartão estiver montado, recria com a paleta do novo tema
+      if (cardBrickController) {
+        try {
+          cardBrickController.unmount();
+        } catch (e) {}
+        cardBrickController = null;
+        cardBrickInitialized = false;
+        if (currentMethod === 'card') {
+          initCardForm();
+        }
+      }
     }
     const initialTheme = localStorage.getItem('crivos_web_theme') || 'light';
     document.documentElement.setAttribute('data-theme', initialTheme);
@@ -933,6 +984,8 @@
       const currentAmount = parseFloat(planData[productSelect.value].price);
       const email = userOrderData.email || document.getElementById('user-email').value || 'candidato@crivos.com.br';
 
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+
       try {
         const bricksBuilder = mp.bricks();
 
@@ -943,7 +996,68 @@
           },
           customization: {
             visual: {
-              style: { theme: 'default' },
+              style: {
+                theme: isDark ? 'dark' : 'default',
+                customVariables: {
+                  theme: isDark ? 'dark' : 'default',
+                  baseColor: '#D92B2B',
+                  baseColorFirstVariant: '#B52222',
+                  baseColorSecondVariant: '#8F1B1B',
+                  errorColor: '#D92B2B',
+                  successColor: '#0d9488',
+                  outlinePrimaryColor: '#D92B2B',
+                  outlineSecondaryColor: isDark ? '#333333' : '#111111',
+                  buttonTextColor: '#FFFFFF',
+                  textPrimaryColor: isDark ? '#F4F4F0' : '#111111',
+                  textSecondaryColor: isDark ? '#A0A0A0' : '#666666',
+                  inputBackgroundColor: isDark ? '#1A1A1A' : '#F4F4F0',
+                  formBackgroundColor: isDark ? '#141414' : '#FFFFFF',
+                  fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+                  borderRadiusSmall: '0px',
+                  borderRadiusMedium: '0px',
+                  borderRadiusLarge: '0px',
+                  borderRadiusFull: '0px',
+                  formInputsBaseRadius: '0px',
+                  buttonBorderRadius: '0px',
+                  inputFocusedBoxShadow: '0 0 0 2px #D92B2B',
+                  inputErrorFocusedBoxShadow: '0 0 0 2px #D92B2B',
+                }
+              },
+              texts: {
+                formTitle: 'DADOS DO CARTÃO DE CRÉDITO',
+                formSubmit: '[ CONFIRMAR PAGAMENTO VIA CARTÃO ]',
+                email: {
+                  label: 'E-MAIL',
+                  placeholder: 'seu.email@dominio.com',
+                },
+                cardholderName: {
+                  label: 'NOME IMPRESSO NO CARTÃO',
+                  placeholder: 'Como está gravado no cartão',
+                },
+                cardNumber: {
+                  label: 'NÚMERO DO CARTÃO',
+                  placeholder: '0000 0000 0000 0000',
+                },
+                expirationDate: {
+                  label: 'VALIDADE (MM/AA)',
+                  placeholder: 'MM/AA',
+                },
+                securityCode: {
+                  label: 'CÓDIGO DE SEGURANÇA (CVV)',
+                  placeholder: '123',
+                },
+                installments: {
+                  label: 'PARCELAMENTO',
+                  placeholder: 'Selecione o número de parcelas',
+                },
+                identificationType: {
+                  label: 'TIPO DE DOCUMENTO',
+                },
+                identificationNumber: {
+                  label: 'CPF / CNPJ DO TITULAR',
+                  placeholder: '000.000.000-00',
+                },
+              },
             },
             paymentMethods: {
               maxInstallments: 12,
