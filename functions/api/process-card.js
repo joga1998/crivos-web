@@ -62,7 +62,7 @@ export async function onRequestPost(context) {
     }
 
     const cleanDocNumber = docNumber ? String(docNumber).replace(/\D/g, '') : '';
-    const cleanDocType = docType || 'CPF';
+    const cleanDocType = docType || (cleanDocNumber.length > 11 ? 'CNPJ' : 'CPF');
 
     const idempotencyKey = `card-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 

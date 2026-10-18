@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CRIVOS // Checkout Seguro</title>
+  <title>CRIVOS // Configuração do Sistema & Checkout</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
@@ -59,9 +59,8 @@
       padding: 20px 20px 60px 20px;
     }
 
-    /* Top Bar */
     .top-bar {
-      max-width: 620px;
+      max-width: 640px;
       margin: 0 auto 20px auto;
       display: flex;
       justify-content: space-between;
@@ -92,14 +91,47 @@
       font-weight: 700;
     }
 
-    /* Card Principal */
     .checkout-container {
-      max-width: 620px;
+      max-width: 640px;
       margin: 0 auto;
       background: var(--card-bg);
       border: 1px solid var(--border-color);
       box-shadow: var(--box-shadow);
       padding: 32px 28px;
+    }
+
+    /* Indicador Visual de Etapas */
+    .steps-nav {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .step-indicator {
+      border: 1px solid var(--border-color);
+      background: var(--input-bg);
+      padding: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-muted);
+    }
+
+    .step-indicator.active {
+      background: var(--text-color);
+      color: var(--bg-color);
+      border-color: var(--text-color);
+      box-shadow: 2px 2px 0px var(--accent-color);
+    }
+
+    .step-indicator.done {
+      background: var(--card-bg);
+      color: var(--text-color);
+      border-color: var(--border-color);
     }
 
     .header-tag {
@@ -110,7 +142,7 @@
       color: #FFFFFF;
       padding: 4px 8px;
       display: inline-block;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       font-weight: 700;
       letter-spacing: 0.5px;
     }
@@ -119,24 +151,19 @@
       font-size: 24px;
       font-weight: 900;
       text-transform: uppercase;
-      margin-bottom: 16px;
+      margin-bottom: 8px;
       letter-spacing: -0.5px;
     }
 
-    .urgency-box {
-      border: 1px dashed var(--accent-color);
-      padding: 10px 12px;
+    .step-desc {
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--text-muted);
       margin-bottom: 20px;
-      font-size: 11px;
-      font-family: 'JetBrains Mono', monospace;
-      background: var(--urgency-bg);
-      color: var(--accent-color);
-      font-weight: 700;
-      line-height: 1.4;
     }
 
     .form-group {
-      margin-bottom: 16px;
+      margin-bottom: 18px;
     }
 
     label {
@@ -149,17 +176,27 @@
       color: var(--text-color);
     }
 
-    select, input {
+    label .req {
+      color: var(--accent-color);
+    }
+
+    select, input, textarea {
       width: 100%;
       background: var(--input-bg);
       border: 1px solid var(--border-color);
-      padding: 11px 12px;
+      padding: 12px;
       font-family: 'JetBrains Mono', monospace;
       font-size: 13px;
       color: var(--text-color);
     }
 
-    select:focus, input:focus {
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+      line-height: 1.4;
+    }
+
+    select:focus, input:focus, textarea:focus {
       outline: none;
       border-color: var(--accent-color);
     }
@@ -176,73 +213,53 @@
       color: var(--text-color);
     }
 
-    /* Tabs de Método de Pagamento */
-    .tabs-header {
+    /* Alternador Edital: Upload vs Texto */
+    .edital-mode-switch {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
-      margin-bottom: 20px;
+      margin-bottom: 12px;
     }
 
-    .tab-btn {
+    .edital-mode-btn {
       background: var(--input-bg);
-      color: var(--text-color);
       border: 1px solid var(--border-color);
-      padding: 12px;
+      color: var(--text-color);
+      padding: 8px 10px;
       font-family: 'JetBrains Mono', monospace;
       font-size: 11px;
       font-weight: 700;
-      text-transform: uppercase;
       cursor: pointer;
       text-align: center;
     }
 
-    .tab-btn.active {
-      background: var(--text-color);
-      color: var(--bg-color);
-      border-color: var(--text-color);
-      box-shadow: 2px 2px 0px var(--accent-color);
+    .edital-mode-btn.active {
+      background: var(--card-bg);
+      border-left: 3px solid var(--accent-color);
+      font-weight: 700;
     }
 
-    /* Sistema de Abas Acessível para SDKs de Cartão */
-    .tab-content {
-      position: absolute;
-      top: -9999px;
-      left: -9999px;
-      opacity: 0;
-      pointer-events: none;
-      visibility: hidden;
-      height: 0;
-      overflow: hidden;
-    }
-
-    .tab-content.active {
-      position: relative;
-      top: 0;
-      left: 0;
-      opacity: 1;
-      pointer-events: auto;
-      visibility: visible;
-      height: auto;
-      overflow: visible;
-    }
-
-    .mp-container {
+    .upload-zone {
+      border: 2px dashed var(--border-color);
       background: var(--input-bg);
-      border: 1px solid var(--border-color);
-      min-height: 48px;
-      height: 48px;
-      display: block;
-      margin-bottom: 4px;
-      position: relative;
-      padding: 0;
+      padding: 18px;
+      text-align: center;
+      cursor: pointer;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      margin-bottom: 6px;
     }
 
-    .mp-container iframe {
-      width: 100% !important;
-      height: 100% !important;
-      min-height: 46px !important;
-      border: none !important;
+    .upload-zone:hover {
+      border-color: var(--accent-color);
+    }
+
+    .file-selected-name {
+      display: block;
+      margin-top: 8px;
+      font-weight: 700;
+      color: var(--accent-color);
+      word-break: break-all;
     }
 
     .grid-2 {
@@ -271,9 +288,18 @@
       color: #FFFFFF;
     }
 
-    .submit-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
+    .btn-secondary {
+      background: var(--input-bg);
+      color: var(--text-color);
+      box-shadow: none;
+      margin-top: 8px;
+      padding: 12px;
+      font-size: 12px;
+    }
+
+    .btn-secondary:hover {
+      background: var(--card-bg);
+      color: var(--text-color);
     }
 
     .submit-btn.btn-pix {
@@ -286,7 +312,51 @@
       background: #0f766e;
     }
 
-    /* Container de exibição do Pix */
+    /* Etapa 2: Métodos de Pagamento */
+    .tabs-header {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      background: var(--input-bg);
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+      padding: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .tab-btn.active {
+      background: var(--text-color);
+      color: var(--bg-color);
+      border-color: var(--text-color);
+      box-shadow: 2px 2px 0px var(--accent-color);
+    }
+
+    .mp-container {
+      background: var(--input-bg);
+      border: 1px solid var(--border-color);
+      min-height: 48px;
+      height: 48px;
+      display: block;
+      margin-bottom: 4px;
+      position: relative;
+    }
+
+    .mp-container iframe {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 46px !important;
+      border: none !important;
+    }
+
     .pix-display-box {
       display: none;
       background: var(--input-bg);
@@ -350,6 +420,17 @@
       display: none;
     }
 
+    .summary-badge {
+      background: var(--input-bg);
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--accent-color);
+      padding: 10px 14px;
+      margin-bottom: 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      line-height: 1.6;
+    }
+
     .secure-footer {
       margin-top: 24px;
       text-align: center;
@@ -359,8 +440,11 @@
       line-height: 1.5;
     }
 
-    @media (max-width: 520px) {
+    @media (max-width: 540px) {
       .grid-2 {
+        grid-template-columns: 1fr;
+      }
+      .steps-nav {
         grid-template-columns: 1fr;
       }
     }
@@ -374,143 +458,216 @@
   </header>
 
   <div class="checkout-container">
-    <div class="header-tag">[ AMBIENTE DE PAGAMENTO CRIPTOGRAFADO // MERCADO PAGO ]</div>
-    <h1>Checkout CRIVOS</h1>
-
-    <div class="urgency-box">
-      [!] ATENÇÃO: As vagas para calibração e envio em até 48h possuem limite técnico semanal para garantir precisão e densidade de análise do edital.
+    
+    <!-- Barra de Progresso das Etapas -->
+    <div class="steps-nav">
+      <div id="step-nav-1" class="step-indicator active">
+        <span>[01]</span> DADOS DO EDITAL &amp; ACESSO
+      </div>
+      <div id="step-nav-2" class="step-indicator">
+        <span>[02]</span> CHECKOUT SEGURO
+      </div>
     </div>
 
     <div id="checkout-error" class="error-msg"></div>
 
-    <!-- Seletor de Plano Unificado -->
-    <div class="form-group">
-      <label for="product-select">01. SELEÇÃO DO SISTEMA</label>
-      <select id="product-select">
-        <option value="tatico">Nível 1 · Tático — R$ 67,00 (Pagamento Único)</option>
-        <option value="arsenal">Nível 2 · Arsenal (Com Motor SM-2) — R$ 124,00</option>
-        <option value="elite">Nível 3 · Elite (Pacote Completo) — R$ 221,00</option>
-      </select>
-    </div>
+    <!-- ======================================================== -->
+    <!-- ETAPA 1: DADOS DO CONCURSO, EDITAL E E-MAIL               -->
+    <!-- ======================================================== -->
+    <div id="stage-1">
+      <div class="header-tag">[ ETAPA 01 // ESPECIFICAÇÃO DE ENGENHARIA ]</div>
+      <h1>Seu Concurso &amp; Rotina</h1>
+      <p class="step-desc">
+        Informe o concurso desejado e anexe seu edital (ou descreva os cargos/tópicos). Seu e-mail será vinculado ao seu futuro painel de estudos.
+      </p>
 
-    <!-- Descritivo Técnico do Plano -->
-    <div id="plan-description-box" class="plan-description">
-      Carregando detalhes do sistema...
-    </div>
-
-    <!-- Seletor de Método de Pagamento (Tabs) -->
-    <label>02. ESCOLHA O MÉTODO DE PAGAMENTO</label>
-    <div class="tabs-header">
-      <button type="button" class="tab-btn active" id="tab-pix-btn" onclick="switchTab('pix')">
-        ⚡ PIX (IMEDIATO)
-      </button>
-      <button type="button" class="tab-btn" id="tab-card-btn" onclick="switchTab('card')">
-        💳 CARTÃO DE CRÉDITO
-      </button>
-    </div>
-
-    <!-- TAB 1: PIX TRANSPARENTE -->
-    <div id="tab-pix" class="tab-content active">
-      <form id="pix-form" onsubmit="handlePixSubmit(event)">
+      <form id="form-stage-1" onsubmit="goToStage2(event)">
+        <!-- E-mail de Acesso -->
         <div class="form-group">
-          <label for="pix-email">SEU E-MAIL (RECEBERÁ O ACESSO)</label>
-          <input type="email" id="pix-email" placeholder="candidato@email.com" required />
+          <label for="user-email">E-MAIL DO CANDIDATO <span class="req">*</span></label>
+          <input type="email" id="user-email" placeholder="seu.email@dominio.com" required />
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);margin-top:4px;">
+            Este será o login para envio do seu link de calibração em até 48h.
+          </div>
         </div>
 
+        <!-- Concurso e Cargo -->
         <div class="grid-2">
           <div class="form-group">
-            <label for="pix-name">NOME COMPLETO</label>
-            <input type="text" id="pix-name" placeholder="Ex: Carlos Silva" required />
+            <label for="user-concurso">CONCURSO / EXAME ALVO <span class="req">*</span></label>
+            <input type="text" id="user-concurso" placeholder="Ex: SEFAZ, Receita, CNU, OAB, etc." required />
           </div>
           <div class="form-group">
-            <label for="pix-cpf">CPF (EXIGIDO PELO BANCO CENTRAL)</label>
-            <input type="text" id="pix-cpf" placeholder="000.000.000-00" maxlength="14" required />
+            <label for="user-cargo">CARGO / ESPECIALIDADE <span class="req">*</span></label>
+            <input type="text" id="user-cargo" placeholder="Ex: Auditor Fiscal, TI, etc." required />
           </div>
         </div>
 
-        <button type="submit" id="pix-submit-btn" class="submit-btn btn-pix">
-          [ GERAR QR CODE PIX // R$ <span class="current-price-label">67,00</span> ]
+        <!-- Seleção de Plano -->
+        <div class="form-group">
+          <label for="product-select">PLANO ESCOLHIDO <span class="req">*</span></label>
+          <select id="product-select">
+            <option value="tatico">Nível 1 · Tático — R$ 67,00 (Pagamento Único)</option>
+            <option value="arsenal">Nível 2 · Arsenal (Com Motor SM-2) — R$ 124,00</option>
+            <option value="elite">Nível 3 · Elite (Pacote Completo) — R$ 221,00</option>
+          </select>
+        </div>
+
+        <div id="plan-description-box" class="plan-description">
+          Carregando detalhes do sistema...
+        </div>
+
+        <!-- Edital: Upload ou Descrição Detalhada -->
+        <div class="form-group">
+          <label>COMO PREFERE ENVIAR O EDITAL? <span class="req">*</span></label>
+          <div class="edital-mode-switch">
+            <button type="button" class="edital-mode-btn active" id="btn-mode-upload" onclick="setEditalMode('upload')">
+              📎 UPLOAD DO PDF / EDITAL
+            </button>
+            <button type="button" class="edital-mode-btn" id="btn-mode-text" onclick="setEditalMode('text')">
+              ✍ DESCREVER DETALHES
+            </button>
+          </div>
+
+          <!-- Bloco Upload -->
+          <div id="edital-upload-block">
+            <div class="upload-zone" onclick="document.getElementById('edital-file').click()">
+              <input type="file" id="edital-file" accept=".pdf,.doc,.docx,.png,.jpg" style="display:none;" onchange="handleFileSelect(event)" />
+              <div>Clique ou arraste o PDF do edital aqui</div>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">Formatos aceitos: PDF, DOC, DOCX ou Imagens</div>
+              <span id="file-chosen-text" class="file-selected-name"></span>
+            </div>
+          </div>
+
+          <!-- Bloco Texto / Descrição -->
+          <div id="edital-text-block" style="display:none;">
+            <textarea id="edital-description" placeholder="Cole o link do edital ou descreva disciplinas, banca e matérias de foco que deseja priorizar..."></textarea>
+          </div>
+        </div>
+
+        <button type="submit" class="submit-btn">
+          [ AVANÇAR PARA PAGAMENTO // R$ <span class="current-price-label">67,00</span> ] →
         </button>
       </form>
+    </div>
 
-      <!-- Caixa de Exibição do QR Code Pix Gerado -->
-      <div id="pix-display" class="pix-display-box">
-        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--pix-green);">
-          [✓ PIX GERADO // AGUARDANDO PAGAMENTO]
-        </div>
-        <img id="pix-qr-img" class="pix-qr-img" alt="QR Code PIX Mercado Pago" />
-        
-        <p style="font-size:11px;font-family:'JetBrains Mono',monospace;margin-bottom:8px;">
-          Escaneie o QR Code acima no app do seu banco ou copie o código Pix:
-        </p>
+    <!-- ======================================================== -->
+    <!-- ETAPA 2: CHECKOUT TRANSPARENTE (PIX / CARTÃO)             -->
+    <!-- ======================================================== -->
+    <div id="stage-2" style="display:none;">
+      <div class="header-tag">[ ETAPA 02 // CHECKOUT CRIPTOGRAFADO MERCADO PAGO ]</div>
+      <h1>Pagamento Seguro</h1>
 
-        <input type="text" id="pix-code-str" class="pix-code-input" readonly />
-        <button type="button" class="submit-btn" style="margin-top:0;padding:10px;font-size:12px;" onclick="copyPixCode()">
-          [ COPIAR CÓDIGO PIX ]
+      <!-- Resumo dos Dados Preenchidos na Etapa 1 -->
+      <div class="summary-badge" id="order-summary-box">
+        <div><strong>CANDIDATO:</strong> <span id="sum-email">...</span></div>
+        <div><strong>EDITAL ALVO:</strong> <span id="sum-concurso">...</span> (<span id="sum-cargo">...</span>)</div>
+        <div><strong>PLANO:</strong> <span id="sum-plano">...</span> — <strong>R$ <span class="current-price-label">67,00</span></strong></div>
+      </div>
+
+      <!-- Abas de Pagamento -->
+      <label>ESCOLHA O MÉTODO DE PAGAMENTO</label>
+      <div class="tabs-header">
+        <button type="button" class="tab-btn active" id="tab-pix-btn" onclick="switchPaymentMethod('pix')">
+          ⚡ PIX (IMEDIATO)
         </button>
+        <button type="button" class="tab-btn" id="tab-card-btn" onclick="switchPaymentMethod('card')">
+          💳 CARTÃO DE CRÉDITO
+        </button>
+      </div>
 
-        <div class="pix-status-polling">
-          <span class="pulse-dot"></span>
-          <span>Sincronizando com o Banco Central...</span>
+      <!-- MÉTODO 1: PIX -->
+      <div id="method-pix">
+        <form id="pix-form" onsubmit="handlePixSubmit(event)">
+          <div class="grid-2">
+            <div class="form-group">
+              <label for="pix-name">NOME COMPLETO <span class="req">*</span></label>
+              <input type="text" id="pix-name" placeholder="Ex: Carlos Silva" required />
+            </div>
+            <div class="form-group">
+              <label for="pix-cpf">CPF / CNPJ <span class="req">*</span></label>
+              <input type="text" id="pix-cpf" placeholder="000.000.000-00" required />
+            </div>
+          </div>
+
+          <button type="submit" id="pix-submit-btn" class="submit-btn btn-pix">
+            [ GERAR QR CODE PIX // R$ <span class="current-price-label">67,00</span> ]
+          </button>
+        </form>
+
+        <div id="pix-display" class="pix-display-box">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--pix-green);">
+            [✓ PIX GERADO // AGUARDANDO PAGAMENTO]
+          </div>
+          <img id="pix-qr-img" class="pix-qr-img" alt="QR Code PIX Mercado Pago" />
+          
+          <p style="font-size:11px;font-family:'JetBrains Mono',monospace;margin-bottom:8px;">
+            Escaneie o QR Code no app do seu banco ou copie o código Pix abaixo:
+          </p>
+
+          <input type="text" id="pix-code-str" class="pix-code-input" readonly />
+          <button type="button" class="submit-btn" style="margin-top:0;padding:10px;font-size:12px;" onclick="copyPixCode()">
+            [ COPIAR CÓDIGO PIX ]
+          </button>
+
+          <div class="pix-status-polling">
+            <span class="pulse-dot"></span>
+            <span>Sincronizando com o Banco Central...</span>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- TAB 2: CARTÃO DE CRÉDITO TRANSPARENTE -->
-    <div id="tab-card" class="tab-content">
-      <form id="form-checkout">
-        <div class="form-group">
-          <label for="form-checkout__cardholderEmail">E-MAIL DO CANDIDATO</label>
-          <input type="email" id="form-checkout__cardholderEmail" placeholder="seu.email@dominio.com" required />
-        </div>
+      <!-- MÉTODO 2: CARTÃO DE CRÉDITO -->
+      <div id="method-card" style="display:none;">
+        <form id="form-checkout">
+          <div class="grid-2">
+            <div class="form-group">
+              <label for="form-checkout__cardholderName">NOME IMPRESSO NO CARTÃO <span class="req">*</span></label>
+              <input type="text" id="form-checkout__cardholderName" placeholder="NOME COMPLETO" required />
+            </div>
+            <!-- Campo CPF / CNPJ do titular DIRETO sem Tipo de Documento -->
+            <div class="form-group">
+              <label for="form-checkout__identificationNumber">CPF / CNPJ DO TITULAR <span class="req">*</span></label>
+              <input type="text" id="form-checkout__identificationNumber" placeholder="000.000.000-00" required />
+            </div>
+          </div>
 
-        <div class="form-group">
-          <label for="form-checkout__cardholderName">NOME IMPRESSO NO CARTÃO</label>
-          <input type="text" id="form-checkout__cardholderName" placeholder="NOME COMPLETO" required />
-        </div>
-
-        <div class="grid-2">
           <div class="form-group">
-            <label for="form-checkout__identificationType">TIPO DOC.</label>
-            <select id="form-checkout__identificationType"></select>
+            <label>NÚMERO DO CARTÃO <span class="req">*</span></label>
+            <div id="form-checkout__cardNumber-container" class="mp-container"></div>
           </div>
-          <div class="form-group">
-            <label for="form-checkout__identificationNumber">CPF / CNPJ DO TITULAR</label>
-            <input type="text" id="form-checkout__identificationNumber" placeholder="000.000.000-00" required />
-          </div>
-        </div>
 
-        <div class="form-group">
-          <label>NÚMERO DO CARTÃO</label>
-          <div id="form-checkout__cardNumber-container" class="mp-container"></div>
-        </div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label>VENCIMENTO (MM/AA) <span class="req">*</span></label>
+              <div id="form-checkout__expirationDate-container" class="mp-container"></div>
+            </div>
+            <div class="form-group">
+              <label>CVV <span class="req">*</span></label>
+              <div id="form-checkout__securityCode-container" class="mp-container"></div>
+            </div>
+          </div>
 
-        <div class="grid-2">
-          <div class="form-group">
-            <label>VENCIMENTO (MM/AA)</label>
-            <div id="form-checkout__expirationDate-container" class="mp-container"></div>
+          <div class="grid-2">
+            <div class="form-group" style="display:none;" id="issuer-wrapper">
+              <label for="form-checkout__issuer">BANCO EMISSOR</label>
+              <select id="form-checkout__issuer"></select>
+            </div>
+            <div class="form-group" style="grid-column: span 2;" id="installments-wrapper">
+              <label for="form-checkout__installments">NÚMERO DE PARCELAS <span class="req">*</span></label>
+              <select id="form-checkout__installments"></select>
+            </div>
           </div>
-          <div class="form-group">
-            <label>CVV</label>
-            <div id="form-checkout__securityCode-container" class="mp-container"></div>
-          </div>
-        </div>
 
-        <div class="grid-2">
-          <div class="form-group" style="display:none;" id="issuer-wrapper">
-            <label for="form-checkout__issuer">BANCO EMISSOR</label>
-            <select id="form-checkout__issuer"></select>
-          </div>
-          <div class="form-group" style="grid-column: span 2;" id="installments-wrapper">
-            <label for="form-checkout__installments">NÚMERO DE PARCELAS</label>
-            <select id="form-checkout__installments"></select>
-          </div>
-        </div>
+          <button type="submit" id="form-checkout__submit" class="submit-btn">
+            [ PAGAR R$ <span class="current-price-label">67,00</span> NO CARTÃO ]
+          </button>
+        </form>
+      </div>
 
-        <button type="submit" id="form-checkout__submit" class="submit-btn">
-          [ PAGAR R$ <span class="current-price-label">67,00</span> NO CARTÃO ]
-        </button>
-      </form>
+      <button type="button" class="submit-btn btn-secondary" onclick="backToStage1()">
+        [← VOLTAR E EDITAR DADOS DO CONCURSO]
+      </button>
     </div>
 
     <div class="secure-footer">
@@ -531,7 +688,7 @@
     const initialTheme = localStorage.getItem('crivos_web_theme') || 'light';
     document.documentElement.setAttribute('data-theme', initialTheme);
 
-    // Chave Pública do Mercado Pago
+    // Chave Pública de Teste do Mercado Pago
     const MP_PUBLIC_KEY = window.CRIVOS_MP_PUBLIC_KEY || 'TEST-4476765927390023-060520-a8fe78b4873b8944f0719177c1cf8366-200773649';
     
     let mp;
@@ -544,19 +701,22 @@
     // Tabela e dados dos planos
     const planData = {
       tatico: {
+        title: "Nível 1 · Tático",
         price: "67.00",
         formatted: "67,00",
-        desc: "<strong>[ NÍVEL 1: TÁTICO — EXECUÇÃO ]</strong><br>Sistema enxuto e cirúrgico para quem precisa estudar o que realmente cai. Você envia o edital e sua disponibilidade semanal; nós devolvemos seu cronograma diário estruturado com pesos de banca."
+        desc: "<strong>[ NÍVEL 1: TÁTICO — EXECUÇÃO ]</strong><br>Sistema enxuto e cirúrgico para quem precisa estudar o que realmente cai. Você envia o edital e sua rotina semanal; nós devolvemos seu cronograma diário estruturado com pesos estatísticos."
       },
       arsenal: {
+        title: "Nível 2 · Arsenal (SM-2)",
         price: "124.00",
         formatted: "124,00",
         desc: "<strong>[ NÍVEL 2: ARSENAL — RETENÇÃO ATIVA + SM-2 ]</strong><br>Tudo do Nível Tático acoplado ao motor de repetição espaçada SuperMemo-2 (SM-2), banco de flashcards de alta densidade e mapa de conexões conceituais."
       },
       elite: {
+        title: "Nível 3 · Elite",
         price: "221.00",
         formatted: "221,00",
-        desc: "<strong>[ NÍVEL 3: ELITE — ECOSSISTEMA COMPLETO ]</strong><br>O pacote integral de engenharia: Tático + Arsenal + Simulador cronometrado de Discursivas e Grade técnica espelhada nos critérios da sua banca examinadora."
+        desc: "<strong>[ NÍVEL 3: ELITE — ECOSSISTEMA COMPLETO ]</strong><br>O pacote integral de engenharia: Tático + Arsenal + Simulador cronometrado de Discursivas e Grade técnica espelhada nos critérios da banca examinadora."
       }
     };
 
@@ -588,17 +748,23 @@
       }
     });
 
-    let cardFormInitialized = false;
+    // Controle de Envio do Edital (Upload vs Descrição)
+    let editalMode = 'upload';
+    function setEditalMode(mode) {
+      editalMode = mode;
+      document.getElementById('btn-mode-upload').classList.toggle('active', mode === 'upload');
+      document.getElementById('btn-mode-text').classList.toggle('active', mode === 'text');
+      document.getElementById('edital-upload-block').style.display = mode === 'upload' ? 'block' : 'none';
+      document.getElementById('edital-text-block').style.display = mode === 'text' ? 'block' : 'none';
+    }
 
-    // Alternador de Abas
-    function switchTab(tab) {
-      document.getElementById('tab-pix-btn').classList.toggle('active', tab === 'pix');
-      document.getElementById('tab-card-btn').classList.toggle('active', tab === 'card');
-      document.getElementById('tab-pix').classList.toggle('active', tab === 'pix');
-      document.getElementById('tab-card').classList.toggle('active', tab === 'card');
-
-      if (tab === 'card' && !cardFormInitialized) {
-        initCardForm();
+    function handleFileSelect(e) {
+      const file = e.target.files[0];
+      const textElem = document.getElementById('file-chosen-text');
+      if (file) {
+        textElem.textContent = `[✓ ARQUIVO SELECIONADO: ${file.name}]`;
+      } else {
+        textElem.textContent = '';
       }
     }
 
@@ -614,7 +780,79 @@
     }
 
     // ==========================================
-    // FLUXO 1: PIX TRANSPARENTE
+    // TRANSIÇÃO DE ETAPAS (1 -> 2 e 2 -> 1)
+    // ==========================================
+    let userOrderData = {};
+
+    function goToStage2(e) {
+      e.preventDefault();
+      hideError();
+
+      const email = document.getElementById('user-email').value.trim();
+      const concurso = document.getElementById('user-concurso').value.trim();
+      const cargo = document.getElementById('user-cargo').value.trim();
+      const planKey = productSelect.value;
+
+      if (!email || !concurso || !cargo) {
+        showError('Por favor preencha todos os campos obrigatórios da Etapa 1.');
+        return;
+      }
+
+      userOrderData = {
+        email,
+        concurso,
+        cargo,
+        planKey,
+      };
+
+      // Atualiza o resumo da Etapa 2
+      document.getElementById('sum-email').textContent = email;
+      document.getElementById('sum-concurso').textContent = concurso;
+      document.getElementById('sum-cargo').textContent = cargo;
+      document.getElementById('sum-plano').textContent = planData[planKey].title;
+
+      // Troca visual das etapas
+      document.getElementById('stage-1').style.display = 'none';
+      document.getElementById('stage-2').style.display = 'block';
+
+      document.getElementById('step-nav-1').classList.remove('active');
+      document.getElementById('step-nav-1').classList.add('done');
+      document.getElementById('step-nav-2').classList.add('active');
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function backToStage1() {
+      hideError();
+      document.getElementById('stage-2').style.display = 'none';
+      document.getElementById('stage-1').style.display = 'block';
+
+      document.getElementById('step-nav-2').classList.remove('active');
+      document.getElementById('step-nav-1').classList.remove('done');
+      document.getElementById('step-nav-1').classList.add('active');
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ==========================================
+    // SELETOR DE MÉTODO DE PAGAMENTO
+    // ==========================================
+    let currentMethod = 'pix';
+    function switchPaymentMethod(method) {
+      currentMethod = method;
+      document.getElementById('tab-pix-btn').classList.toggle('active', method === 'pix');
+      document.getElementById('tab-card-btn').classList.toggle('active', method === 'card');
+      
+      document.getElementById('method-pix').style.display = method === 'pix' ? 'block' : 'none';
+      document.getElementById('method-card').style.display = method === 'card' ? 'block' : 'none';
+
+      if (method === 'card' && !cardFormInitialized) {
+        initCardForm();
+      }
+    }
+
+    // ==========================================
+    // FLUXO 1: PIX
     // ==========================================
     let pixPollingInterval = null;
 
@@ -623,7 +861,7 @@
       hideError();
 
       const btn = document.getElementById('pix-submit-btn');
-      const email = document.getElementById('pix-email').value;
+      const email = userOrderData.email || document.getElementById('user-email').value;
       const name = document.getElementById('pix-name').value;
       const cpf = document.getElementById('pix-cpf').value;
       const plan = productSelect.value;
@@ -655,7 +893,6 @@
           throw new Error(data.error || 'Não foi possível gerar a cobrança Pix.');
         }
 
-        // Exibe o QR Code e código
         document.getElementById('pix-form').style.display = 'none';
         const display = document.getElementById('pix-display');
         display.style.display = 'block';
@@ -665,7 +902,6 @@
         }
         document.getElementById('pix-code-str').value = data.qr_code;
 
-        // Inicia verificação automática de pagamento a cada 4 segundos
         startPixPolling(data.id);
 
       } catch (err) {
@@ -680,7 +916,7 @@
       input.select();
       input.setSelectionRange(0, 99999);
       navigator.clipboard.writeText(input.value);
-      alert('Código Pix copiado com sucesso! Abra o app do seu banco e cole na opção Pix Copia e Cola.');
+      alert('Código Pix copiado! Abra o app do seu banco e selecione Pix Copia e Cola.');
     }
 
     function startPixPolling(paymentId) {
@@ -702,6 +938,10 @@
       }, 4000);
     }
 
+    // ==========================================
+    // FLUXO 2: CARTÃO DE CRÉDITO COM SDK OFICIAL
+    // ==========================================
+    let cardFormInitialized = false;
     let cardFormInstance = null;
 
     function initCardForm() {
@@ -717,10 +957,6 @@
             cardholderName: {
               id: "form-checkout__cardholderName",
               placeholder: "NOME IMPRESSO NO CARTÃO",
-            },
-            cardholderEmail: {
-              id: "form-checkout__cardholderEmail",
-              placeholder: "E-MAIL",
             },
             cardNumber: {
               id: "form-checkout__cardNumber-container",
@@ -753,13 +989,9 @@
               id: "form-checkout__installments",
               placeholder: "Parcelas",
             },
-            identificationType: {
-              id: "form-checkout__identificationType",
-              placeholder: "Tipo de documento",
-            },
             identificationNumber: {
               id: "form-checkout__identificationNumber",
-              placeholder: "Número do documento",
+              placeholder: "CPF ou CNPJ (somente números)",
             },
             issuer: {
               id: "form-checkout__issuer",
@@ -790,6 +1022,7 @@
               try {
                 const formData = cardFormInstance.getCardFormData();
                 const selectedPlan = productSelect.value;
+                const email = userOrderData.email || document.getElementById('user-email').value;
 
                 const response = await fetch('/api/process-card', {
                   method: 'POST',
@@ -800,8 +1033,7 @@
                     payment_method_id: formData.paymentMethodId,
                     installments: formData.installments,
                     plan: selectedPlan,
-                    email: formData.cardholderEmail,
-                    docType: formData.identificationType,
+                    email: email,
                     docNumber: formData.identificationNumber,
                   }),
                 });
@@ -813,7 +1045,7 @@
                 } else if (result.status === 'in_process') {
                   window.location.href = `/sucesso.html?id=${result.id}&status=in_process`;
                 } else {
-                  throw new Error(result.error || 'Pagamento recusado. Verifique os dados ou contate a operadora do seu cartão.');
+                  throw new Error(result.error || 'Pagamento recusado pelo emissor do cartão.');
                 }
               } catch (err) {
                 showError(err.message);
