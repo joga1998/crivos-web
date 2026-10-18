@@ -6,13 +6,14 @@
   <title>CRIVOS // Checkout Seguro</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
   
   <!-- Favicon com o quadrado vermelho oficial da marca -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%23D92B2B' stroke='%23111111' stroke-width='1'/></svg>">
 
-  <!-- SDK Oficial do Mercado Pago -->
+  <!-- SDK Oficial do Mercado Pago V2 -->
   <script src="https://sdk.mercadopago.com/js/v2"></script>
+
   <style>
     :root {
       --bg-color: #F4F4F0;
@@ -20,11 +21,13 @@
       --text-color: #111111;
       --text-muted: #666666;
       --border-color: #111111;
+      --border-subtle: #DDDDDD;
       --accent-color: #D92B2B;
       --box-shadow: 4px 4px 0px #111111;
-      --btn-shadow: 2px 2px 0px #D92B2B;
+      --btn-shadow: 2px 2px 0px #111111;
       --input-bg: #F4F4F0;
-      --urgency-bg: #FFF9F9;
+      --urgency-bg: #FFF5F5;
+      --pix-green: #0d9488;
     }
 
     [data-theme="dark"] {
@@ -33,11 +36,13 @@
       --text-color: #F4F4F0;
       --text-muted: #A0A0A0;
       --border-color: #333333;
+      --border-subtle: #262626;
       --accent-color: #EF4444;
       --box-shadow: 4px 4px 0px #333333;
       --btn-shadow: 2px 2px 0px #EF4444;
       --input-bg: #1A1A1A;
       --urgency-bg: #1F1212;
+      --pix-green: #14b8a6;
     }
 
     * {
@@ -45,7 +50,7 @@
       margin: 0;
       padding: 0;
       border-radius: 0px !important;
-      transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+      transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
     }
 
     body {
@@ -55,25 +60,25 @@
       padding: 20px 20px 60px 20px;
     }
 
-    /* Barra Superior de Navegação / Status alinhada às extremidades */
+    /* Top Bar */
     .top-bar {
-      max-width: 560px;
-      margin: 0 auto 24px auto;
+      max-width: 620px;
+      margin: 0 auto 20px auto;
       display: flex;
       justify-content: space-between;
       align-items: center;
       background: var(--card-bg);
       border: 1px solid var(--border-color);
-      padding: 12px 16px;
+      padding: 10px 16px;
       box-shadow: 2px 2px 0px var(--border-color);
       font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
+      font-size: 11px;
     }
 
     .back-link {
       color: var(--text-color);
       text-decoration: none;
-      font-size: 11px;
+      font-weight: 700;
       border-bottom: 1px dashed var(--text-color);
     }
 
@@ -83,49 +88,64 @@
       border: 1px solid var(--border-color);
       padding: 4px 8px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
+      font-size: 10px;
       cursor: pointer;
+      font-weight: 700;
     }
 
+    /* Card Principal */
     .checkout-container {
-      max-width: 560px;
+      max-width: 620px;
       margin: 0 auto;
       background: var(--card-bg);
       border: 1px solid var(--border-color);
       box-shadow: var(--box-shadow);
-      padding: 32px;
+      padding: 32px 28px;
     }
 
     .header-tag {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
+      font-size: 10px;
       text-transform: uppercase;
       background: var(--accent-color);
       color: #FFFFFF;
       padding: 4px 8px;
       display: inline-block;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       font-weight: 700;
+      letter-spacing: 0.5px;
     }
 
     h1 {
       font-size: 24px;
       font-weight: 900;
       text-transform: uppercase;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       letter-spacing: -0.5px;
     }
 
-    .form-group {
+    .urgency-box {
+      border: 1px dashed var(--accent-color);
+      padding: 10px 12px;
       margin-bottom: 20px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      background: var(--urgency-bg);
+      color: var(--accent-color);
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
     }
 
     label {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
       display: block;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       text-transform: uppercase;
       color: var(--text-color);
     }
@@ -134,9 +154,9 @@
       width: 100%;
       background: var(--input-bg);
       border: 1px solid var(--border-color);
-      padding: 12px;
+      padding: 11px 12px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 14px;
+      font-size: 13px;
       color: var(--text-color);
     }
 
@@ -149,37 +169,62 @@
       background: var(--input-bg);
       border: 1px solid var(--border-color);
       border-left: 4px solid var(--accent-color);
-      padding: 14px;
-      margin-bottom: 20px;
-      font-size: 13px;
+      padding: 12px 14px;
+      margin-bottom: 22px;
+      font-size: 12px;
       line-height: 1.5;
       font-family: 'JetBrains Mono', monospace;
       color: var(--text-color);
     }
 
-    .urgency-box {
-      border: 1px dashed var(--border-color);
-      padding: 10px 14px;
+    /* Tabs de Método de Pagamento */
+    .tabs-header {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
       margin-bottom: 20px;
-      font-size: 11px;
+    }
+
+    .tab-btn {
+      background: var(--input-bg);
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+      padding: 12px;
       font-family: 'JetBrains Mono', monospace;
-      background: var(--urgency-bg);
-      color: var(--accent-color);
+      font-size: 11px;
       font-weight: 700;
+      text-transform: uppercase;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .tab-btn.active {
+      background: var(--text-color);
+      color: var(--bg-color);
+      border-color: var(--text-color);
+      box-shadow: 2px 2px 0px var(--accent-color);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
     }
 
     .mp-container {
       background: var(--input-bg);
       border: 1px solid var(--border-color);
-      padding: 12px;
-      min-height: 45px;
+      padding: 10px 12px;
+      min-height: 44px;
       margin-bottom: 4px;
     }
 
     .grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 16px;
+      gap: 12px;
     }
 
     .submit-btn {
@@ -187,244 +232,555 @@
       background: var(--text-color);
       color: var(--bg-color);
       border: 1px solid var(--border-color);
-      padding: 16px;
+      padding: 15px;
       font-family: 'Inter', sans-serif;
       font-weight: 800;
       font-size: 14px;
       text-transform: uppercase;
       cursor: pointer;
       box-shadow: var(--btn-shadow);
-      margin-top: 8px;
-      transition: transform 0.1s ease;
+      margin-top: 10px;
     }
 
-    .submit-btn:hover {
+    .submit-btn:hover:not(:disabled) {
       background: var(--accent-color);
       color: #FFFFFF;
-      box-shadow: 2px 2px 0px var(--border-color);
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .submit-btn.btn-pix {
+      background: var(--pix-green);
+      color: #FFFFFF;
+      border-color: var(--border-color);
+    }
+
+    .submit-btn.btn-pix:hover:not(:disabled) {
+      background: #0f766e;
+    }
+
+    /* Container de exibição do Pix */
+    .pix-display-box {
+      display: none;
+      background: var(--input-bg);
+      border: 1px solid var(--border-color);
+      padding: 20px;
+      text-align: center;
+      margin-top: 16px;
+    }
+
+    .pix-qr-img {
+      max-width: 200px;
+      margin: 12px auto;
+      display: block;
+      border: 1px solid var(--border-color);
+      background: #FFFFFF;
+      padding: 8px;
+    }
+
+    .pix-code-input {
+      font-size: 11px;
+      padding: 8px;
+      text-align: center;
+      margin-bottom: 8px;
+      background: var(--card-bg);
+    }
+
+    .pix-status-polling {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--accent-color);
+      margin-top: 12px;
+      font-weight: 700;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--accent-color);
+      border-radius: 50% !important;
+      display: inline-block;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .error-msg {
+      background: var(--urgency-bg);
+      color: var(--accent-color);
+      border: 1px solid var(--accent-color);
+      padding: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      margin-bottom: 14px;
+      display: none;
     }
 
     .secure-footer {
       margin-top: 24px;
       text-align: center;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
+      font-size: 10px;
       color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    @media (max-width: 520px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
 
-  <!-- Barra Superior de Navegação com botão alinhado à direita -->
   <header class="top-bar">
     <a href="index.html" class="back-link">[← VOLTAR À VITRINE]</a>
-    <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()">[ DIA/NOITE ]</button>
+    <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()">[ ◐ TEMA ]</button>
   </header>
 
   <div class="checkout-container">
-    <div class="header-tag">[ AMBIENTE DE PAGAMENTO SEGURO ]</div>
+    <div class="header-tag">[ AMBIENTE DE PAGAMENTO CRIPTOGRAFADO // MERCADO PAGO ]</div>
     <h1>Checkout CRIVOS</h1>
 
-    <!-- Caixa de Urgência Técnica -->
     <div class="urgency-box">
-      [!] ATENÇÃO: As vagas para processamento de editais desta semana têm limite técnico para preservar a precisão da engenharia de rotina.
+      [!] ATENÇÃO: As vagas para calibração e envio em até 48h possuem limite técnico semanal para garantir precisão e densidade de análise do edital.
     </div>
 
-    <form id="form-checkout">
-      <!-- Seletor de Plano -->
-      <div class="form-group">
-        <label for="product-select">PLANO SELECIONADO</label>
-        <select id="product-select">
-          <option value="tatico">Nível 1 · Tático — R$ 67,00</option>
-          <option value="arsenal">Nível 2 · Arsenal (Com SM-2) — R$ 124,00</option>
-          <option value="elite">Nível 3 · Elite (Completo) — R$ 221,00</option>
-        </select>
-      </div>
+    <div id="checkout-error" class="error-msg"></div>
 
-      <!-- Descritivo Dinâmico do Plano -->
-      <div id="plan-description-box" class="plan-description">
-        Carregando detalhes do sistema...
-      </div>
+    <!-- Seletor de Plano Unificado -->
+    <div class="form-group">
+      <label for="product-select">01. SELEÇÃO DO SISTEMA</label>
+      <select id="product-select">
+        <option value="tatico">Nível 1 · Tático — R$ 67,00 (Pagamento Único)</option>
+        <option value="arsenal">Nível 2 · Arsenal (Com Motor SM-2) — R$ 124,00</option>
+        <option value="elite">Nível 3 · Elite (Pacote Completo) — R$ 221,00</option>
+      </select>
+    </div>
 
-      <!-- E-mail -->
-      <div class="form-group">
-        <label for="form-checkout__cardholderEmail">E-MAIL DO CANDIDATO</label>
-        <input type="email" id="form-checkout__cardholderEmail" placeholder="seu.email@dominio.com" required />
-      </div>
+    <!-- Descritivo Técnico do Plano -->
+    <div id="plan-description-box" class="plan-description">
+      Carregando detalhes do sistema...
+    </div>
 
-      <!-- Nome do Titular -->
-      <div class="form-group">
-        <label for="form-checkout__cardholderName">NOME IMPRESSO NO CARTÃO</label>
-        <input type="text" id="form-checkout__cardholderName" placeholder="NOME COMPLETO" required />
-      </div>
-
-      <!-- Número do Cartão -->
-      <div class="form-group">
-        <label>NÚMERO DO CARTÃO</label>
-        <div id="form-checkout__cardNumber-container" class="mp-container"></div>
-      </div>
-
-      <!-- Vencimento e CVV -->
-      <div class="grid-2">
-        <div class="form-group">
-          <label>VENCIMENTO</label>
-          <div id="form-checkout__expirationDate-container" class="mp-container"></div>
-        </div>
-        <div class="form-group">
-          <label>CVV</label>
-          <div id="form-checkout__securityCode-container" class="mp-container"></div>
-        </div>
-      </div>
-
-      <button type="submit" id="form-checkout__submit" class="submit-btn">
-        [ PROCESSAR PAGAMENTO ]
+    <!-- Seletor de Método de Pagamento (Tabs) -->
+    <label>02. ESCOLHA O MÉTODO DE PAGAMENTO</label>
+    <div class="tabs-header">
+      <button type="button" class="tab-btn active" id="tab-pix-btn" onclick="switchTab('pix')">
+        ⚡ PIX (IMEDIATO)
       </button>
-    </form>
+      <button type="button" class="tab-btn" id="tab-card-btn" onclick="switchTab('card')">
+        💳 CARTÃO DE CRÉDITO
+      </button>
+    </div>
+
+    <!-- TAB 1: PIX TRANSPARENTE -->
+    <div id="tab-pix" class="tab-content active">
+      <form id="pix-form" onsubmit="handlePixSubmit(event)">
+        <div class="form-group">
+          <label for="pix-email">SEU E-MAIL (RECEBERÁ O ACESSO)</label>
+          <input type="email" id="pix-email" placeholder="candidato@email.com" required />
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="pix-name">NOME COMPLETO</label>
+            <input type="text" id="pix-name" placeholder="Ex: Carlos Silva" required />
+          </div>
+          <div class="form-group">
+            <label for="pix-cpf">CPF (EXIGIDO PELO BANCO CENTRAL)</label>
+            <input type="text" id="pix-cpf" placeholder="000.000.000-00" maxlength="14" required />
+          </div>
+        </div>
+
+        <button type="submit" id="pix-submit-btn" class="submit-btn btn-pix">
+          [ GERAR QR CODE PIX // R$ <span class="current-price-label">67,00</span> ]
+        </button>
+      </form>
+
+      <!-- Caixa de Exibição do QR Code Pix Gerado -->
+      <div id="pix-display" class="pix-display-box">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--pix-green);">
+          [✓ PIX GERADO // AGUARDANDO PAGAMENTO]
+        </div>
+        <img id="pix-qr-img" class="pix-qr-img" alt="QR Code PIX Mercado Pago" />
+        
+        <p style="font-size:11px;font-family:'JetBrains Mono',monospace;margin-bottom:8px;">
+          Escaneie o QR Code acima no app do seu banco ou copie o código Pix:
+        </p>
+
+        <input type="text" id="pix-code-str" class="pix-code-input" readonly />
+        <button type="button" class="submit-btn" style="margin-top:0;padding:10px;font-size:12px;" onclick="copyPixCode()">
+          [ COPIAR CÓDIGO PIX ]
+        </button>
+
+        <div class="pix-status-polling">
+          <span class="pulse-dot"></span>
+          <span>Sincronizando com o Banco Central...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: CARTÃO DE CRÉDITO TRANSPARENTE -->
+    <div id="tab-card" class="tab-content">
+      <form id="form-checkout">
+        <div class="form-group">
+          <label for="form-checkout__cardholderEmail">E-MAIL DO CANDIDATO</label>
+          <input type="email" id="form-checkout__cardholderEmail" placeholder="seu.email@dominio.com" required />
+        </div>
+
+        <div class="form-group">
+          <label for="form-checkout__cardholderName">NOME IMPRESSO NO CARTÃO</label>
+          <input type="text" id="form-checkout__cardholderName" placeholder="NOME COMPLETO" required />
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="form-checkout__identificationType">TIPO DOC.</label>
+            <select id="form-checkout__identificationType"></select>
+          </div>
+          <div class="form-group">
+            <label for="form-checkout__identificationNumber">CPF / CNPJ DO TITULAR</label>
+            <input type="text" id="form-checkout__identificationNumber" placeholder="000.000.000-00" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>NÚMERO DO CARTÃO</label>
+          <div id="form-checkout__cardNumber-container" class="mp-container"></div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label>VENCIMENTO (MM/AA)</label>
+            <div id="form-checkout__expirationDate-container" class="mp-container"></div>
+          </div>
+          <div class="form-group">
+            <label>CVV</label>
+            <div id="form-checkout__securityCode-container" class="mp-container"></div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group" style="display:none;" id="issuer-wrapper">
+            <label for="form-checkout__issuer">BANCO EMISSOR</label>
+            <select id="form-checkout__issuer"></select>
+          </div>
+          <div class="form-group" style="grid-column: span 2;" id="installments-wrapper">
+            <label for="form-checkout__installments">NÚMERO DE PARCELAS</label>
+            <select id="form-checkout__installments"></select>
+          </div>
+        </div>
+
+        <button type="submit" id="form-checkout__submit" class="submit-btn">
+          [ PAGAR R$ <span class="current-price-label">67,00</span> NO CARTÃO ]
+        </button>
+      </form>
+    </div>
 
     <div class="secure-footer">
-      CRIVOS Inteligência para Concursos e Exames // Processamento criptografado via Mercado Pago<br>
-      [i] Acesso liberado no painel exclusivo em até 48h após a confirmação.
+      CRIVOS // Sistemas de Estudo Sob Demanda • Processamento criptografado via Mercado Pago<br>
+      Acesso liberado e início da calibração tática em até 48h após a confirmação.
     </div>
   </div>
 
   <script>
-    // Lógica do Modo Noturno (Sincronizada com o estado global)
+    // Gerenciador de Tema
     function toggleTheme() {
       const html = document.documentElement;
-      const currentTheme = html.getAttribute('data-theme');
-      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-      html.setAttribute('data-theme', newTheme);
-      localStorage.setItem('crivos_theme', newTheme);
+      const current = html.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      localStorage.setItem('crivos_web_theme', next);
+    }
+    const initialTheme = localStorage.getItem('crivos_web_theme') || 'light';
+    document.documentElement.setAttribute('data-theme', initialTheme);
+
+    // Chave Pública do Mercado Pago (Substitua pela sua Public Key ou configure no deploy)
+    const MP_PUBLIC_KEY = window.CRIVOS_MP_PUBLIC_KEY || 'TEST-00000000-0000-0000-0000-000000000000';
+    
+    let mp;
+    try {
+      mp = new MercadoPago(MP_PUBLIC_KEY, { locale: 'pt-BR' });
+    } catch (e) {
+      console.warn("Mercado Pago SDK precisa de uma Public Key válida:", e);
     }
 
-    // Carrega a preferência salva de tema ao iniciar
-    const savedTheme = localStorage.getItem('crivos_theme') || 'light';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-
-    // Inicializa o SDK do Mercado Pago com sua Public Key
-    const mp = new MercadoPago('SUA_PUBLIC_KEY_DO_MERCADO_PAGO', {
-      locale: 'pt-BR'
-    });
-
-    // Dados e descritivos dos planos
+    // Tabela e dados dos planos
     const planData = {
       tatico: {
         price: "67.00",
-        desc: "<strong>[ O BÁSICO DE EXECUÇÃO ]</strong><br>O sistema operacional enxuto para quem tem pouco tempo. Você entrega o edital e a rotina; nós devolvemos o cronograma tático dia a dia em grade rígida, sem firulas teóricas. Foco total em alta incidência."
+        formatted: "67,00",
+        desc: "<strong>[ NÍVEL 1: TÁTICO — EXECUÇÃO ]</strong><br>Sistema enxuto e cirúrgico para quem precisa estudar o que realmente cai. Você envia o edital e sua disponibilidade semanal; nós devolvemos seu cronograma diário estruturado com pesos de banca."
       },
       arsenal: {
         price: "124.00",
-        desc: "<strong>[ SISTEMA + RETENÇÃO ATIVA ]</strong><br>Tudo do Nível Tático acoplado ao motor de memorização de longo prazo (baseado em repetição espaçada SM-2). Ideal para quem absorve a teoria mas sofre com o 'branco' na hora da prova."
+        formatted: "124,00",
+        desc: "<strong>[ NÍVEL 2: ARSENAL — RETENÇÃO ATIVA + SM-2 ]</strong><br>Tudo do Nível Tático acoplado ao motor de repetição espaçada SuperMemo-2 (SM-2), banco de flashcards de alta densidade e mapa de conexões conceituais."
       },
       elite: {
         price: "221.00",
-        desc: "<strong>[ O ECOSSISTEMA DE ALTA PERFORMANCE ]</strong><br>A engenharia completa de aprovação. Inclui cronograma tático adaptativo, motor SM-2, simulados de auditoria e arguição. Para quem exige margem de segurança absoluta contra a banca."
+        formatted: "221,00",
+        desc: "<strong>[ NÍVEL 3: ELITE — ECOSSISTEMA COMPLETO ]</strong><br>O pacote integral de engenharia: Tático + Arsenal + Simulador cronometrado de Discursivas e Grade técnica espelhada nos critérios da sua banca examinadora."
       }
     };
 
     const productSelect = document.getElementById('product-select');
     const descBox = document.getElementById('plan-description-box');
+    const priceLabels = document.querySelectorAll('.current-price-label');
 
-    // Lê o parâmetro da URL para pré-selecionar o produto (ex: /payment.html?produto=arsenal)
+    // Lê query param ?produto=tatico|arsenal|elite
     const urlParams = new URLSearchParams(window.location.search);
-    const produtoParam = urlParams.get('produto');
-
+    const produtoParam = (urlParams.get('produto') || '').toLowerCase();
     if (produtoParam && planData[produtoParam]) {
       productSelect.value = produtoParam;
     }
 
-    // Função para atualizar o texto descritivo com base no select
-    function updatePlanDetails() {
-      const selectedKey = productSelect.value;
-      descBox.innerHTML = planData[selectedKey].desc;
-      return planData[selectedKey].price;
+    function updatePlanUI() {
+      const key = productSelect.value;
+      const plan = planData[key];
+      descBox.innerHTML = plan.desc;
+      priceLabels.forEach(lbl => lbl.textContent = plan.formatted);
+      return plan.price;
     }
 
-    let currentAmount = updatePlanDetails();
+    updatePlanUI();
 
     productSelect.addEventListener('change', () => {
-      currentAmount = updatePlanDetails();
+      const newPrice = updatePlanUI();
+      if (cardFormInstance && cardFormInstance.setAmount) {
+        cardFormInstance.setAmount(newPrice);
+      }
     });
 
-    // Monta o formulário de cartão seguro do Mercado Pago
-    const cardForm = mp.cardForm({
-      amount: currentAmount,
-      autoMount: true,
-      processingMode: "aggregator",
-      form: {
-        id: "form-checkout",
-        cardholderName: {
-          id: "form-checkout__cardholderName",
-        },
-        cardholderEmail: {
-          id: "form-checkout__cardholderEmail",
-        },
-        securityCode: {
-          id: "form-checkout__securityCode-container",
-        },
-        expirationDate: {
-          id: "form-checkout__expirationDate-container",
-        },
-        cardNumber: {
-          id: "form-checkout__cardNumber-container",
-        },
-      },
-      callbacks: {
-        onFormMounted: error => {
-          if (error) return console.warn("Erro ao montar o form do cartão: ", error);
-        },
-        onSubmit: event => {
-          event.preventDefault();
+    // Alternador de Abas
+    function switchTab(tab) {
+      document.getElementById('tab-pix-btn').classList.toggle('active', tab === 'pix');
+      document.getElementById('tab-card-btn').classList.toggle('active', tab === 'card');
+      document.getElementById('tab-pix').classList.toggle('active', tab === 'pix');
+      document.getElementById('tab-card').classList.toggle('active', tab === 'card');
+    }
 
-          const {
-            paymentMethodId: payment_method_id,
-            issuerId: issuer_id,
-            cardholderEmail: email,
-            token,
-            installments,
-            identificationNumber,
-            identificationType,
-          } = cardForm.getCardFormData();
+    function showError(msg) {
+      const errBox = document.getElementById('checkout-error');
+      errBox.textContent = msg;
+      errBox.style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
-          const selectedPlan = productSelect.value;
+    function hideError() {
+      document.getElementById('checkout-error').style.display = 'none';
+    }
 
-          // Envia os dados tokenizados para sua API / Edge Function de cobrança
-          fetch('/api/process-payment', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
+    // ==========================================
+    // FLUXO 1: PIX TRANSPARENTE
+    // ==========================================
+    let pixPollingInterval = null;
+
+    async function handlePixSubmit(e) {
+      e.preventDefault();
+      hideError();
+
+      const btn = document.getElementById('pix-submit-btn');
+      const email = document.getElementById('pix-email').value;
+      const name = document.getElementById('pix-name').value;
+      const cpf = document.getElementById('pix-cpf').value;
+      const plan = productSelect.value;
+
+      const nameParts = name.trim().split(' ');
+      const firstName = nameParts[0] || 'Candidato';
+      const lastName = nameParts.slice(1).join(' ') || 'CRIVOS';
+
+      btn.disabled = true;
+      btn.textContent = 'GERANDO PIX NO MERCADO PAGO...';
+
+      try {
+        const response = await fetch('/api/process-pix', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            plan,
+            email,
+            firstName,
+            lastName,
+            docType: 'CPF',
+            docNumber: cpf,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Não foi possível gerar a cobrança Pix.');
+        }
+
+        // Exibe o QR Code e código
+        document.getElementById('pix-form').style.display = 'none';
+        const display = document.getElementById('pix-display');
+        display.style.display = 'block';
+
+        if (data.qr_code_base64) {
+          document.getElementById('pix-qr-img').src = `data:image/png;base64,${data.qr_code_base64}`;
+        }
+        document.getElementById('pix-code-str').value = data.qr_code;
+
+        // Inicia verificação automática de pagamento a cada 4 segundos
+        startPixPolling(data.id);
+
+      } catch (err) {
+        showError(err.message);
+        btn.disabled = false;
+        btn.textContent = `[ GERAR QR CODE PIX // R$ ${planData[plan].formatted} ]`;
+      }
+    }
+
+    function copyPixCode() {
+      const input = document.getElementById('pix-code-str');
+      input.select();
+      input.setSelectionRange(0, 99999);
+      navigator.clipboard.writeText(input.value);
+      alert('Código Pix copiado com sucesso! Abra o app do seu banco e cole na opção Pix Copia e Cola.');
+    }
+
+    function startPixPolling(paymentId) {
+      if (pixPollingInterval) clearInterval(pixPollingInterval);
+
+      pixPollingInterval = setInterval(async () => {
+        try {
+          const res = await fetch(`/api/check-payment/${paymentId}`);
+          if (!res.ok) return;
+          const info = await res.json();
+
+          if (info.status === 'approved') {
+            clearInterval(pixPollingInterval);
+            window.location.href = `/sucesso.html?id=${paymentId}`;
+          }
+        } catch (e) {
+          console.warn("Polling Pix:", e);
+        }
+      }, 4000);
+    }
+
+    // ==========================================
+    // FLUXO 2: CARTÃO DE CRÉDITO TRANSPARENTE
+    // ==========================================
+    let cardFormInstance = null;
+
+    if (mp) {
+      try {
+        cardFormInstance = mp.cardForm({
+          amount: planData[productSelect.value].price,
+          autoMount: true,
+          form: {
+            id: "form-checkout",
+            cardholderName: {
+              id: "form-checkout__cardholderName",
+              placeholder: "NOME IMPRESSO NO CARTÃO",
             },
-            body: JSON.stringify({
-              token,
-              issuer_id,
-              payment_method_id,
-              transaction_amount: Number(planData[selectedPlan].price),
-              installments: Number(installments),
-              description: `CRIVOS // Plano ${selectedPlan.toUpperCase()}`,
-              payer: {
-                email,
-                identification: {
-                  type: identificationType || 'CPF',
-                  number: identificationNumber || '00000000000',
-                },
-              },
-            }),
-          })
-          .then(res => res.json())
-          .then(result => {
-            if (result.status === 'approved') {
-              window.location.href = `/sucesso.html?id=${result.id}`;
-            } else {
-              alert('Pagamento não aprovado. Verifique os dados ou tente outro cartão.');
-            }
-          })
-          .catch(err => {
-            console.error("Erro na requisição de pagamento:", err);
-            alert('Erro de comunicação com o gateway.');
-          });
-        },
-      },
-    });
+            cardholderEmail: {
+              id: "form-checkout__cardholderEmail",
+              placeholder: "E-MAIL",
+            },
+            cardNumber: {
+              id: "form-checkout__cardNumber-container",
+              placeholder: "NÚMERO DO CARTÃO",
+            },
+            expirationDate: {
+              id: "form-checkout__expirationDate-container",
+              placeholder: "MM/AA",
+            },
+            securityCode: {
+              id: "form-checkout__securityCode-container",
+              placeholder: "CVV",
+            },
+            installments: {
+              id: "form-checkout__installments",
+              placeholder: "Parcelas",
+            },
+            identificationType: {
+              id: "form-checkout__identificationType",
+              placeholder: "Tipo de documento",
+            },
+            identificationNumber: {
+              id: "form-checkout__identificationNumber",
+              placeholder: "Número do documento",
+            },
+            issuer: {
+              id: "form-checkout__issuer",
+              placeholder: "Banco emissor",
+            },
+          },
+          callbacks: {
+            onFormMounted: error => {
+              if (error) console.warn("Erro cardForm:", error);
+            },
+            onIssuersReceived: (error, issuers) => {
+              const wrapper = document.getElementById('issuer-wrapper');
+              if (issuers && issuers.length > 1) {
+                wrapper.style.display = 'block';
+              } else {
+                wrapper.style.display = 'none';
+              }
+            },
+            onSubmit: async event => {
+              event.preventDefault();
+              hideError();
+
+              const submitBtn = document.getElementById('form-checkout__submit');
+              submitBtn.disabled = true;
+              submitBtn.textContent = 'PROCESSANDO TRANSAÇÃO SEGURA...';
+
+              try {
+                const formData = cardFormInstance.getCardFormData();
+                const selectedPlan = productSelect.value;
+
+                const response = await fetch('/api/process-card', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    token: formData.token,
+                    issuer_id: formData.issuerId,
+                    payment_method_id: formData.paymentMethodId,
+                    installments: formData.installments,
+                    plan: selectedPlan,
+                    email: formData.cardholderEmail,
+                    docType: formData.identificationType,
+                    docNumber: formData.identificationNumber,
+                  }),
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.status === 'approved') {
+                  window.location.href = `/sucesso.html?id=${result.id}`;
+                } else if (result.status === 'in_process') {
+                  window.location.href = `/sucesso.html?id=${result.id}&status=in_process`;
+                } else {
+                  throw new Error(result.error || 'Pagamento recusado. Verifique os dados ou contate a operadora do seu cartão.');
+                }
+              } catch (err) {
+                showError(err.message);
+                submitBtn.disabled = false;
+                submitBtn.textContent = `[ PAGAR R$ ${planData[productSelect.value].formatted} NO CARTÃO ]`;
+              }
+            },
+          },
+        });
+      } catch (err) {
+        console.warn("Falha ao inicializar cardForm:", err);
+      }
+    }
   </script>
 </body>
 </html>

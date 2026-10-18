@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRIVOS // Pagamento Confirmado</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%23D92B2B' stroke='%23111111' stroke-width='1'/></svg>">
+
+  <style>
+    :root {
+      --bg-color: #F4F4F0;
+      --card-bg: #FFFFFF;
+      --text-color: #111111;
+      --text-muted: #666666;
+      --border-color: #111111;
+      --accent-color: #D92B2B;
+      --box-shadow: 4px 4px 0px #111111;
+      --btn-shadow: 2px 2px 0px #D92B2B;
+      --input-bg: #F4F4F0;
+      --success-color: #15803d;
+    }
+
+    [data-theme="dark"] {
+      --bg-color: #0A0A0A;
+      --card-bg: #141414;
+      --text-color: #F4F4F0;
+      --text-muted: #A0A0A0;
+      --border-color: #333333;
+      --accent-color: #EF4444;
+      --box-shadow: 4px 4px 0px #333333;
+      --btn-shadow: 2px 2px 0px #EF4444;
+      --input-bg: #1A1A1A;
+      --success-color: #22c55e;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      border-radius: 0px !important;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: 'Inter', sans-serif;
+      padding: 20px 20px 60px 20px;
+    }
+
+    .top-bar {
+      max-width: 600px;
+      margin: 0 auto 24px auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      padding: 12px 16px;
+      box-shadow: 2px 2px 0px var(--border-color);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--box-shadow);
+      padding: 36px 32px;
+    }
+
+    .status-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      background: var(--success-color);
+      color: #FFFFFF;
+      padding: 4px 8px;
+      display: inline-block;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-size: 26px;
+      font-weight: 900;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+
+    .lead-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    .order-summary {
+      background: var(--input-bg);
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--accent-color);
+      padding: 16px;
+      margin-bottom: 24px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .steps-box {
+      border: 1px solid var(--border-color);
+      padding: 20px;
+      margin-bottom: 28px;
+    }
+
+    .steps-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      color: var(--accent-color);
+    }
+
+    .step-item {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .step-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: var(--accent-color);
+    }
+
+    .cta-button {
+      display: block;
+      width: 100%;
+      text-align: center;
+      background: var(--accent-color);
+      color: #FFFFFF;
+      text-decoration: none;
+      font-family: 'Inter', sans-serif;
+      font-weight: 800;
+      font-size: 14px;
+      padding: 16px;
+      box-shadow: 2px 2px 0px var(--border-color);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+
+    .cta-button:hover {
+      background: var(--text-color);
+    }
+
+    .btn-secondary {
+      background: var(--card-bg);
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+      box-shadow: 2px 2px 0px var(--border-color);
+    }
+
+    .footer-note {
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="top-bar">
+    <a href="index.html" style="color:var(--text-color);text-decoration:none;">[← INÍCIO DA CRIVOS]</a>
+    <span>// CONFIRMAÇÃO DE PEDIDO</span>
+  </header>
+
+  <div class="container">
+    <div class="status-badge">[✓ PAGAMENTO IDENTIFICADO COM SUCESSO]</div>
+    <h1>BEM-VINDO AO CRIVOS</h1>
+    <p class="lead-text">
+      Sua transação foi processada de forma segura e seu slot de calibração tática já está garantido na nossa fila de engenharia.
+    </p>
+
+    <div class="order-summary" id="order-info">
+      <div><strong>TRANSAÇÃO:</strong> <span id="tx-id">Carregando...</span></div>
+      <div><strong>STATUS:</strong> <span id="tx-status" style="color:var(--success-color);">APROVADO</span></div>
+      <div><strong>PRAZO DE CALIBRAÇÃO:</strong> ATÉ 48 HORAS ÚTEIS</div>
+    </div>
+
+    <div class="steps-box">
+      <div class="steps-title">[ PRÓXIMOS PASSOS OBRIGATÓRIOS ]</div>
+      <div class="step-item">
+        <span class="step-num">01.</span>
+        <div>
+          <strong>Envio do Edital:</strong> Encaminhe o PDF do seu edital ou o link oficial da banca examinadora através do canal de atendimento.
+        </div>
+      </div>
+      <div class="step-item">
+        <span class="step-num">02.</span>
+        <div>
+          <strong>Calibração da Rotina:</strong> Informe suas horas líquidas disponíveis por dia para que nossa equipe ajuste os blocos e o motor elástico.
+        </div>
+      </div>
+      <div class="step-item">
+        <span class="step-num">03.</span>
+        <div>
+          <strong>Liberação do Sistema:</strong> Você receberá por WhatsApp e E-mail o link exclusivo com seu painel 100% montado e pronto para uso.
+        </div>
+      </div>
+    </div>
+
+    <a href="https://wa.me/5500000000000?text=Ol%C3%A1!%20Acabei%20de%20adquirir%20meu%20plano%20CRIVOS%20e%20gostaria%20de%20enviar%20meu%20edital." target="_blank" rel="noopener noreferrer" class="cta-button">
+      [ ENVIAR MEU EDITAL VIA WHATSAPP ] →
+    </a>
+
+    <a href="https://crivos-painel.pages.dev" target="_blank" rel="noopener noreferrer" class="cta-button btn-secondary">
+      [ EXPLORAR DEMONSTRAÇÃO DO PAINEL ]
+    </a>
+
+    <div class="footer-note">
+      Dúvidas ou suporte prioritário: contato@crivos.com.br<br>
+      CRIVOS // Inteligência para Concursos e Exames
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // Sincroniza tema
+      const savedTheme = localStorage.getItem('crivos_web_theme') || localStorage.getItem('crivos_theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+
+      // Lê o ID da transação da URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const id = urlParams.get('id') || urlParams.get('payment_id') || 'CRV-' + Math.floor(100000 + Math.random() * 900000);
+      document.getElementById('tx-id').textContent = '#' + id;
+    })();
+  </script>
+</body>
+</html>
