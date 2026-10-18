@@ -915,8 +915,19 @@
     let cardBrickInitialized = false;
     let cardBrickController = null;
 
+    function brickMsg(text) {
+      const c = document.getElementById('cardPaymentBrick_container');
+      if (c) {
+        c.innerHTML = `<div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent-color);padding:20px;border:1px solid var(--accent-color);word-break:break-word;">${text}</div>`;
+      }
+    }
+
     async function initCardForm() {
-      if (cardBrickInitialized || !mp) return;
+      if (cardBrickInitialized) return;
+      if (!mp) {
+        brickMsg('[ ERRO ] SDK do Mercado Pago não carregou. Desative bloqueadores de anúncios/privacidade para este site e recarregue (Ctrl+F5).');
+        return;
+      }
       cardBrickInitialized = true;
 
       const currentAmount = parseFloat(planData[productSelect.value].price);
@@ -924,31 +935,15 @@
 
       try {
         const bricksBuilder = mp.bricks();
-        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
 
         const settings = {
           initialization: {
             amount: currentAmount,
-            payer: {
-              email: email,
-            },
+            payer: { email: email },
           },
           customization: {
             visual: {
-              style: {
-                theme: isDark ? 'dark' : 'default',
-                customVariables: {
-                  primaryColor: '#D92B2B',
-                  baseColor: isDark ? '#F4F4F0' : '#111111',
-                  baseColorSecondary: isDark ? '#A0A0A0' : '#666666',
-                  borderRadius: '0px',
-                  fontFamily: 'Inter, sans-serif',
-                }
-              },
-              hidePaymentButton: false,
-              texts: {
-                formTitle: 'DADOS DO CARTÃO DE CRÉDITO',
-              }
+              style: { theme: 'default' },
             },
             paymentMethods: {
               maxInstallments: 12,
@@ -956,7 +951,7 @@
           },
           callbacks: {
             onReady: () => {
-              console.log("[CRIVOS] Card Payment Brick montado e pronto para interação.");
+              console.log("[CRIVOS] Card Payment Brick pronto.");
             },
             onSubmit: (cardFormData) => {
               return new Promise(async (resolve, reject) => {
@@ -989,34 +984,42 @@
                     window.location.href = `/sucesso.html?id=${result.id}&status=in_process`;
                     resolve();
                   } else {
-                    const errMsg = result.error || 'Pagamento recusado pelo emissor do cartão.';
-                    showError(errMsg);
-                    reject(errMsg);
+                    showError(result.error || 'Pagamento recusado pelo emissor do cartão.');
+                    reject();
                   }
                 } catch (err) {
                   showError(err.message || 'Erro ao comunicar com o servidor.');
-                  reject(err);
+                  reject();
                 }
               });
             },
             onError: (error) => {
-              console.error("[CRIVOS] Erro no Card Payment Brick:", error);
-              showError("Houve uma falha ao renderizar os campos seguros do cartão. Tente recarregar a página.");
+              console.error("[CRIVOS] Erro no Brick:", error);
+              if (!document.querySelector('#cardPaymentBrick_container iframe, #cardPaymentBrick_container form')) {
+                brickMsg('[ ERRO NO TERMINAL DE CARTÃO ] ' + (error && (error.message || error.type || error.cause) || 'desconhecido'));
+              }
             },
           },
         };
 
-        const container = document.getElementById('cardPaymentBrick_container');
-        container.innerHTML = ''; // Limpa o placeholder de carregamento
+        document.getElementById('cardPaymentBrick_container').innerHTML = '';
 
         cardBrickController = await bricksBuilder.create(
           'cardPayment',
           'cardPaymentBrick_container',
           settings
         );
+
+        // Diagnóstico: se após 6s nada foi renderizado, mostra aviso visível
+        setTimeout(() => {
+          const c = document.getElementById('cardPaymentBrick_container');
+          if (c && c.children.length === 0) {
+            brickMsg('[ ERRO ] Campos do cartão não renderizaram. Possíveis causas: bloqueador de anúncios/extensão de privacidade, ou credencial inválida. Teste em aba anônima.');
+          }
+        }, 6000);
       } catch (err) {
         console.error("Falha ao inicializar Card Payment Brick:", err);
-        showError("Não foi possível carregar os campos do cartão.");
+        brickMsg('[ ERRO ] ' + (err && (err.message || JSON.stringify(err)) || 'falha ao inicializar'));
       }
     }
   </script>
