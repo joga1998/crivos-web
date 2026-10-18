@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,37 +10,122 @@
   <!-- SDK Oficial do Mercado Pago -->
   <script src="https://sdk.mercadopago.com/js/v2"></script>
   <style>
+    :root {
+      --bg-color: #F4F4F0;
+      --card-bg: #FFFFFF;
+      --text-color: #111111;
+      --text-muted: #666666;
+      --border-color: #111111;
+      --accent-color: #D92B2B;
+      --box-shadow: 4px 4px 0px #111111;
+      --btn-shadow: 2px 2px 0px #D92B2B;
+      --input-bg: #F4F4F0;
+      --urgency-bg: #FFF9F9;
+    }
+
+    [data-theme="dark"] {
+      --bg-color: #0A0A0A;
+      --card-bg: #141414;
+      --text-color: #F4F4F0;
+      --text-muted: #A0A0A0;
+      --border-color: #333333;
+      --accent-color: #EF4444;
+      --box-shadow: 4px 4px 0px #333333;
+      --btn-shadow: 2px 2px 0px #EF4444;
+      --input-bg: #1A1A1A;
+      --urgency-bg: #1F1212;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
       border-radius: 0px !important;
+      transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
     }
+
     body {
-      background-color: #F4F4F0;
-      color: #111111;
+      background-color: var(--bg-color);
+      color: var(--text-color);
       font-family: 'Inter', sans-serif;
-      padding: 40px 20px;
+      padding: 20px 20px 60px 20px;
     }
+
+    /* Barra Superior de Navegação / Status (Estilo Home) */
+    .top-bar {
+      max-width: 560px;
+      margin: 0 auto 24px auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      padding: 12px 16px;
+      box-shadow: 2px 2px 0px var(--border-color);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+    }
+
+    .brand-link {
+      color: var(--text-color);
+      text-decoration: none;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-square {
+      width: 12px;
+      height: 12px;
+      background: var(--accent-color);
+      border: 1px solid var(--border-color);
+    }
+
+    .top-bar-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .back-link {
+      color: var(--text-color);
+      text-decoration: none;
+      font-size: 11px;
+      border-bottom: 1px dashed var(--text-color);
+    }
+
+    .theme-toggle {
+      background: var(--input-bg);
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+      padding: 4px 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      cursor: pointer;
+    }
+
     .checkout-container {
       max-width: 560px;
       margin: 0 auto;
-      background: #FFFFFF;
-      border: 1px solid #111111;
-      box-shadow: 4px 4px 0px #111111;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--box-shadow);
       padding: 32px;
     }
+
     .header-tag {
       font-family: 'JetBrains Mono', monospace;
       font-size: 11px;
       text-transform: uppercase;
-      background: #D92B2B;
+      background: var(--accent-color);
       color: #FFFFFF;
       padding: 4px 8px;
       display: inline-block;
       margin-bottom: 16px;
       font-weight: 700;
     }
+
     h1 {
       font-size: 24px;
       font-weight: 900;
@@ -48,9 +133,11 @@
       margin-bottom: 20px;
       letter-spacing: -0.5px;
     }
+
     .form-group {
       margin-bottom: 20px;
     }
+
     label {
       font-family: 'JetBrains Mono', monospace;
       font-size: 12px;
@@ -58,87 +145,109 @@
       display: block;
       margin-bottom: 8px;
       text-transform: uppercase;
+      color: var(--text-color);
     }
+
     select, input {
       width: 100%;
-      background: #F4F4F0;
-      border: 1px solid #111111;
+      background: var(--input-bg);
+      border: 1px solid var(--border-color);
       padding: 12px;
       font-family: 'JetBrains Mono', monospace;
       font-size: 14px;
-      color: #111111;
+      color: var(--text-color);
     }
+
     select:focus, input:focus {
       outline: none;
-      border-color: #D92B2B;
+      border-color: var(--accent-color);
     }
+
     .plan-description {
-      background: #F4F4F0;
-      border-left: 3px solid #D92B2B;
-      border: 1px solid #111111;
-      border-left-width: 4px;
+      background: var(--input-bg);
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--accent-color);
       padding: 14px;
       margin-bottom: 20px;
       font-size: 13px;
       line-height: 1.5;
       font-family: 'JetBrains Mono', monospace;
+      color: var(--text-color);
     }
+
     .urgency-box {
-      border: 1px dashed #111111;
+      border: 1px dashed var(--border-color);
       padding: 10px 14px;
       margin-bottom: 20px;
       font-size: 11px;
       font-family: 'JetBrains Mono', monospace;
-      background: #FFF9F9;
-      color: #D92B2B;
+      background: var(--urgency-bg);
+      color: var(--accent-color);
       font-weight: 700;
     }
+
     .mp-container {
-      background: #F4F4F0;
-      border: 1px solid #111111;
+      background: var(--input-bg);
+      border: 1px solid var(--border-color);
       padding: 12px;
       min-height: 45px;
       margin-bottom: 4px;
     }
+
     .grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 16px;
     }
+
     .submit-btn {
       width: 100%;
-      background: #111111;
-      color: #F4F4F0;
-      border: 1px solid #111111;
+      background: var(--text-color);
+      color: var(--bg-color);
+      border: 1px solid var(--border-color);
       padding: 16px;
       font-family: 'Inter', sans-serif;
       font-weight: 800;
       font-size: 14px;
       text-transform: uppercase;
       cursor: pointer;
-      box-shadow: 2px 2px 0px #D92B2B;
+      box-shadow: var(--btn-shadow);
       margin-top: 8px;
       transition: transform 0.1s ease;
     }
+
     .submit-btn:hover {
-      background: #D92B2B;
+      background: var(--accent-color);
       color: #FFFFFF;
-      box-shadow: 2px 2px 0px #111111;
+      box-shadow: 2px 2px 0px var(--border-color);
     }
+
     .secure-footer {
       margin-top: 24px;
       text-align: center;
       font-family: 'JetBrains Mono', monospace;
       font-size: 11px;
-      color: #666666;
+      color: var(--text-muted);
     }
   </style>
 </head>
 <body>
 
+  <!-- Barra Superior de Navegação e Modo Noturno -->
+  <header class="top-bar">
+    <a href="index.html" class="brand-link">
+      <div class="brand-square"></div>
+      CRIV<span style="color:var(--accent-color)">OS</span>
+    </a>
+    <div class="top-bar-actions">
+      <a href="index.html" class="back-link">[← VOLTAR À VITRINE]</a>
+      <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()">[ DARK/LIGHT ]</button>
+    </div>
+  </header>
+
   <div class="checkout-container">
-    <div class="header-tag">[ AMBIENTE DE AUDITORIA SEGURO ]</div>
-    <h1>Checkout CRIVOS</h1>
+    <div class="header-tag">[ AMBIENTE DE PAGAMENTO SEGURO ]</div>
+    <h1>Checkout CRIVOS</span></h1>
 
     <!-- Caixa de Urgência Técnica -->
     <div class="urgency-box">
@@ -197,12 +306,25 @@
     </form>
 
     <div class="secure-footer">
-      CRIV<span style="color:#D92B2B">OS</span> // Processamento criptografado via Mercado Pago<br>
+      CRIVOS Inteligência para Concursos e Exames // Processamento criptografado via Mercado Pago<br>
       [i] Acesso liberado no painel exclusivo em até 48h após a confirmação.
     </div>
   </div>
 
   <script>
+    // Lógica do Modo Noturno (Sincronizada com o estado global)
+    function toggleTheme() {
+      const html = document.documentElement;
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('crivos_theme', newTheme);
+    }
+
+    // Carrega a preferência salva de tema ao iniciar
+    const savedTheme = localStorage.getItem('crivos_theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+
     // Inicializa o SDK do Mercado Pago com sua Public Key
     const mp = new MercadoPago('SUA_PUBLIC_KEY_DO_MERCADO_PAGO', {
       locale: 'pt-BR'
@@ -246,7 +368,6 @@
 
     productSelect.addEventListener('change', () => {
       currentAmount = updatePlanDetails();
-      // Recarrega o formulário do cartão para atualizar o valor se necessário
     });
 
     // Monta o formulário de cartão seguro do Mercado Pago
