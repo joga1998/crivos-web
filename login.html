@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRIVOS // Área do Candidato — Acesso ao Painel</title>
+  <meta name="description" content="Acesse seu Sistema Operacional de Estudos CRIVOS com seu e-mail e chave de acesso tática.">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23D92B2B'/></svg>">
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    (function() {
+      try {
+        var t = localStorage.getItem('crivos_web_theme') || localStorage.getItem('crivos_theme');
+        if (t === 'dark' || (!t && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      } catch(e) {}
+    })();
+  </script>
+
+  <!-- SDK Oficial Supabase JS v2 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .login-container {
+      min-height: calc(100vh - 120px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+    .login-card {
+      background: var(--bg-card);
+      border: 2px solid var(--border-color);
+      box-shadow: var(--shadow-hard-lg);
+      width: 100%;
+      max-width: 460px;
+      padding: 36px 28px;
+    }
+    .login-brand-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .login-brand-sq {
+      width: 24px;
+      height: 24px;
+      background: var(--crivos-red);
+      flex-shrink: 0;
+    }
+    .login-brand-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 800;
+      font-size: 15px;
+      letter-spacing: 0.05em;
+      line-height: 1.2;
+    }
+    .login-brand-subtitle {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--ink-muted);
+      letter-spacing: 0.03em;
+    }
+    .login-form-group {
+      margin-bottom: 20px;
+    }
+    .login-label {
+      display: block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      color: var(--ink-primary);
+    }
+    .login-input {
+      width: 100%;
+      background: var(--bg-card);
+      color: var(--ink-primary);
+      border: 1px solid var(--border-color);
+      padding: 12px 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      transition: border-color 0.15s ease;
+    }
+    .login-input:focus {
+      outline: none;
+      border-color: var(--crivos-red);
+    }
+    .login-feedback {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      margin-bottom: 16px;
+      line-height: 1.4;
+    }
+    .login-feedback.error {
+      background: rgba(217, 43, 43, 0.08);
+      border-left: 3px solid var(--crivos-red);
+      color: var(--crivos-red);
+      padding: 10px 12px;
+    }
+    .login-feedback.success {
+      background: rgba(21, 128, 61, 0.08);
+      border-left: 3px solid #15803D;
+      color: #15803D;
+      padding: 10px 12px;
+    }
+    .login-footer-actions {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .login-link-secondary {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--ink-muted);
+      text-decoration: underline;
+      cursor: pointer;
+      display: inline-block;
+    }
+    .login-link-secondary:hover {
+      color: var(--crivos-red);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOPBAR INSTITUCIONAL -->
+  <header class="crivos-topbar">
+    <div class="crivos-topbar-left">
+      <span class="sq-red">■</span> CRIVOS // PORTAL DE ACESSO DO CANDIDATO
+    </div>
+    <div class="crivos-topbar-right">
+      <a href="/" style="color:#FFF;text-decoration:none;font-weight:700;margin-right:12px;">← VOLTAR À HOME</a>
+      <button type="button" id="theme-toggle-btn" class="theme-toggle-btn" title="Alternar Modo Escuro">[ ◐ DIA ]</button>
+    </div>
+  </header>
+
+  <!-- ÁREA DE LOGIN -->
+  <main class="login-container">
+    <div class="login-card">
+      <div class="login-brand-header">
+        <div class="login-brand-sq"></div>
+        <div>
+          <div class="login-brand-title">CRIVOS // ÁREA DO CANDIDATO</div>
+          <div class="login-brand-subtitle">SISTEMA OPERACIONAL DE ESTUDOS</div>
+        </div>
+      </div>
+
+      <p style="font-size: 13px; color: var(--ink-muted); line-height: 1.5; margin-bottom: 22px;">
+        Informe o e-mail cadastrado na contratação e a sua chave de acesso enviada automaticamente após a confirmação do pagamento.
+      </p>
+
+      <div id="login-feedback" class="login-feedback" style="display:none;"></div>
+
+      <form id="login-form" onsubmit="return false;">
+        <div class="login-form-group">
+          <label for="login-email" class="login-label">E-mail do Candidato</label>
+          <input type="email" id="login-email" class="login-input" placeholder="seu-email@exemplo.com" required autocomplete="email">
+        </div>
+
+        <div class="login-form-group">
+          <label for="login-password" class="login-label">Chave de Acesso (Senha Tática)</label>
+          <input type="password" id="login-password" class="login-input" placeholder="••••••••••••" required autocomplete="current-password">
+        </div>
+
+        <button type="submit" id="btn-submit-login" class="btn btn-primary" style="width:100%;padding:14px;font-size:13px;font-weight:700;letter-spacing:0.04em;">
+          [ ENTRAR NO PAINEL ] →
+        </button>
+      </form>
+
+      <div class="login-footer-actions">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+          <a href="#" id="link-forgot" class="login-link-secondary">
+            Esqueceu sua chave de acesso?
+          </a>
+          <a href="/" class="login-link-secondary">
+            Ainda não tem um plano?
+          </a>
+        </div>
+
+        <div style="margin-top:8px;padding-top:14px;border-top:1px dashed var(--border-subtle);text-align:center;">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-muted);display:block;margin-bottom:8px">
+            ACESSO DE DEMONSTRAÇÃO PÚBLICA
+          </span>
+          <a href="https://painel.crivos.me?demo=1" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="width:100%;padding:10px;font-size:11px;">
+            ⚡ TESTAR DEMO AO VIVO (PPGHS) ↗
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer style="padding:24px 20px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-muted);border-top:1px solid var(--border-color);background:var(--bg-dark);">
+    CRIVOS // SISTEMA OPERACIONAL DE ESTUDOS · SEGURANÇA E PRIVACIDADE LOCAL
+  </footer>
+
+  <script>
+    // Inicialização do Supabase
+    const SUPABASE_URL = 'https://dmmtmfjlieqeqwlhtgrr.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRtbXRtZmpsaWVxZXF3bGh0Z3JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIzNjAwNjMsImV4cCI6MjEwNzkzNjA2M30.62ItYAgrweWcK9zqdMqtYlD6lOZ8TesQv2ygGe-xJI8';
+    
+    let supabase = null;
+    try {
+      if (window.supabase) {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      }
+    } catch(e) {
+      console.warn('Erro ao carregar Supabase:', e);
+    }
+
+    const form = document.getElementById('login-form');
+    const emailInput = document.getElementById('login-email');
+    const passInput = document.getElementById('login-password');
+    const submitBtn = document.getElementById('btn-submit-login');
+    const feedback = document.getElementById('login-feedback');
+    const linkForgot = document.getElementById('link-forgot');
+
+    function showFeedback(msg, isError = true) {
+      feedback.style.display = 'block';
+      feedback.className = 'login-feedback ' + (isError ? 'error' : 'success');
+      feedback.textContent = (isError ? '⚠ ' : '✓ ') + msg;
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = emailInput.value.trim();
+      const password = passInput.value;
+
+      if (!email || !password) {
+        showFeedback('Por favor, informe seu e-mail e chave de acesso.');
+        return;
+      }
+
+      if (!supabase) {
+        showFeedback('Falha na inicialização da conexão com o servidor. Tente novamente em instantes.');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = '[ AUTENTICANDO NO SISTEMA... ]';
+      feedback.style.display = 'none';
+
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: email,
+          password: password,
+        });
+
+        if (error) {
+          throw error;
+        }
+
+        if (data && data.session) {
+          showFeedback('Autenticação bem-sucedida! Carregando seu painel...', false);
+          
+          // Armazena credenciais para facilitar transição local se necessário
+          try {
+            localStorage.setItem('crivos_user_email', email);
+          } catch(e) {}
+
+          // Redireciona diretamente para o painel com token de acesso para auto-login imediato
+          setTimeout(() => {
+            const redirectUrl = `https://painel.crivos.me/#access_token=${encodeURIComponent(data.session.access_token)}&refresh_token=${encodeURIComponent(data.session.refresh_token)}&type=recovery`;
+            window.location.href = redirectUrl;
+          }, 800);
+        }
+      } catch (err) {
+        console.error(err);
+        showFeedback(err.message === 'Invalid login credentials' 
+          ? 'Chave de acesso ou e-mail incorretos. Verifique os dados recebidos por e-mail.' 
+          : (err.message || 'Falha na autenticação. Verifique suas credenciais.'));
+        submitBtn.disabled = false;
+        submitBtn.textContent = '[ ENTRAR NO PAINEL ] →';
+      }
+    });
+
+    linkForgot.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const email = emailInput.value.trim() || prompt('Informe seu e-mail cadastrado para enviarmos instruções de recuperação:');
+      if (!email) return;
+
+      if (!supabase) {
+        alert('Serviço indisponível no momento.');
+        return;
+      }
+
+      try {
+        const { error } = await supabase.auth.resetPasswordForEmail(email);
+        if (error) throw error;
+        alert('✓ Instruções de redefinição de chave foram enviadas para ' + email);
+      } catch (err) {
+        alert('Erro ao solicitar redefinição: ' + (err.message || 'Falha no envio.'));
+      }
+    });
+
+    // Theme toggle
+    const themeBtn = document.getElementById('theme-toggle-btn');
+    function updateThemeUI() {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (themeBtn) themeBtn.textContent = isDark ? '[ ◑ NOITE ]' : '[ ◐ DIA ]';
+    }
+    if (themeBtn) {
+      themeBtn.onclick = function() {
+        const cur = document.documentElement.getAttribute('data-theme');
+        const next = cur === 'dark' ? 'light' : 'dark';
+        if (next === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+        else document.documentElement.removeAttribute('data-theme');
+        try {
+          localStorage.setItem('crivos_web_theme', next);
+          localStorage.setItem('crivos_theme', next);
+        } catch(e) {}
+        updateThemeUI();
+      };
+      updateThemeUI();
+    }
+  </script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   --bg-paper: #F4F4F0;
   --bg-card: #FFFFFF;
   --bg-subtle: #EAEAE4;
@@ -1605,4 +1605,22 @@ p {
   .spec-rows {
     font-size: 10px;
   }
+}
+
+.crivos-topbar-candidate-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #FFFFFF !important;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  transition: all 0.15s ease;
+}
+.crivos-topbar-candidate-btn:hover {
+  background: var(--crivos-red);
+  border-color: var(--crivos-red);
+  color: #FFFFFF !important;
 }
