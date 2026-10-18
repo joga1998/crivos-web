@@ -649,8 +649,8 @@
     const initialTheme = localStorage.getItem('crivos_web_theme') || 'light';
     document.documentElement.setAttribute('data-theme', initialTheme);
 
-    // Chave Pública de Teste do Mercado Pago
-    const MP_PUBLIC_KEY = window.CRIVOS_MP_PUBLIC_KEY || 'TEST-4476765927390023-060520-a8fe78b4873b8944f0719177c1cf8366-200773649';
+    // Public Key do Mercado Pago (formato TEST-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx). NÃO use o Access Token aqui.
+    const MP_PUBLIC_KEY = window.CRIVOS_MP_PUBLIC_KEY || 'COLE_AQUI_A_PUBLIC_KEY';
     
     let mp;
     try {
