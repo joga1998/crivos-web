@@ -23,7 +23,7 @@
       padding: 40px 20px;
     }
     .checkout-container {
-      max-width: 520px;
+      max-width: 560px;
       margin: 0 auto;
       background: #FFFFFF;
       border: 1px solid #111111;
@@ -45,7 +45,7 @@
       font-size: 24px;
       font-weight: 900;
       text-transform: uppercase;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       letter-spacing: -0.5px;
     }
     .form-group {
@@ -71,6 +71,27 @@
     select:focus, input:focus {
       outline: none;
       border-color: #D92B2B;
+    }
+    .plan-description {
+      background: #F4F4F0;
+      border-left: 3px solid #D92B2B;
+      border: 1px solid #111111;
+      border-left-width: 4px;
+      padding: 14px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      line-height: 1.5;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .urgency-box {
+      border: 1px dashed #111111;
+      padding: 10px 14px;
+      margin-bottom: 20px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      background: #FFF9F9;
+      color: #D92B2B;
+      font-weight: 700;
     }
     .mp-container {
       background: #F4F4F0;
@@ -117,10 +138,15 @@
 
   <div class="checkout-container">
     <div class="header-tag">[ AMBIENTE DE AUDITORIA SEGURO ]</div>
-    <h1>Checkout CRIVOS</h1>
+    <h1>Checkout CRIV<span style="color:#D92B2B">OS</span></h1>
+
+    <!-- Caixa de Urgência Técnica -->
+    <div class="urgency-box">
+      [!] ATENÇÃO: As vagas para processamento de editais desta semana têm limite técnico para preservar a precisão da engenharia de rotina.
+    </div>
 
     <form id="form-checkout">
-      <!-- Seletor de Plano (Permite alterar na hora) -->
+      <!-- Seletor de Plano -->
       <div class="form-group">
         <label for="product-select">PLANO SELECIONADO</label>
         <select id="product-select">
@@ -128,6 +154,11 @@
           <option value="arsenal">Nível 2 · Arsenal (Com SM-2) — R$ 124,00</option>
           <option value="elite">Nível 3 · Elite (Completo) — R$ 221,00</option>
         </select>
+      </div>
+
+      <!-- Descritivo Dinâmico do Plano -->
+      <div id="plan-description-box" class="plan-description">
+        Carregando detalhes do sistema...
       </div>
 
       <!-- E-mail -->
@@ -166,7 +197,8 @@
     </form>
 
     <div class="secure-footer">
-      CRIV<span style="color:#D92B2B">OS</span> // Processamento criptografado via Mercado Pago
+      CRIV<span style="color:#D92B2B">OS</span> // Processamento criptografado via Mercado Pago<br>
+      [i] Acesso liberado no painel exclusivo em até 48h após a confirmação.
     </div>
   </div>
 
@@ -176,28 +208,45 @@
       locale: 'pt-BR'
     });
 
-    // Mapeamento de preços por plano
-    const prices = {
-      tatico: "67.00",
-      arsenal: "124.00",
-      elite: "221.00"
+    // Dados e descritivos dos planos
+    const planData = {
+      tatico: {
+        price: "67.00",
+        desc: "<strong>[ O BÁSICO DE EXECUÇÃO ]</strong><br>O sistema operacional enxuto para quem tem pouco tempo. Você entrega o edital e a rotina; nós devolvemos o cronograma tático dia a dia em grade rígida, sem firulas teóricas. Foco total em alta incidência."
+      },
+      arsenal: {
+        price: "124.00",
+        desc: "<strong>[ SISTEMA + RETENÇÃO ATIVA ]</strong><br>Tudo do Nível Tático acoplado ao motor de memorização de longo prazo (baseado em repetição espaçada SM-2). Ideal para quem absorve a teoria mas sofre com o 'branco' na hora da prova."
+      },
+      elite: {
+        price: "221.00",
+        desc: "<strong>[ O ECOSSISTEMA DE ALTA PERFORMANCE ]</strong><br>A engenharia completa de aprovação. Inclui cronograma tático adaptativo, motor SM-2, simulados de auditoria e arguição. Para quem exige margem de segurança absoluta contra a banca."
+      }
     };
+
+    const productSelect = document.getElementById('product-select');
+    const descBox = document.getElementById('plan-description-box');
 
     // Lê o parâmetro da URL para pré-selecionar o produto (ex: /payment.html?produto=arsenal)
     const urlParams = new URLSearchParams(window.location.search);
     const produtoParam = urlParams.get('produto');
-    const productSelect = document.getElementById('product-select');
 
-    if (produtoParam && prices[produtoParam]) {
+    if (produtoParam && planData[produtoParam]) {
       productSelect.value = produtoParam;
     }
 
-    let currentAmount = prices[productSelect.value];
+    // Função para atualizar o texto descritivo com base no select
+    function updatePlanDetails() {
+      const selectedKey = productSelect.value;
+      descBox.innerHTML = planData[selectedKey].desc;
+      return planData[selectedKey].price;
+    }
 
-    // Atualiza o valor se o usuário alterar o plano no select da página
-    productSelect.addEventListener('change', (e) => {
-      currentAmount = prices[e.target.value];
-      // Reinicializa ou atualiza o formulário do cartão com o novo valor se necessário
+    let currentAmount = updatePlanDetails();
+
+    productSelect.addEventListener('change', () => {
+      currentAmount = updatePlanDetails();
+      // Recarrega o formulário do cartão para atualizar o valor se necessário
     });
 
     // Monta o formulário de cartão seguro do Mercado Pago
@@ -252,7 +301,7 @@
               token,
               issuer_id,
               payment_method_id,
-              transaction_amount: Number(prices[selectedPlan]),
+              transaction_amount: Number(planData[selectedPlan].price),
               installments: Number(installments),
               description: `CRIVOS // Plano ${selectedPlan.toUpperCase()}`,
               payer: {
