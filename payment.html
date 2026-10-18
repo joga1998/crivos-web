@@ -511,13 +511,13 @@
     <div id="checkout-error" class="error-msg"></div>
 
     <!-- ======================================================== -->
-    <!-- ETAPA 1: DADOS DO CONCURSO, EDITAL E E-MAIL               -->
+    <!-- ETAPA 1: DADOS DO CONCURSO, ROTINA E E-MAIL               -->
     <!-- ======================================================== -->
     <div id="stage-1">
       <div class="header-tag">[ ETAPA 01 // ESPECIFICAÇÃO DE ENGENHARIA ]</div>
       <h1>Seu Concurso &amp; Rotina</h1>
       <p class="step-desc">
-        Informe o concurso desejado e anexe seu edital (ou descreva os cargos/tópicos). Seu e-mail será vinculado ao seu futuro painel de estudos.
+        Informe seu concurso-alvo, disponibilidade semanal de horas e anexe seu edital (opcional). Seu ecossistema de estudos será dimensionado sob medida para sua realidade.
       </p>
 
       <form id="form-stage-1" onsubmit="goToStage2(event)">
@@ -526,7 +526,7 @@
           <label for="user-email">E-MAIL DO CANDIDATO <span class="req">*</span></label>
           <input type="email" id="user-email" placeholder="seu.email@dominio.com" required />
           <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);margin-top:4px;">
-            Este será o login para envio do seu link de calibração em até 48h.
+            Este será o login para envio do seu link de calibração tática em até 48h.
           </div>
         </div>
 
@@ -534,11 +534,20 @@
         <div class="grid-2">
           <div class="form-group">
             <label for="user-concurso">CONCURSO / EXAME ALVO <span class="req">*</span></label>
-            <input type="text" id="user-concurso" placeholder="Ex: SEFAZ, Receita, CNU, OAB, etc." required />
+            <input type="text" id="user-concurso" placeholder="Ex: SEFAZ, Receita Federal, CNU, OAB, etc." required />
           </div>
           <div class="form-group">
             <label for="user-cargo">CARGO / ESPECIALIDADE <span class="req">*</span></label>
-            <input type="text" id="user-cargo" placeholder="Ex: Auditor Fiscal, TI, etc." required />
+            <input type="text" id="user-cargo" placeholder="Ex: Auditor Fiscal, Analista de TI, etc." required />
+          </div>
+        </div>
+
+        <!-- Disponibilidade Semanal de Horas de Estudo -->
+        <div class="form-group">
+          <label for="user-availability">DISPONIBILIDADE SEMANAL DE HORAS DE ESTUDO <span class="req">*</span></label>
+          <textarea id="user-availability" rows="4" placeholder="Descreva com o máximo de detalhes possível sua rotina semanal de estudos:&#10;• Segunda a Sexta: Ex: 3h líquidas/dia (noite, 19h às 22h)&#10;• Sábados: Ex: 6h líquidas (manhã e tarde)&#10;• Domingos: Ex: 3h para simulados / revisões (ou descanso)&#10;• Rotina de trabalho: Trabalho das 8h às 18h em dias úteis..." required></textarea>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);margin-top:4px;">
+            Quanto mais específico sobre dias, turnos e horas líquidas disponíveis, mais assertiva será a distribuição de metas no seu cronograma diário.
           </div>
         </div>
 
@@ -556,31 +565,16 @@
           Carregando detalhes do sistema...
         </div>
 
-        <!-- Edital: Upload ou Descrição Detalhada -->
+        <!-- Edital: Upload Opcional do PDF -->
         <div class="form-group">
-          <label>COMO PREFERE ENVIAR O EDITAL? <span class="req">*</span></label>
-          <div class="edital-mode-switch">
-            <button type="button" class="edital-mode-btn active" id="btn-mode-upload" onclick="setEditalMode('upload')">
-              📎 UPLOAD DO PDF / EDITAL
-            </button>
-            <button type="button" class="edital-mode-btn" id="btn-mode-text" onclick="setEditalMode('text')">
-              ✍ DESCREVER DETALHES
-            </button>
-          </div>
-
-          <!-- Bloco Upload -->
-          <div id="edital-upload-block">
-            <div class="upload-zone" onclick="document.getElementById('edital-file').click()">
-              <input type="file" id="edital-file" accept=".pdf,.doc,.docx,.png,.jpg" style="display:none;" onchange="handleFileSelect(event)" />
-              <div>Clique ou arraste o PDF do edital aqui</div>
-              <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">Formatos aceitos: PDF, DOC, DOCX ou Imagens</div>
-              <span id="file-chosen-text" class="file-selected-name"></span>
+          <label for="edital-file">ANEXAR EDITAL (PDF / DOCUMENTO) <span style="font-size:10px;color:var(--text-muted);font-weight:normal;">[ OPCIONAL ]</span></label>
+          <div class="upload-zone" onclick="document.getElementById('edital-file').click()">
+            <input type="file" id="edital-file" accept=".pdf,.doc,.docx,.png,.jpg" style="display:none;" onchange="handleFileSelect(event)" />
+            <div>📎 Clique ou arraste o PDF do edital aqui (opcional)</div>
+            <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">
+              Caso não tenha o arquivo em mãos agora, nossa equipe de engenharia localizará o documento oficial da banca examinadora com base no concurso e cargo informados.
             </div>
-          </div>
-
-          <!-- Bloco Texto / Descrição -->
-          <div id="edital-text-block" style="display:none;">
-            <textarea id="edital-description" placeholder="Cole o link do edital ou descreva disciplinas, banca e matérias de foco que deseja priorizar..."></textarea>
+            <span id="file-chosen-text" class="file-selected-name"></span>
           </div>
         </div>
 
@@ -601,6 +595,8 @@
       <div class="summary-badge" id="order-summary-box">
         <div><strong>CANDIDATO:</strong> <span id="sum-email">...</span></div>
         <div><strong>EDITAL ALVO:</strong> <span id="sum-concurso">...</span> (<span id="sum-cargo">...</span>)</div>
+        <div><strong>DISPONIBILIDADE:</strong> <span id="sum-rotina">...</span></div>
+        <div><strong>EDITAL:</strong> <span id="sum-edital">...</span></div>
         <div><strong>PLANO:</strong> <span id="sum-plano">...</span> — <strong>R$ <span class="current-price-label">67,00</span></strong></div>
       </div>
 
@@ -768,16 +764,7 @@
       }
     });
 
-    // Controle de Envio do Edital (Upload vs Descrição)
-    let editalMode = 'upload';
-    function setEditalMode(mode) {
-      editalMode = mode;
-      document.getElementById('btn-mode-upload').classList.toggle('active', mode === 'upload');
-      document.getElementById('btn-mode-text').classList.toggle('active', mode === 'text');
-      document.getElementById('edital-upload-block').style.display = mode === 'upload' ? 'block' : 'none';
-      document.getElementById('edital-text-block').style.display = mode === 'text' ? 'block' : 'none';
-    }
-
+    // Controle de Envio do Edital (Upload Opcional)
     function handleFileSelect(e) {
       const file = e.target.files[0];
       const textElem = document.getElementById('file-chosen-text');
@@ -788,9 +775,20 @@
       }
     }
 
-    function showError(msg) {
+    // Exibição amigável de erros de transação e validação
+    function showError(msg, isCard = false) {
       const errBox = document.getElementById('checkout-error');
-      errBox.textContent = msg;
+      
+      let html = `<div style="font-weight:700;margin-bottom:6px;letter-spacing:0.5px;">[ AVISO DO PROCESSADOR // RETORNO DE TRANSAÇÃO ]</div>`;
+      html += `<div style="font-size:12px;line-height:1.5;">${msg}</div>`;
+      
+      if (isCard) {
+        html += `<div style="margin-top:10px;padding-top:8px;border-top:1px dashed var(--accent-color);font-size:11px;line-height:1.4;">
+          ⚡ <strong>Alternativa Imediata:</strong> Para liberação instantânea sem depender de autorização ou limites da operadora de cartão, selecione a aba <strong>⚡ PIX (IMEDIATO)</strong> acima.
+        </div>`;
+      }
+      
+      errBox.innerHTML = html;
       errBox.style.display = 'block';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -811,10 +809,18 @@
       const email = document.getElementById('user-email').value.trim();
       const concurso = document.getElementById('user-concurso').value.trim();
       const cargo = document.getElementById('user-cargo').value.trim();
+      const availability = document.getElementById('user-availability').value.trim();
       const planKey = productSelect.value;
+      const fileInput = document.getElementById('edital-file');
+      const fileName = fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0].name : null;
 
       if (!email || !concurso || !cargo) {
-        showError('Por favor preencha todos os campos obrigatórios da Etapa 1.');
+        showError('Por favor, informe seu e-mail, concurso e cargo pretendido.');
+        return;
+      }
+
+      if (!availability) {
+        showError('Por favor, descreva sua disponibilidade semanal de estudos (dias e horas líquidas) para que possamos dimensionar sua rotina.');
         return;
       }
 
@@ -822,13 +828,16 @@
         email,
         concurso,
         cargo,
+        availability,
+        fileName,
         planKey,
       };
 
       // Atualiza o resumo da Etapa 2
       document.getElementById('sum-email').textContent = email;
-      document.getElementById('sum-concurso').textContent = concurso;
-      document.getElementById('sum-cargo').textContent = cargo;
+      document.getElementById('sum-concurso').textContent = `${concurso} (${cargo})`;
+      document.getElementById('sum-rotina').textContent = availability.length > 70 ? availability.substring(0, 70) + '...' : availability;
+      document.getElementById('sum-edital').textContent = fileName ? `Anexado (${fileName})` : 'Localização oficial automática pela equipe CRIVOS';
       document.getElementById('sum-plano').textContent = planData[planKey].title;
 
       // Troca visual das etapas
@@ -912,7 +921,7 @@
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.error || 'Não foi possível gerar a cobrança Pix.');
+          throw new Error(data.user_message || data.error || 'Não foi possível gerar a cobrança Pix.');
         }
 
         document.getElementById('pix-form').style.display = 'none';
@@ -927,7 +936,7 @@
         startPixPolling(data.id);
 
       } catch (err) {
-        showError(err.message);
+        showError(err.message, false);
         btn.disabled = false;
         btn.textContent = `[ GERAR QR CODE PIX // R$ ${planData[plan].formatted} ]`;
       }
@@ -1098,11 +1107,12 @@
                     window.location.href = `/sucesso.html?id=${result.id}&status=in_process`;
                     resolve();
                   } else {
-                    showError(result.error || 'Pagamento recusado pelo emissor do cartão.');
+                    const friendlyError = result.user_message || result.error || 'O pagamento não foi aprovado pelo emissor do cartão.';
+                    showError(friendlyError, true);
                     reject();
                   }
                 } catch (err) {
-                  showError(err.message || 'Erro ao comunicar com o servidor.');
+                  showError(err.message || 'Instabilidade de conexão ao comunicar com o servidor. Por favor, tente novamente.', true);
                   reject();
                 }
               });
@@ -1110,7 +1120,7 @@
             onError: (error) => {
               console.error("[CRIVOS] Erro no Brick:", error);
               if (!document.querySelector('#cardPaymentBrick_container iframe, #cardPaymentBrick_container form')) {
-                brickMsg('[ ERRO NO TERMINAL DE CARTÃO ] ' + (error && (error.message || error.type || error.cause) || 'desconhecido'));
+                brickMsg('[ ERRO NO TERMINAL DE CARTÃO ] Verifique as informações ou recarregue a página (Ctrl+F5).');
               }
             },
           },

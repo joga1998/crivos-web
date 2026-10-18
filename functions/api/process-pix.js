@@ -84,12 +84,30 @@ export async function onRequestPost(context) {
 
     if (!mpResponse.ok) {
       console.error('Erro Mercado Pago PIX:', mpData);
+      let friendlyError = 'Não foi possível gerar a cobrança Pix no momento.';
+
+      if (Array.isArray(mpData.cause) && mpData.cause.length > 0) {
+        const causes = mpData.cause.map(c => {
+          const desc = String(c.description || '').toLowerCase();
+          if (desc.includes('identification') || desc.includes('docnumber')) return 'CPF ou CNPJ informado é inválido.';
+          if (desc.includes('email')) return 'E-mail informado é inválido.';
+          return c.description;
+        }).filter(Boolean);
+        if (causes.length > 0) friendlyError = causes.join(' ');
+      } else if (mpData.message) {
+        const msg = String(mpData.message).toLowerCase();
+        if (msg.includes('identification')) friendlyError = 'O CPF informado é inválido. Por favor, confira o número.';
+        else if (msg.includes('unauthorized')) friendlyError = 'Credencial de pagamento não autorizada.';
+        else friendlyError = mpData.message;
+      }
+
       return new Response(
         JSON.stringify({
-          error: mpData.message || 'Falha ao gerar cobrança PIX no Mercado Pago.',
+          error: friendlyError,
+          user_message: friendlyError,
           details: mpData,
         }),
-        { status: mpResponse.status, headers: corsHeaders }
+        { status: mpResponse.status >= 500 ? 500 : 400, headers: corsHeaders }
       );
     }
 

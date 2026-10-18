@@ -84,6 +84,64 @@ export async function onRequestPost(context) {
       },
     };
 
+    const STATUS_DETAIL_MESSAGES = {
+      cc_rejected_bad_filled_card_number: 'Número do cartão inválido ou incompleto. Por favor, confira os números digitados.',
+      cc_rejected_bad_filled_date: 'Data de validade incorreta. Verifique o mês e ano informados no cartão.',
+      cc_rejected_bad_filled_security_code: 'Código de segurança (CVV) inválido. Verifique os 3 ou 4 dígitos no verso do cartão.',
+      cc_rejected_bad_filled_other: 'Dados do cartão preenchidos incorretamente. Verifique as informações digitadas.',
+      cc_rejected_insufficient_amount: 'Saldo ou limite insuficiente no seu cartão de crédito.',
+      cc_rejected_call_for_authorize: 'Transação não autorizada pelo seu banco. Ligue para o número da operadora no verso do seu cartão para autorizar a compra, ou conclua via Pix.',
+      cc_rejected_card_disabled: 'Este cartão está bloqueado ou inativo. Desbloqueie no aplicativo do seu banco ou use outro cartão.',
+      cc_rejected_card_error: 'Não foi possível processar a transação com este cartão. Tente outro cartão ou opte pelo Pix.',
+      cc_rejected_duplicated_payment: 'Identificamos um pagamento idêntico recente. Aguarde alguns minutos ou utilize outro cartão.',
+      cc_rejected_high_risk: 'Transação recusada pelas políticas preventivas de segurança do emissor. Recomendamos pagar via Pix.',
+      cc_rejected_max_attempts: 'Você atingiu o limite de tentativas com este cartão. Aguarde alguns minutos ou realize o pagamento via Pix.',
+      cc_rejected_blacklist: 'Não foi possível processar com este cartão. Por favor, tente outro cartão ou utilize o Pix.',
+      cc_rejected_invalid_installments: 'A quantidade de parcelas selecionada não é permitida para este cartão.',
+      rejected_by_bank: 'O banco emissor do cartão recusou a autorização do pagamento.',
+      rejected_by_regulations: 'O pagamento não foi autorizado de acordo com as normas do banco emissor.',
+    };
+
+    function getFriendlyCardErrorMessage(data) {
+      if (!data) return 'Não foi possível processar o pagamento com cartão.';
+
+      if (data.status_detail && STATUS_DETAIL_MESSAGES[data.status_detail]) {
+        return STATUS_DETAIL_MESSAGES[data.status_detail];
+      }
+
+      if (Array.isArray(data.cause) && data.cause.length > 0) {
+        const causes = data.cause.map(c => {
+          const desc = String(c.description || '').toLowerCase();
+          const code = String(c.code || '');
+          if (code === '205' || desc.includes('parameter cardnumber')) return 'Número do cartão inválido.';
+          if (code === '208' || desc.includes('parameter cardexpirationmonth')) return 'Mês de validade inválido.';
+          if (code === '209' || desc.includes('parameter cardexpirationyear')) return 'Ano de validade inválido.';
+          if (code === '212' || desc.includes('parameter doctype')) return 'Tipo de documento inválido.';
+          if (code === '214' || desc.includes('parameter docnumber')) return 'CPF ou CNPJ do titular inválido.';
+          if (code === '220' || desc.includes('parameter cardissuerid')) return 'Emissor do cartão não identificado.';
+          if (code === '221' || desc.includes('parameter cardholdername')) return 'Nome do titular incompleto.';
+          if (code === '224' || desc.includes('parameter securitycode')) return 'Código CVV incorreto.';
+          if (code === 'E301' || desc.includes('invalid card_number_length')) return 'Quantidade de dígitos do cartão incorreta.';
+          if (code === 'E302' || desc.includes('invalid security_code')) return 'Código de segurança (CVV) inválido.';
+          if (code === '325' || desc.includes('invalid cardexpirationmonth')) return 'Mês de vencimento inválido.';
+          if (code === '326' || desc.includes('invalid cardexpirationyear')) return 'Ano de vencimento expirado ou inválido.';
+          return c.description || null;
+        }).filter(Boolean);
+
+        if (causes.length > 0) return causes.join(' ');
+      }
+
+      const rawMsg = String(data.message || data.error || '').toLowerCase();
+      if (rawMsg.includes('unauthorized') || rawMsg.includes('invalid credentials')) {
+        return 'Falha na autenticação do gateway de pagamento. Entre em contato com o suporte.';
+      }
+      if (rawMsg.includes('payer') && rawMsg.includes('identification')) {
+        return 'O CPF ou CNPJ informado do titular é inválido.';
+      }
+
+      return data.message || 'Pagamento recusado pela operadora do cartão.';
+    }
+
     const mpResponse = await fetch('https://api.mercadopago.com/v1/payments', {
       method: 'POST',
       headers: {
@@ -98,14 +156,31 @@ export async function onRequestPost(context) {
 
     if (!mpResponse.ok) {
       console.error('Erro Mercado Pago Cartão:', mpData);
+      const friendlyError = getFriendlyCardErrorMessage(mpData);
       return new Response(
         JSON.stringify({
-          error: mpData.message || 'Falha ao processar pagamento com cartão.',
+          error: friendlyError,
+          user_message: friendlyError,
           status: mpData.status || 'rejected',
           status_detail: mpData.status_detail,
           details: mpData,
         }),
-        { status: mpResponse.status, headers: corsHeaders }
+        { status: mpResponse.status >= 500 ? 500 : 400, headers: corsHeaders }
+      );
+    }
+
+    // Mesmo com HTTP 200/201, o pagamento pode ter sido recusado pelo emissor
+    if (mpData.status === 'rejected') {
+      const friendlyError = getFriendlyCardErrorMessage(mpData);
+      return new Response(
+        JSON.stringify({
+          id: mpData.id,
+          status: 'rejected',
+          status_detail: mpData.status_detail,
+          error: friendlyError,
+          user_message: friendlyError,
+        }),
+        { status: 200, headers: corsHeaders }
       );
     }
 
@@ -122,7 +197,7 @@ export async function onRequestPost(context) {
   } catch (err) {
     console.error('Exceção ao processar cartão:', err);
     return new Response(
-      JSON.stringify({ error: 'Erro interno ao processar pagamento.', message: err.message }),
+      JSON.stringify({ error: 'Erro interno ao processar pagamento.', user_message: 'Instabilidade de conexão ao processar seu pagamento. Por favor, tente novamente.', message: err.message }),
       { status: 500, headers: corsHeaders }
     );
   }
