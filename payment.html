@@ -620,12 +620,16 @@
       <!-- MÉTODO 2: CARTÃO DE CRÉDITO -->
       <div id="method-card" style="display:none;">
         <form id="form-checkout">
+          <!-- Campo invisível de e-mail e tipo de documento exigidos internamente pelo SDK do Mercado Pago -->
+          <input type="hidden" id="form-checkout__cardholderEmail" />
+          <select id="form-checkout__identificationType" style="display:none;"></select>
+
           <div class="grid-2">
             <div class="form-group">
               <label for="form-checkout__cardholderName">NOME IMPRESSO NO CARTÃO <span class="req">*</span></label>
               <input type="text" id="form-checkout__cardholderName" placeholder="NOME COMPLETO" required />
             </div>
-            <!-- Campo CPF / CNPJ do titular DIRETO sem Tipo de Documento -->
+            <!-- Campo CPF / CNPJ do titular DIRETO sem Tipo de Documento visível -->
             <div class="form-group">
               <label for="form-checkout__identificationNumber">CPF / CNPJ DO TITULAR <span class="req">*</span></label>
               <input type="text" id="form-checkout__identificationNumber" placeholder="000.000.000-00" required />
@@ -810,6 +814,7 @@
       document.getElementById('sum-concurso').textContent = concurso;
       document.getElementById('sum-cargo').textContent = cargo;
       document.getElementById('sum-plano').textContent = planData[planKey].title;
+      document.getElementById('form-checkout__cardholderEmail').value = email;
 
       // Troca visual das etapas
       document.getElementById('stage-1').style.display = 'none';
@@ -847,7 +852,9 @@
       document.getElementById('method-card').style.display = method === 'card' ? 'block' : 'none';
 
       if (method === 'card' && !cardFormInitialized) {
-        initCardForm();
+        setTimeout(() => {
+          initCardForm();
+        }, 100);
       }
     }
 
@@ -958,6 +965,10 @@
               id: "form-checkout__cardholderName",
               placeholder: "NOME IMPRESSO NO CARTÃO",
             },
+            cardholderEmail: {
+              id: "form-checkout__cardholderEmail",
+              placeholder: "E-MAIL",
+            },
             cardNumber: {
               id: "form-checkout__cardNumber-container",
               placeholder: "0000 0000 0000 0000",
@@ -988,6 +999,10 @@
             installments: {
               id: "form-checkout__installments",
               placeholder: "Parcelas",
+            },
+            identificationType: {
+              id: "form-checkout__identificationType",
+              placeholder: "Tipo",
             },
             identificationNumber: {
               id: "form-checkout__identificationNumber",
