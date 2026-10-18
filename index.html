@@ -14,6 +14,16 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
+    <script>
+    (function() {
+      try {
+        var t = localStorage.getItem('crivo_web_theme');
+        if (t === 'dark' || (!t && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      } catch(e) {}
+    })();
+  </script>
   <!-- Estilos Oficiais CRIVO (Editorial Suíço / Brutalista) -->
   <link rel="stylesheet" href="style.css">
 </head>
@@ -28,6 +38,7 @@
     </div>
     <div class="crivo-topbar-right">
       <span>SISTEMAS DE ESTUDO PÓS-EDITAL SOB DEMANDA</span>
+      <button type="button" id="theme-toggle-btn" class="theme-toggle-btn" title="Alternar Modo Escuro">[ ◐ DIA ]</button>
     </div>
   </header>
 
@@ -49,8 +60,19 @@
 
     <div class="nav-actions">
       <a href="#precos" class="btn btn-primary">Montar Meu Plano →</a>
+      <button type="button" id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Menu de Navegação">☰ MENU</button>
     </div>
   </nav>
+
+  <!-- DRAWER MOBILE DE NAVEGAÇÃO -->
+  <div id="mobile-nav-drawer" class="mobile-nav-drawer">
+    <a href="#como-funciona" class="mobile-nav-link">01. Como Funciona</a>
+    <a href="#anatomia" class="mobile-nav-link">02. Anatomia do Plano</a>
+    <a href="#demonstracao" class="mobile-nav-link">03. Demonstração Ao Vivo</a>
+    <a href="#precos" class="mobile-nav-link">04. Tabela de Preços</a>
+    <a href="#faq" class="mobile-nav-link">05. Perguntas Frequentes (FAQ)</a>
+    <a href="#precos" class="btn btn-primary" style="width:100%;margin-top:6px;">Montar Meu Plano →</a>
+  </div>
 
   <!-- ======================================================== -->
   <!-- B. HERO SECTION (A GRANDE PROMESSA)                      -->
@@ -204,7 +226,7 @@
             </div>
             <p style="font-size:12px;margin-bottom:12px;">Disciplinas ordenadas por relevância e incidência na prova.</p>
 
-            <table class="demo-table">
+            <div class="demo-table-wrapper"><table class="demo-table">
               <thead>
                 <tr>
                   <th>Disciplina</th>
@@ -245,7 +267,7 @@
                   <td style="text-align:right;">2.5h/sem</td>
                 </tr>
               </tbody>
-            </table>
+            </table></div>
 
             <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-muted);">
               *Regra de Pareto: 60% do seu tempo dedicado nos 80% das chances de aprovação.
