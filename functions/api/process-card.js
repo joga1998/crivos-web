@@ -50,11 +50,11 @@ export async function onRequestPost(context) {
       });
     }
 
-    const accessToken = env.MP_ACCESS_TOKEN;
+    const accessToken = env?.MP_ACCESS_TOKEN || (typeof MP_ACCESS_TOKEN !== 'undefined' ? MP_ACCESS_TOKEN : null);
     if (!accessToken) {
       return new Response(
         JSON.stringify({
-          error: 'Configuração incompleta: Variável MP_ACCESS_TOKEN não definida nas variáveis de ambiente do Cloudflare Pages.',
+          error: 'Configuração incompleta: Variável MP_ACCESS_TOKEN não definida nas variáveis de ambiente do Cloudflare Pages (verifique se foi adicionada em Production e Preview em Settings > Variables and Secrets).',
         }),
         { status: 500, headers: corsHeaders }
       );
