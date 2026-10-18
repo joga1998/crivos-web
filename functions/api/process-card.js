@@ -2,15 +2,20 @@
 function getCorsHeaders(request) {
   const origin = request.headers.get('Origin') || '';
   const isAllowed =
+    origin === 'https://crivos.me' ||
+    origin.endsWith('.crivos.me') ||
     origin === 'https://crivos.com.br' ||
-    origin === 'https://www.crivos.com.br' ||
+    origin.endsWith('.crivos.com.br') ||
     origin === 'https://crivos-web.pages.dev' ||
     origin.endsWith('.crivos-web.pages.dev') ||
+    origin.endsWith('.pages.dev') ||
     origin.startsWith('http://localhost:') ||
     origin.startsWith('http://127.0.0.1:');
 
+  const defaultOrigin = origin.includes('crivos.me') ? origin : 'https://crivos.me';
+
   return {
-    'Access-Control-Allow-Origin': isAllowed ? origin : 'https://crivos-web.pages.dev',
+    'Access-Control-Allow-Origin': isAllowed ? origin : defaultOrigin,
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Max-Age': '86400',
