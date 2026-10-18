@@ -24,6 +24,8 @@ function getCorsHeaders(request) {
   };
 }
 
+import { provisionUserOrder } from './_provision.js';
+
 export async function onRequestPost(context) {
   const { request, env } = context;
   const corsHeaders = getCorsHeaders(request);
@@ -39,6 +41,7 @@ export async function onRequestPost(context) {
       email,
       docType,
       docNumber,
+      orderId,
     } = body;
 
     const planPrices = {
@@ -93,6 +96,8 @@ export async function onRequestPost(context) {
       installments: Number(installments) || 1,
       payment_method_id,
       issuer_id: issuer_id ? String(issuer_id) : undefined,
+      external_reference: orderId ? String(orderId) : undefined,
+      notification_url: 'https://crivos.me/api/webhook-mp',
       payer: {
         email: email.trim(),
         identification: cleanDocNumber
@@ -201,6 +206,19 @@ export async function onRequestPost(context) {
         }),
         { status: 200, headers: corsHeaders }
       );
+    }
+
+    // Se aprovado imediatamente, já provisiona o usuário e envia o E-mail #1
+    if (mpData.status === 'approved') {
+      try {
+        await provisionUserOrder(env, {
+          orderId: orderId || null,
+          mpPaymentId: String(mpData.id),
+          paymentMethod: 'credit_card',
+        });
+      } catch (provErr) {
+        console.warn('[process-card] Falha no provisionamento imediato (o webhook cuidará):', provErr.message);
+      }
     }
 
     return new Response(

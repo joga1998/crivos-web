@@ -814,9 +814,12 @@
     // ==========================================
     let userOrderData = {};
 
-    function goToStage2(e) {
+    async function goToStage2(e) {
       e.preventDefault();
       hideError();
+
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const originalBtnText = submitBtn ? submitBtn.innerHTML : '';
 
       const email = document.getElementById('user-email').value.trim();
       const concurso = document.getElementById('user-concurso').value.trim();
@@ -824,7 +827,8 @@
       const availability = document.getElementById('user-availability').value.trim();
       const planKey = productSelect.value;
       const fileInput = document.getElementById('edital-file');
-      const fileName = fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0].name : null;
+      const file = fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
+      const fileName = file ? file.name : null;
 
       if (!email || !concurso || !cargo) {
         showError('Por favor, informe seu e-mail, concurso e cargo pretendido.');
@@ -836,31 +840,78 @@
         return;
       }
 
-      userOrderData = {
-        email,
-        concurso,
-        cargo,
-        availability,
-        fileName,
-        planKey,
-      };
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'REGISTRANDO ESPECIFICAÇÃO DE ENGENHARIA...';
+      }
 
-      // Atualiza o resumo da Etapa 2
-      document.getElementById('sum-email').textContent = email;
-      document.getElementById('sum-concurso').textContent = `${concurso} (${cargo})`;
-      document.getElementById('sum-rotina').textContent = availability.length > 70 ? availability.substring(0, 70) + '...' : availability;
-      document.getElementById('sum-edital').textContent = fileName ? `Anexado (${fileName})` : 'Localização oficial automática pela equipe CRIVOS';
-      document.getElementById('sum-plano').textContent = planData[planKey].title;
+      try {
+        const formData = new FormData();
+        formData.append('email', email);
+        formData.append('concurso', concurso);
+        formData.append('cargo', cargo);
+        formData.append('availability', availability);
+        formData.append('plan', planKey);
+        if (file) {
+          formData.append('editalFile', file);
+        }
 
-      // Troca visual das etapas
-      document.getElementById('stage-1').style.display = 'none';
-      document.getElementById('stage-2').style.display = 'block';
+        const intakeRes = await fetch('/api/save-intake', {
+          method: 'POST',
+          body: formData,
+        });
 
-      document.getElementById('step-nav-1').classList.remove('active');
-      document.getElementById('step-nav-1').classList.add('done');
-      document.getElementById('step-nav-2').classList.add('active');
+        const intakeData = await intakeRes.json();
+        const orderId = intakeData?.orderId || null;
 
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+        userOrderData = {
+          orderId,
+          email,
+          concurso,
+          cargo,
+          availability,
+          fileName,
+          planKey,
+        };
+
+        // Atualiza o resumo da Etapa 2
+        document.getElementById('sum-email').textContent = email;
+        document.getElementById('sum-concurso').textContent = `${concurso} (${cargo})`;
+        document.getElementById('sum-rotina').textContent = availability.length > 70 ? availability.substring(0, 70) + '...' : availability;
+        document.getElementById('sum-edital').textContent = fileName ? `Anexado (${fileName})` : 'Localização oficial automática pela equipe CRIVOS';
+        document.getElementById('sum-plano').textContent = planData[planKey].title;
+
+        // Troca visual das etapas
+        document.getElementById('stage-1').style.display = 'none';
+        document.getElementById('stage-2').style.display = 'block';
+
+        document.getElementById('step-nav-1').classList.remove('active');
+        document.getElementById('step-nav-1').classList.add('done');
+        document.getElementById('step-nav-2').classList.add('active');
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (err) {
+        console.warn('Aviso no intake:', err);
+        // Mesmo em falha transitória do intake, permite seguir
+        userOrderData = {
+          email,
+          concurso,
+          cargo,
+          availability,
+          fileName,
+          planKey,
+        };
+        document.getElementById('stage-1').style.display = 'none';
+        document.getElementById('stage-2').style.display = 'block';
+        document.getElementById('step-nav-1').classList.remove('active');
+        document.getElementById('step-nav-1').classList.add('done');
+        document.getElementById('step-nav-2').classList.add('active');
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalBtnText;
+        }
+      }
     }
 
     function backToStage1() {
@@ -927,6 +978,7 @@
             lastName,
             docType: 'CPF',
             docNumber: cpf,
+            orderId: userOrderData.orderId || undefined,
           }),
         });
 
@@ -1108,6 +1160,7 @@
                       email: candidateEmail,
                       docType: cardFormData.payer?.identification?.type,
                       docNumber: cardFormData.payer?.identification?.number,
+                      orderId: userOrderData.orderId || undefined,
                     }),
                   });
 

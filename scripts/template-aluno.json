@@ -1,0 +1,70 @@
+{
+  "header_config": {
+    "title": "SEU CONCURSO / ÓRGÃO 2026",
+    "subtitle": "CARGO: ANALISTA JUDICIÁRIO · ÁREA JUDICIÁRIA",
+    "badge": "// SISTEMA ARSENAL",
+    "dates": [
+      ["Meta de inscrição", "2026-11-15T23:59"],
+      ["Prova Objetiva e Discursiva", "2027-01-24T09:00"],
+      ["Resultado Preliminar", "2027-03-01T17:00"]
+    ]
+  },
+  "enabled_modules": {
+    "home": "active",
+    "crono": "active",
+    "textos": "active",
+    "cards": "active",
+    "pomo": "active",
+    "sim": "locked_upsell",
+    "arg": "hidden",
+    "mapa": "active",
+    "links": "active",
+    "dicas": "active",
+    "dados": "active",
+    "perfil": "active"
+  },
+  "content_data": {
+    "sched": [
+      {
+        "d": "2026-10-20",
+        "h": 3,
+        "t": "<span class=\"tag adm\">ADM</span> Leitura inicial do Edital e montagem do ciclo semanal de estudo."
+      },
+      {
+        "d": "2026-10-21",
+        "h": 3.5,
+        "t": "<span class=\"tag ar\">DIREITO CONST</span> <b>Direitos Fundamentais</b> (Art. 5º). Ficha esquemática e resolução de 20 questões."
+      }
+    ],
+    "texts": [
+      {
+        "id": "const_art5",
+        "sec": "area",
+        "prio": "ESSENCIAL",
+        "ordem": 1,
+        "autor": "Constituição Federal",
+        "titulo": "Título II — Dos Direitos e Garantias Fundamentais",
+        "ref": "BRASIL. Constituição da República Federativa do Brasil de 1988.",
+        "arq": "constituicao_1988_art5.pdf",
+        "faixa": "Art. 5º (completo)",
+        "porque": "Matéria com maior incidência estatística histórica na banca examinadora.",
+        "contexto": "Dispositivos pétreos e jurisprudência vinculante do STF.",
+        "tese": "Eficácia plena e aplicabilidade imediata dos direitos individuais.",
+        "conceitos": [
+          ["Habeas Corpus", "Garantia de liberdade de locomoção contra ato ilegal ou abuso de poder."],
+          ["Mandado de Segurança", "Proteção de direito líquido e certo não amparado por HC ou HD."]
+        ],
+        "estrutura": ["Incisos I a XL", "Incisos XLI a LXXVIII"],
+        "cit": [["Art. 5", "Todos são iguais perante a lei", "Princípio da isonomia."]],
+        "ex_comp": [
+          ["Qual a distinção entre remédios constitucionais judiciais e administrativos?", "Os remédios judiciais dependem de provocação ao Poder Judiciário (HC, MS, HD), enquanto os administrativos decorrem do direito de petição e certidão."]
+        ]
+      }
+    ],
+    "sim": {},
+    "arg": {},
+    "rubric": {},
+    "vespera": "<h2>Orientações de Véspera</h2><p>Descanse e revise apenas pontos-chave.</p>",
+    "escrita": "<p>Técnicas de estruturação de resposta discursiva para o cargo.</p>"
+  }
+}

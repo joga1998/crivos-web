@@ -24,13 +24,15 @@ function getCorsHeaders(request) {
   };
 }
 
+import { supabaseRest } from './_supabase.js';
+
 export async function onRequestPost(context) {
   const { request, env } = context;
   const corsHeaders = getCorsHeaders(request);
 
   try {
     const body = await request.json();
-    const { plan, email, firstName, lastName, docType, docNumber } = body;
+    const { plan, email, firstName, lastName, docType, docNumber, orderId } = body;
 
     // Tabela oficial de preços no servidor (anti-adulteração de preços no frontend)
     const planPrices = {
@@ -76,8 +78,7 @@ export async function onRequestPost(context) {
       );
     }
 
-    // Limpeza de pontuação do documento
-    const cleanDocNumber = String(docNumber).replace(/\D/g, '');
+    // Tipo do documento
     const cleanDocType = docType || 'CPF';
 
     // Chave única de idempotência para evitar cobranças duplicadas em requisições repetidas
@@ -87,6 +88,8 @@ export async function onRequestPost(context) {
       transaction_amount: selected.amount,
       description: selected.title,
       payment_method_id: 'pix',
+      external_reference: orderId ? String(orderId) : undefined,
+      notification_url: 'https://crivos.me/api/webhook-mp',
       payer: {
         email: email.trim(),
         first_name: firstName ? firstName.trim() : 'Candidato',
@@ -136,6 +139,24 @@ export async function onRequestPost(context) {
         }),
         { status: mpResponse.status >= 500 ? 500 : 400, headers: corsHeaders }
       );
+    }
+
+    // Se temos orderId, vincula mp_payment_id e full_name na tabela orders
+    if (orderId && mpData?.id) {
+      try {
+        const fullName = `${firstName || ''} ${lastName || ''}`.trim() || undefined;
+        await supabaseRest(env, `/orders?id=eq.${orderId}`, {
+          method: 'PATCH',
+          body: {
+            mp_payment_id: String(mpData.id),
+            full_name: fullName,
+            doc_number: cleanDocNumber,
+            payment_method: 'pix',
+          },
+        });
+      } catch (patchErr) {
+        console.warn('[process-pix] Falha ao atualizar orders com mp_payment_id:', patchErr.message);
+      }
     }
 
     const txData = mpData.point_of_interaction?.transaction_data;
