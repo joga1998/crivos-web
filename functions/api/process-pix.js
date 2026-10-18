@@ -36,8 +36,8 @@ export async function onRequestPost(context) {
       });
     }
 
-    // Token secreto do Mercado Pago configurado no Cloudflare Pages Secrets
-    const accessToken = env?.MP_ACCESS_TOKEN || (typeof MP_ACCESS_TOKEN !== 'undefined' ? MP_ACCESS_TOKEN : null);
+    // Token secreto do Mercado Pago configurado no Cloudflare Pages Secrets (suporta MP_ACCESS_TOKEN e MP_ACESS_TOKEN)
+    const accessToken = env?.MP_ACCESS_TOKEN || env?.MP_ACESS_TOKEN || (typeof MP_ACCESS_TOKEN !== 'undefined' ? MP_ACCESS_TOKEN : (typeof MP_ACESS_TOKEN !== 'undefined' ? MP_ACESS_TOKEN : null));
     if (!accessToken) {
       return new Response(
         JSON.stringify({

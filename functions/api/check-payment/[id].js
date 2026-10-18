@@ -17,7 +17,7 @@ export async function onRequestGet(context) {
     });
   }
 
-  const accessToken = env?.MP_ACCESS_TOKEN || (typeof MP_ACCESS_TOKEN !== 'undefined' ? MP_ACCESS_TOKEN : null);
+  const accessToken = env?.MP_ACCESS_TOKEN || env?.MP_ACESS_TOKEN || (typeof MP_ACCESS_TOKEN !== 'undefined' ? MP_ACCESS_TOKEN : (typeof MP_ACESS_TOKEN !== 'undefined' ? MP_ACESS_TOKEN : null));
   if (!accessToken) {
     return new Response(
       JSON.stringify({
