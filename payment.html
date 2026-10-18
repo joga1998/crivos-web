@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRIVOS // Checkout Seguro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <!-- SDK Oficial do Mercado Pago -->
+  <script src="https://sdk.mercadopago.com/js/v2"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      border-radius: 0px !important;
+    }
+    body {
+      background-color: #F4F4F0;
+      color: #111111;
+      font-family: 'Inter', sans-serif;
+      padding: 40px 20px;
+    }
+    .checkout-container {
+      max-width: 520px;
+      margin: 0 auto;
+      background: #FFFFFF;
+      border: 1px solid #111111;
+      box-shadow: 4px 4px 0px #111111;
+      padding: 32px;
+    }
+    .header-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      background: #D92B2B;
+      color: #FFFFFF;
+      padding: 4px 8px;
+      display: inline-block;
+      margin-bottom: 16px;
+      font-weight: 700;
+    }
+    h1 {
+      font-size: 24px;
+      font-weight: 900;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+      letter-spacing: -0.5px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      display: block;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+    select, input {
+      width: 100%;
+      background: #F4F4F0;
+      border: 1px solid #111111;
+      padding: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      color: #111111;
+    }
+    select:focus, input:focus {
+      outline: none;
+      border-color: #D92B2B;
+    }
+    .mp-container {
+      background: #F4F4F0;
+      border: 1px solid #111111;
+      padding: 12px;
+      min-height: 45px;
+      margin-bottom: 4px;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .submit-btn {
+      width: 100%;
+      background: #111111;
+      color: #F4F4F0;
+      border: 1px solid #111111;
+      padding: 16px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 800;
+      font-size: 14px;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 2px 2px 0px #D92B2B;
+      margin-top: 8px;
+      transition: transform 0.1s ease;
+    }
+    .submit-btn:hover {
+      background: #D92B2B;
+      color: #FFFFFF;
+      box-shadow: 2px 2px 0px #111111;
+    }
+    .secure-footer {
+      margin-top: 24px;
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #666666;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="checkout-container">
+    <div class="header-tag">[ AMBIENTE DE AUDITORIA SEGURO ]</div>
+    <h1>Checkout CRIVOS</h1>
+
+    <form id="form-checkout">
+      <!-- Seletor de Plano (Permite alterar na hora) -->
+      <div class="form-group">
+        <label for="product-select">PLANO SELECIONADO</label>
+        <select id="product-select">
+          <option value="tatico">Nível 1 · Tático — R$ 67,00</option>
+          <option value="arsenal">Nível 2 · Arsenal (Com SM-2) — R$ 124,00</option>
+          <option value="elite">Nível 3 · Elite (Completo) — R$ 221,00</option>
+        </select>
+      </div>
+
+      <!-- E-mail -->
+      <div class="form-group">
+        <label for="form-checkout__cardholderEmail">E-MAIL DO CANDIDATO</label>
+        <input type="email" id="form-checkout__cardholderEmail" placeholder="seu.email@dominio.com" required />
+      </div>
+
+      <!-- Nome do Titular -->
+      <div class="form-group">
+        <label for="form-checkout__cardholderName">NOME IMPRESSO NO CARTÃO</label>
+        <input type="text" id="form-checkout__cardholderName" placeholder="NOME COMPLETO" required />
+      </div>
+
+      <!-- Número do Cartão -->
+      <div class="form-group">
+        <label>NÚMERO DO CARTÃO</label>
+        <div id="form-checkout__cardNumber-container" class="mp-container"></div>
+      </div>
+
+      <!-- Vencimento e CVV -->
+      <div class="grid-2">
+        <div class="form-group">
+          <label>VENCIMENTO</label>
+          <div id="form-checkout__expirationDate-container" class="mp-container"></div>
+        </div>
+        <div class="form-group">
+          <label>CVV</label>
+          <div id="form-checkout__securityCode-container" class="mp-container"></div>
+        </div>
+      </div>
+
+      <button type="submit" id="form-checkout__submit" class="submit-btn">
+        [ PROCESSAR PAGAMENTO ]
+      </button>
+    </form>
+
+    <div class="secure-footer">
+      CRIV<span style="color:#D92B2B">OS</span> // Processamento criptografado via Mercado Pago
+    </div>
+  </div>
+
+  <script>
+    // Inicializa o SDK do Mercado Pago com sua Public Key
+    const mp = new MercadoPago('SUA_PUBLIC_KEY_DO_MERCADO_PAGO', {
+      locale: 'pt-BR'
+    });
+
+    // Mapeamento de preços por plano
+    const prices = {
+      tatico: "67.00",
+      arsenal: "124.00",
+      elite: "221.00"
+    };
+
+    // Lê o parâmetro da URL para pré-selecionar o produto (ex: /payment.html?produto=arsenal)
+    const urlParams = new URLSearchParams(window.location.search);
+    const produtoParam = urlParams.get('produto');
+    const productSelect = document.getElementById('product-select');
+
+    if (produtoParam && prices[produtoParam]) {
+      productSelect.value = produtoParam;
+    }
+
+    let currentAmount = prices[productSelect.value];
+
+    // Atualiza o valor se o usuário alterar o plano no select da página
+    productSelect.addEventListener('change', (e) => {
+      currentAmount = prices[e.target.value];
+      // Reinicializa ou atualiza o formulário do cartão com o novo valor se necessário
+    });
+
+    // Monta o formulário de cartão seguro do Mercado Pago
+    const cardForm = mp.cardForm({
+      amount: currentAmount,
+      autoMount: true,
+      processingMode: "aggregator",
+      form: {
+        id: "form-checkout",
+        cardholderName: {
+          id: "form-checkout__cardholderName",
+        },
+        cardholderEmail: {
+          id: "form-checkout__cardholderEmail",
+        },
+        securityCode: {
+          id: "form-checkout__securityCode-container",
+        },
+        expirationDate: {
+          id: "form-checkout__expirationDate-container",
+        },
+        cardNumber: {
+          id: "form-checkout__cardNumber-container",
+        },
+      },
+      callbacks: {
+        onFormMounted: error => {
+          if (error) return console.warn("Erro ao montar o form do cartão: ", error);
+        },
+        onSubmit: event => {
+          event.preventDefault();
+
+          const {
+            paymentMethodId: payment_method_id,
+            issuerId: issuer_id,
+            cardholderEmail: email,
+            token,
+            installments,
+            identificationNumber,
+            identificationType,
+          } = cardForm.getCardFormData();
+
+          const selectedPlan = productSelect.value;
+
+          // Envia os dados tokenizados para sua API / Edge Function de cobrança
+          fetch('/api/process-payment', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              token,
+              issuer_id,
+              payment_method_id,
+              transaction_amount: Number(prices[selectedPlan]),
+              installments: Number(installments),
+              description: `CRIVOS // Plano ${selectedPlan.toUpperCase()}`,
+              payer: {
+                email,
+                identification: {
+                  type: identificationType || 'CPF',
+                  number: identificationNumber || '00000000000',
+                },
+              },
+            }),
+          })
+          .then(res => res.json())
+          .then(result => {
+            if (result.status === 'approved') {
+              window.location.href = `/sucesso.html?id=${result.id}`;
+            } else {
+              alert('Pagamento não aprovado. Verifique os dados ou tente outro cartão.');
+            }
+          })
+          .catch(err => {
+            console.error("Erro na requisição de pagamento:", err);
+            alert('Erro de comunicação com o gateway.');
+          });
+        },
+      },
+    });
+  </script>
+</body>
+</html>
