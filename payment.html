@@ -50,7 +50,6 @@
       margin: 0;
       padding: 0;
       border-radius: 0px !important;
-      transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
     }
 
     body {
@@ -205,20 +204,45 @@
       box-shadow: 2px 2px 0px var(--accent-color);
     }
 
+    /* Sistema de Abas Acessível para SDKs de Cartão */
     .tab-content {
-      display: none;
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+      opacity: 0;
+      pointer-events: none;
+      visibility: hidden;
+      height: 0;
+      overflow: hidden;
     }
 
     .tab-content.active {
-      display: block;
+      position: relative;
+      top: 0;
+      left: 0;
+      opacity: 1;
+      pointer-events: auto;
+      visibility: visible;
+      height: auto;
+      overflow: visible;
     }
 
     .mp-container {
       background: var(--input-bg);
       border: 1px solid var(--border-color);
-      padding: 10px 12px;
-      min-height: 44px;
+      min-height: 48px;
+      height: 48px;
+      display: block;
       margin-bottom: 4px;
+      position: relative;
+      padding: 0;
+    }
+
+    .mp-container iframe {
+      width: 100% !important;
+      height: 100% !important;
+      min-height: 46px !important;
+      border: none !important;
     }
 
     .grid-2 {
@@ -564,12 +588,18 @@
       }
     });
 
+    let cardFormInitialized = false;
+
     // Alternador de Abas
     function switchTab(tab) {
       document.getElementById('tab-pix-btn').classList.toggle('active', tab === 'pix');
       document.getElementById('tab-card-btn').classList.toggle('active', tab === 'card');
       document.getElementById('tab-pix').classList.toggle('active', tab === 'pix');
       document.getElementById('tab-card').classList.toggle('active', tab === 'card');
+
+      if (tab === 'card' && !cardFormInitialized) {
+        initCardForm();
+      }
     }
 
     function showError(msg) {
@@ -672,12 +702,12 @@
       }, 4000);
     }
 
-    // ==========================================
-    // FLUXO 2: CARTÃO DE CRÉDITO TRANSPARENTE
-    // ==========================================
     let cardFormInstance = null;
 
-    if (mp) {
+    function initCardForm() {
+      if (cardFormInitialized || !mp) return;
+      cardFormInitialized = true;
+
       try {
         cardFormInstance = mp.cardForm({
           amount: planData[productSelect.value].price,
@@ -694,15 +724,30 @@
             },
             cardNumber: {
               id: "form-checkout__cardNumber-container",
-              placeholder: "NÚMERO DO CARTÃO",
+              placeholder: "0000 0000 0000 0000",
+              style: {
+                color: document.documentElement.getAttribute('data-theme') === 'dark' ? '#F4F4F0' : '#111111',
+                fontSize: '13px',
+                fontFamily: 'monospace',
+              },
             },
             expirationDate: {
               id: "form-checkout__expirationDate-container",
               placeholder: "MM/AA",
+              style: {
+                color: document.documentElement.getAttribute('data-theme') === 'dark' ? '#F4F4F0' : '#111111',
+                fontSize: '13px',
+                fontFamily: 'monospace',
+              },
             },
             securityCode: {
               id: "form-checkout__securityCode-container",
               placeholder: "CVV",
+              style: {
+                color: document.documentElement.getAttribute('data-theme') === 'dark' ? '#F4F4F0' : '#111111',
+                fontSize: '13px',
+                fontFamily: 'monospace',
+              },
             },
             installments: {
               id: "form-checkout__installments",
@@ -723,7 +768,8 @@
           },
           callbacks: {
             onFormMounted: error => {
-              if (error) console.warn("Erro cardForm:", error);
+              if (error) return console.warn("Erro ao montar cardForm:", error);
+              console.log("Campos de cartão Mercado Pago montados com sucesso.");
             },
             onIssuersReceived: (error, issuers) => {
               const wrapper = document.getElementById('issuer-wrapper');
