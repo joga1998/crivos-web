@@ -617,56 +617,13 @@
         </div>
       </div>
 
-      <!-- MÉTODO 2: CARTÃO DE CRÉDITO -->
+      <!-- MÉTODO 2: CARTÃO DE CRÉDITO COM CHECKOUT BRICK OFICIAL -->
       <div id="method-card" style="display:none;">
-        <form id="form-checkout">
-          <!-- Campo invisível de e-mail e tipo de documento exigidos internamente pelo SDK do Mercado Pago -->
-          <input type="hidden" id="form-checkout__cardholderEmail" />
-          <select id="form-checkout__identificationType" style="display:none;"></select>
-
-          <div class="grid-2">
-            <div class="form-group">
-              <label for="form-checkout__cardholderName">NOME IMPRESSO NO CARTÃO <span class="req">*</span></label>
-              <input type="text" id="form-checkout__cardholderName" placeholder="NOME COMPLETO" required />
-            </div>
-            <!-- Campo CPF / CNPJ do titular DIRETO sem Tipo de Documento visível -->
-            <div class="form-group">
-              <label for="form-checkout__identificationNumber">CPF / CNPJ DO TITULAR <span class="req">*</span></label>
-              <input type="text" id="form-checkout__identificationNumber" placeholder="000.000.000-00" required />
-            </div>
+        <div id="cardPaymentBrick_container" style="min-height: 280px; width: 100%;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-muted);padding:20px;text-align:center;">
+            [ CARREGANDO TERMINAL DE CARTÃO CRIPTOGRAFADO... ]
           </div>
-
-          <div class="form-group">
-            <label>NÚMERO DO CARTÃO <span class="req">*</span></label>
-            <div id="form-checkout__cardNumber-container" class="mp-container"></div>
-          </div>
-
-          <div class="grid-2">
-            <div class="form-group">
-              <label>VENCIMENTO (MM/AA) <span class="req">*</span></label>
-              <div id="form-checkout__expirationDate-container" class="mp-container"></div>
-            </div>
-            <div class="form-group">
-              <label>CVV <span class="req">*</span></label>
-              <div id="form-checkout__securityCode-container" class="mp-container"></div>
-            </div>
-          </div>
-
-          <div class="grid-2">
-            <div class="form-group" style="display:none;" id="issuer-wrapper">
-              <label for="form-checkout__issuer">BANCO EMISSOR</label>
-              <select id="form-checkout__issuer"></select>
-            </div>
-            <div class="form-group" style="grid-column: span 2;" id="installments-wrapper">
-              <label for="form-checkout__installments">NÚMERO DE PARCELAS <span class="req">*</span></label>
-              <select id="form-checkout__installments"></select>
-            </div>
-          </div>
-
-          <button type="submit" id="form-checkout__submit" class="submit-btn">
-            [ PAGAR R$ <span class="current-price-label">67,00</span> NO CARTÃO ]
-          </button>
-        </form>
+        </div>
       </div>
 
       <button type="button" class="submit-btn btn-secondary" onclick="backToStage1()">
@@ -747,8 +704,16 @@
 
     productSelect.addEventListener('change', () => {
       const newPrice = updatePlanUI();
-      if (cardFormInstance && cardFormInstance.setAmount) {
-        cardFormInstance.setAmount(newPrice);
+      // Se o brick já tiver sido renderizado, desmonta para recriar com o novo valor se trocar de aba
+      if (cardBrickController) {
+        cardBrickInitialized = false;
+        try {
+          cardBrickController.unmount();
+        } catch (e) {}
+        cardBrickController = null;
+        if (currentMethod === 'card') {
+          initCardForm();
+        }
       }
     });
 
@@ -814,7 +779,6 @@
       document.getElementById('sum-concurso').textContent = concurso;
       document.getElementById('sum-cargo').textContent = cargo;
       document.getElementById('sum-plano').textContent = planData[planKey].title;
-      document.getElementById('form-checkout__cardholderEmail').value = email;
 
       // Troca visual das etapas
       document.getElementById('stage-1').style.display = 'none';
@@ -851,10 +815,10 @@
       document.getElementById('method-pix').style.display = method === 'pix' ? 'block' : 'none';
       document.getElementById('method-card').style.display = method === 'card' ? 'block' : 'none';
 
-      if (method === 'card' && !cardFormInitialized) {
+      if (method === 'card' && !cardBrickInitialized) {
         setTimeout(() => {
           initCardForm();
-        }, 100);
+        }, 50);
       }
     }
 
@@ -946,132 +910,113 @@
     }
 
     // ==========================================
-    // FLUXO 2: CARTÃO DE CRÉDITO COM SDK OFICIAL
+    // FLUXO 2: CARTÃO DE CRÉDITO COM CHECKOUT BRICK OFICIAL
     // ==========================================
-    let cardFormInitialized = false;
-    let cardFormInstance = null;
+    let cardBrickInitialized = false;
+    let cardBrickController = null;
 
-    function initCardForm() {
-      if (cardFormInitialized || !mp) return;
-      cardFormInitialized = true;
+    async function initCardForm() {
+      if (cardBrickInitialized || !mp) return;
+      cardBrickInitialized = true;
+
+      const currentAmount = parseFloat(planData[productSelect.value].price);
+      const email = userOrderData.email || document.getElementById('user-email').value || 'candidato@crivos.com.br';
 
       try {
-        cardFormInstance = mp.cardForm({
-          amount: planData[productSelect.value].price,
-          autoMount: true,
-          form: {
-            id: "form-checkout",
-            cardholderName: {
-              id: "form-checkout__cardholderName",
-              placeholder: "NOME IMPRESSO NO CARTÃO",
+        const bricksBuilder = mp.bricks();
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+
+        const settings = {
+          initialization: {
+            amount: currentAmount,
+            payer: {
+              email: email,
             },
-            cardholderEmail: {
-              id: "form-checkout__cardholderEmail",
-              placeholder: "E-MAIL",
-            },
-            cardNumber: {
-              id: "form-checkout__cardNumber-container",
-              placeholder: "0000 0000 0000 0000",
+          },
+          customization: {
+            visual: {
               style: {
-                color: document.documentElement.getAttribute('data-theme') === 'dark' ? '#F4F4F0' : '#111111',
-                fontSize: '13px',
-                fontFamily: 'monospace',
+                theme: isDark ? 'dark' : 'default',
+                customVariables: {
+                  primaryColor: '#D92B2B',
+                  baseColor: isDark ? '#F4F4F0' : '#111111',
+                  baseColorSecondary: isDark ? '#A0A0A0' : '#666666',
+                  borderRadius: '0px',
+                  fontFamily: 'Inter, sans-serif',
+                }
               },
+              hidePaymentButton: false,
+              texts: {
+                formTitle: 'DADOS DO CARTÃO DE CRÉDITO',
+              }
             },
-            expirationDate: {
-              id: "form-checkout__expirationDate-container",
-              placeholder: "MM/AA",
-              style: {
-                color: document.documentElement.getAttribute('data-theme') === 'dark' ? '#F4F4F0' : '#111111',
-                fontSize: '13px',
-                fontFamily: 'monospace',
-              },
-            },
-            securityCode: {
-              id: "form-checkout__securityCode-container",
-              placeholder: "CVV",
-              style: {
-                color: document.documentElement.getAttribute('data-theme') === 'dark' ? '#F4F4F0' : '#111111',
-                fontSize: '13px',
-                fontFamily: 'monospace',
-              },
-            },
-            installments: {
-              id: "form-checkout__installments",
-              placeholder: "Parcelas",
-            },
-            identificationType: {
-              id: "form-checkout__identificationType",
-              placeholder: "Tipo",
-            },
-            identificationNumber: {
-              id: "form-checkout__identificationNumber",
-              placeholder: "CPF ou CNPJ (somente números)",
-            },
-            issuer: {
-              id: "form-checkout__issuer",
-              placeholder: "Banco emissor",
+            paymentMethods: {
+              maxInstallments: 12,
             },
           },
           callbacks: {
-            onFormMounted: error => {
-              if (error) return console.warn("Erro ao montar cardForm:", error);
-              console.log("Campos de cartão Mercado Pago montados com sucesso.");
+            onReady: () => {
+              console.log("[CRIVOS] Card Payment Brick montado e pronto para interação.");
             },
-            onIssuersReceived: (error, issuers) => {
-              const wrapper = document.getElementById('issuer-wrapper');
-              if (issuers && issuers.length > 1) {
-                wrapper.style.display = 'block';
-              } else {
-                wrapper.style.display = 'none';
-              }
-            },
-            onSubmit: async event => {
-              event.preventDefault();
-              hideError();
+            onSubmit: (cardFormData) => {
+              return new Promise(async (resolve, reject) => {
+                hideError();
+                try {
+                  const selectedPlan = productSelect.value;
+                  const candidateEmail = userOrderData.email || document.getElementById('user-email').value;
 
-              const submitBtn = document.getElementById('form-checkout__submit');
-              submitBtn.disabled = true;
-              submitBtn.textContent = 'PROCESSANDO TRANSAÇÃO SEGURA...';
+                  const response = await fetch('/api/process-card', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      token: cardFormData.token,
+                      issuer_id: cardFormData.issuer_id,
+                      payment_method_id: cardFormData.payment_method_id,
+                      installments: cardFormData.installments,
+                      plan: selectedPlan,
+                      email: candidateEmail,
+                      docType: cardFormData.payer?.identification?.type,
+                      docNumber: cardFormData.payer?.identification?.number,
+                    }),
+                  });
 
-              try {
-                const formData = cardFormInstance.getCardFormData();
-                const selectedPlan = productSelect.value;
-                const email = userOrderData.email || document.getElementById('user-email').value;
+                  const result = await response.json();
 
-                const response = await fetch('/api/process-card', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    token: formData.token,
-                    issuer_id: formData.issuerId,
-                    payment_method_id: formData.paymentMethodId,
-                    installments: formData.installments,
-                    plan: selectedPlan,
-                    email: email,
-                    docNumber: formData.identificationNumber,
-                  }),
-                });
-
-                const result = await response.json();
-
-                if (response.ok && result.status === 'approved') {
-                  window.location.href = `/sucesso.html?id=${result.id}`;
-                } else if (result.status === 'in_process') {
-                  window.location.href = `/sucesso.html?id=${result.id}&status=in_process`;
-                } else {
-                  throw new Error(result.error || 'Pagamento recusado pelo emissor do cartão.');
+                  if (response.ok && result.status === 'approved') {
+                    window.location.href = `/sucesso.html?id=${result.id}`;
+                    resolve();
+                  } else if (result.status === 'in_process') {
+                    window.location.href = `/sucesso.html?id=${result.id}&status=in_process`;
+                    resolve();
+                  } else {
+                    const errMsg = result.error || 'Pagamento recusado pelo emissor do cartão.';
+                    showError(errMsg);
+                    reject(errMsg);
+                  }
+                } catch (err) {
+                  showError(err.message || 'Erro ao comunicar com o servidor.');
+                  reject(err);
                 }
-              } catch (err) {
-                showError(err.message);
-                submitBtn.disabled = false;
-                submitBtn.textContent = `[ PAGAR R$ ${planData[productSelect.value].formatted} NO CARTÃO ]`;
-              }
+              });
+            },
+            onError: (error) => {
+              console.error("[CRIVOS] Erro no Card Payment Brick:", error);
+              showError("Houve uma falha ao renderizar os campos seguros do cartão. Tente recarregar a página.");
             },
           },
-        });
+        };
+
+        const container = document.getElementById('cardPaymentBrick_container');
+        container.innerHTML = ''; // Limpa o placeholder de carregamento
+
+        cardBrickController = await bricksBuilder.create(
+          'cardPayment',
+          'cardPaymentBrick_container',
+          settings
+        );
       } catch (err) {
-        console.warn("Falha ao inicializar cardForm:", err);
+        console.error("Falha ao inicializar Card Payment Brick:", err);
+        showError("Não foi possível carregar os campos do cartão.");
       }
     }
   </script>
