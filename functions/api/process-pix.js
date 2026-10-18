@@ -1,14 +1,27 @@
 // Cloudflare Pages Function: Processamento de PIX transparente via Mercado Pago
-export async function onRequestPost(context) {
-  const { request, env } = context;
+function getCorsHeaders(request) {
+  const origin = request.headers.get('Origin') || '';
+  const isAllowed =
+    origin === 'https://crivos.com.br' ||
+    origin === 'https://www.crivos.com.br' ||
+    origin === 'https://crivos-web.pages.dev' ||
+    origin.endsWith('.crivos-web.pages.dev') ||
+    origin.startsWith('http://localhost:') ||
+    origin.startsWith('http://127.0.0.1:');
 
-  // Cabeçalhos CORS para permitir requisições seguras
-  const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
+  return {
+    'Access-Control-Allow-Origin': isAllowed ? origin : 'https://crivos-web.pages.dev',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Max-Age': '86400',
     'Content-Type': 'application/json',
+    'X-Content-Type-Options': 'nosniff',
   };
+}
+
+export async function onRequestPost(context) {
+  const { request, env } = context;
+  const corsHeaders = getCorsHeaders(request);
 
   try {
     const body = await request.json();
@@ -29,8 +42,18 @@ export async function onRequestPost(context) {
       });
     }
 
-    if (!email || !docNumber) {
-      return new Response(JSON.stringify({ error: 'E-mail e CPF são obrigatórios para emissão do PIX.' }), {
+    const cleanEmail = String(email || '').trim().toLowerCase();
+    const cleanDocNumber = String(docNumber || '').replace(/\D/g, '');
+
+    if (!cleanEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+      return new Response(JSON.stringify({ error: 'Formato de e-mail inválido.', user_message: 'Por favor, informe um endereço de e-mail válido.' }), {
+        status: 400,
+        headers: corsHeaders,
+      });
+    }
+
+    if (!cleanDocNumber || cleanDocNumber.length < 11 || cleanDocNumber.length > 14) {
+      return new Response(JSON.stringify({ error: 'CPF ou CNPJ inválido.', user_message: 'Por favor, confira o número de CPF informado.' }), {
         status: 400,
         headers: corsHeaders,
       });
@@ -42,7 +65,7 @@ export async function onRequestPost(context) {
     if (!accessToken) {
       return new Response(
         JSON.stringify({
-          error: 'Configuração incompleta: Variável MP_ACCESS_TOKEN não definida nas variáveis de ambiente do Cloudflare Pages (verifique se foi adicionada em Production e Preview em Settings > Variables and Secrets).',
+          error: 'Configuração incompleta: Variável MP_ACCESS_TOKEN não definida no servidor.',
         }),
         { status: 500, headers: corsHeaders }
       );
@@ -105,7 +128,6 @@ export async function onRequestPost(context) {
         JSON.stringify({
           error: friendlyError,
           user_message: friendlyError,
-          details: mpData,
         }),
         { status: mpResponse.status >= 500 ? 500 : 400, headers: corsHeaders }
       );
@@ -128,19 +150,15 @@ export async function onRequestPost(context) {
   } catch (err) {
     console.error('Exceção ao gerar PIX:', err);
     return new Response(
-      JSON.stringify({ error: 'Erro interno ao processar PIX.', message: err.message }),
+      JSON.stringify({ error: 'Erro temporário ao processar cobrança Pix.', user_message: 'Instabilidade momentânea ao gerar o Pix. Por favor, tente novamente.' }),
       { status: 500, headers: corsHeaders }
     );
   }
 }
 
-export async function onRequestOptions() {
+export async function onRequestOptions(context) {
   return new Response(null, {
     status: 204,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
+    headers: getCorsHeaders(context.request),
   });
 }

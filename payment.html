@@ -775,12 +775,24 @@
       }
     }
 
+    // Sanitização contra injeção de HTML / XSS no DOM
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
     // Exibição amigável de erros de transação e validação
     function showError(msg, isCard = false) {
       const errBox = document.getElementById('checkout-error');
+      const safeMsg = escapeHtml(msg);
       
       let html = `<div style="font-weight:700;margin-bottom:6px;letter-spacing:0.5px;">[ AVISO DO PROCESSADOR // RETORNO DE TRANSAÇÃO ]</div>`;
-      html += `<div style="font-size:12px;line-height:1.5;">${msg}</div>`;
+      html += `<div style="font-size:12px;line-height:1.5;">${safeMsg}</div>`;
       
       if (isCard) {
         html += `<div style="margin-top:10px;padding-top:8px;border-top:1px dashed var(--accent-color);font-size:11px;line-height:1.4;">
@@ -978,7 +990,8 @@
     function brickMsg(text) {
       const c = document.getElementById('cardPaymentBrick_container');
       if (c) {
-        c.innerHTML = `<div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent-color);padding:20px;border:1px solid var(--accent-color);word-break:break-word;">${text}</div>`;
+        const safeText = escapeHtml(text);
+        c.innerHTML = `<div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent-color);padding:20px;border:1px solid var(--accent-color);word-break:break-word;">${safeText}</div>`;
       }
     }
 

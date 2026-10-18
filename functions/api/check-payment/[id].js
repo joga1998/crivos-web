@@ -1,17 +1,31 @@
 // Cloudflare Pages Function: Consulta status de pagamento no Mercado Pago
-export async function onRequestGet(context) {
-  const { params, env } = context;
-  const paymentId = params.id;
+function getCorsHeaders(request) {
+  const origin = request.headers.get('Origin') || '';
+  const isAllowed =
+    origin === 'https://crivos.com.br' ||
+    origin === 'https://www.crivos.com.br' ||
+    origin === 'https://crivos-web.pages.dev' ||
+    origin.endsWith('.crivos-web.pages.dev') ||
+    origin.startsWith('http://localhost:') ||
+    origin.startsWith('http://127.0.0.1:');
 
-  const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
+  return {
+    'Access-Control-Allow-Origin': isAllowed ? origin : 'https://crivos-web.pages.dev',
     'Access-Control-Allow-Methods': 'GET, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Max-Age': '86400',
     'Content-Type': 'application/json',
+    'X-Content-Type-Options': 'nosniff',
   };
+}
 
-  if (!paymentId) {
-    return new Response(JSON.stringify({ error: 'ID do pagamento não informado.' }), {
+export async function onRequestGet(context) {
+  const { params, request, env } = context;
+  const paymentId = String(params.id || '').trim();
+  const corsHeaders = getCorsHeaders(request);
+
+  if (!paymentId || !/^\d+$/.test(paymentId)) {
+    return new Response(JSON.stringify({ error: 'Identificador de pagamento inválido.' }), {
       status: 400,
       headers: corsHeaders,
     });
@@ -22,7 +36,7 @@ export async function onRequestGet(context) {
   if (!accessToken) {
     return new Response(
       JSON.stringify({
-        error: 'Configuração incompleta: Variável MP_ACCESS_TOKEN não definida nas variáveis de ambiente do Cloudflare Pages (verifique se foi adicionada em Production e Preview em Settings > Variables and Secrets).',
+        error: 'Configuração incompleta: Variável MP_ACCESS_TOKEN não definida no servidor.',
       }),
       { status: 500, headers: corsHeaders }
     );
@@ -40,9 +54,10 @@ export async function onRequestGet(context) {
     const mpData = await mpResponse.json();
 
     if (!mpResponse.ok) {
+      console.error('Falha ao consultar Mercado Pago:', mpData);
       return new Response(
-        JSON.stringify({ error: 'Falha ao buscar dados do pagamento.', details: mpData }),
-        { status: mpResponse.status, headers: corsHeaders }
+        JSON.stringify({ error: 'Pagamento não encontrado ou ainda não processado.' }),
+        { status: mpResponse.status === 404 ? 404 : 400, headers: corsHeaders }
       );
     }
 
@@ -59,20 +74,17 @@ export async function onRequestGet(context) {
       { status: 200, headers: corsHeaders }
     );
   } catch (err) {
+    console.error('Exceção ao consultar status:', err);
     return new Response(
-      JSON.stringify({ error: 'Erro ao consultar status.', message: err.message }),
+      JSON.stringify({ error: 'Erro temporário ao consultar status da transação.' }),
       { status: 500, headers: corsHeaders }
     );
   }
 }
 
-export async function onRequestOptions() {
+export async function onRequestOptions(context) {
   return new Response(null, {
     status: 204,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
+    headers: getCorsHeaders(context.request),
   });
 }
