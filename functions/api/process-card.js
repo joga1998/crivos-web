@@ -50,7 +50,8 @@ export async function onRequestPost(context) {
       });
     }
 
-    const accessToken = env?.MP_ACCESS_TOKEN || env?.MP_ACESS_TOKEN || (typeof MP_ACCESS_TOKEN !== 'undefined' ? MP_ACCESS_TOKEN : (typeof MP_ACESS_TOKEN !== 'undefined' ? MP_ACESS_TOKEN : null));
+    const rawToken = env?.MP_ACCESS_TOKEN || (typeof MP_ACCESS_TOKEN !== 'undefined' ? MP_ACCESS_TOKEN : null);
+    const accessToken = rawToken ? String(rawToken).trim() : null;
     if (!accessToken) {
       return new Response(
         JSON.stringify({
