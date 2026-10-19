@@ -113,10 +113,9 @@ export async function supabaseAdminCreateUser(env, { email, password, userMetada
 
   const data = await response.json();
 
-  if (!response.ok) {
-    // Se o usuário já existe, pesquisa o ID dele
+    // Se o usuário já existe, pesquisa o ID dele e atualiza a senha para a nova credencial provisória
     if (data?.msg?.includes('already been registered') || data?.message?.includes('already exists')) {
-      console.log(`[Supabase Auth] Usuário ${email} já existe. Buscando ID...`);
+      console.log(`[Supabase Auth] Usuário ${email} já existe. Buscando ID e atualizando senha...`);
       const listRes = await fetch(`${url}/auth/v1/admin/users?page=1&per_page=50`, {
         headers: {
           'apikey': serviceKey,
@@ -125,7 +124,26 @@ export async function supabaseAdminCreateUser(env, { email, password, userMetada
       });
       const listData = await listRes.json();
       const existing = listData?.users?.find(u => u.email.toLowerCase() === email.trim().toLowerCase());
-      if (existing) return existing;
+      if (existing) {
+        const updateRes = await fetch(`${url}/auth/v1/admin/users/${existing.id}`, {
+          method: 'PUT',
+          headers: {
+            'apikey': serviceKey,
+            'Authorization': `Bearer ${serviceKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            password: String(password),
+            user_metadata: userMetadata,
+            email_confirm: true,
+          }),
+        });
+        if (updateRes.ok) {
+          const updated = await updateRes.json();
+          return updated;
+        }
+        return existing;
+      }
     }
 
     console.error('[Supabase Auth Admin Error]:', data);
