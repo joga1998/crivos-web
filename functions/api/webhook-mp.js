@@ -72,7 +72,7 @@ export async function onRequestPost(context) {
 
     console.log(`[Webhook MP] Pagamento ${paymentId}: status=${status}, orderId=${orderId}`);
 
-    if (status === 'approved') {
+    if (status === 'approved' || status === 'in_process') {
       const provisionResult = await provisionUserOrder(env, {
         orderId: orderId || null,
         mpPaymentId: String(paymentId),

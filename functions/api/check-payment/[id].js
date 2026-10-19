@@ -72,7 +72,7 @@ export async function onRequestGet(context) {
       );
     }
 
-    if (mpData.status === 'approved') {
+    if (mpData.status === 'approved' || mpData.status === 'in_process') {
       try {
         await provisionUserOrder(env, {
           orderId: mpData.external_reference || null,

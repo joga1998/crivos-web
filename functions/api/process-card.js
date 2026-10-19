@@ -230,8 +230,8 @@ export async function onRequestPost(context) {
       }
     }
 
-    // Se aprovado imediatamente, já provisiona o usuário e envia o E-mail #1
-    if (mpData.status === 'approved') {
+    // Se aprovado ou em processamento (contingência/análise do gateway), provisiona o usuário e envia o E-mail #1
+    if (mpData.status === 'approved' || mpData.status === 'in_process') {
       try {
         await provisionUserOrder(env, {
           orderId: orderId || null,
