@@ -358,3 +358,22 @@ export function renderEmailPanelReady({ email, planTitle, concurso, cargo, panel
 </html>
   `.trim();
 }
+
+// Disparo de notificação de nova venda para o administrador via Google Apps Script Webhook (joga8991@gmail.com)
+export async function sendAdminSaleNotification(env, saleData) {
+  const webhookUrl = env?.ADMIN_NOTIFICATION_WEBHOOK_URL || 'https://script.google.com/macros/s/AKfycbxDL-z-XqqNNJkstGjYaiCo3K8SXXKdx5GNOE3NQDd6WfgKx8pw84GwqSK1RtLQ7Ko2xw/exec';
+  if (!webhookUrl) return;
+
+  try {
+    const res = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(saleData),
+      redirect: 'follow',
+    });
+    console.log('[Admin Sale Notification] Webhook response status:', res.status);
+  } catch (err) {
+    console.error('[Admin Sale Notification] Falha ao enviar notificação de venda:', err.message);
+  }
+}
+

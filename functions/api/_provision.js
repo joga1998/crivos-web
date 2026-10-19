@@ -5,6 +5,7 @@ import {
   sendResendEmail,
   generateTacticalPassword,
   renderEmailCredentials,
+  sendAdminSaleNotification,
 } from './_supabase.js';
 
 export function getModulesByTier(planTier) {
@@ -215,6 +216,35 @@ export async function provisionUserOrder(env, { orderId, mpPaymentId, paymentMet
     console.log(`[Provision] E-mail de credenciais enviado com sucesso para ${email}`);
   } catch (emailErr) {
     console.error(`[Provision] Erro ao disparar e-mail de credenciais para ${email}:`, emailErr);
+  }
+
+  // 9. Dispara Notificação Imediata de Venda para o Administrador (joga8991@gmail.com)
+  try {
+    const planPrices = {
+      tatico: '67,00',
+      arsenal: '124,00',
+      elite: '221,00',
+    };
+    const formattedPrice = planPrices[order.plan_tier] || (order.amount_cents ? (order.amount_cents / 100).toFixed(2).replace('.', ',') : '0,00');
+
+    await sendAdminSaleNotification(env, {
+      plan_title: planTitle,
+      amount: formattedPrice,
+      candidate_name: candidateName,
+      email,
+      cpf: candidateCpf,
+      concurso: concursoNome,
+      cargo: cargoNome,
+      availability: parsedNotes.availability || (order.horas_semanais ? `${order.horas_semanais} horas semanais` : 'Não informada'),
+      payment_method: paymentMethod || order.payment_method || 'pix',
+      order_id: order.id,
+      payment_id: String(mpPaymentId || order.payment_id || ''),
+      temp_password: tempPassword,
+      edital_url: order.edital_file_url || null,
+    });
+    console.log(`[Provision] Notificação enviada para o admin (joga8991@gmail.com) da ordem ${order.id}`);
+  } catch (adminErr) {
+    console.error('[Provision] Erro ao notificar administrador sobre a venda:', adminErr);
   }
 
   return {
