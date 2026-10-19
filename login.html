@@ -168,7 +168,7 @@
 
       <div id="login-feedback" class="login-feedback" style="display:none;"></div>
 
-      <form id="login-form" onsubmit="return false;">
+      <form id="login-form">
         <div class="login-form-group">
           <label for="login-email" class="login-label">E-mail do Candidato</label>
           <input type="email" id="login-email" class="login-input" placeholder="seu-email@exemplo.com" required autocomplete="email">
@@ -215,10 +215,10 @@
     const SUPABASE_URL = 'https://dmmtmfjlieqeqwlhtgrr.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRtbXRtZmpsaWVxZXF3bGh0Z3JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIzNjAwNjMsImV4cCI6MjEwNzkzNjA2M30.62ItYAgrweWcK9zqdMqtYlD6lOZ8TesQv2ygGe-xJI8';
     
-    let supabase = null;
+    let sbClient = null;
     try {
-      if (window.supabase) {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      if (window.supabase && typeof window.supabase.createClient === 'function') {
+        sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       }
     } catch(e) {
       console.warn('Erro ao carregar Supabase:', e);
@@ -247,7 +247,7 @@
         return;
       }
 
-      if (!supabase) {
+      if (!sbClient) {
         showFeedback('Falha na inicialização da conexão com o servidor. Tente novamente em instantes.');
         return;
       }
@@ -257,7 +257,7 @@
       feedback.style.display = 'none';
 
       try {
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await sbClient.auth.signInWithPassword({
           email: email,
           password: password,
         });
@@ -278,7 +278,7 @@
           setTimeout(() => {
             const redirectUrl = `https://crivos-painel.pages.dev/#access_token=${encodeURIComponent(data.session.access_token)}&refresh_token=${encodeURIComponent(data.session.refresh_token)}&type=recovery`;
             window.location.href = redirectUrl;
-          }, 800);
+          }, 600);
         }
       } catch (err) {
         console.error(err);
@@ -295,13 +295,13 @@
       const email = emailInput.value.trim() || prompt('Informe seu e-mail cadastrado para enviarmos instruções de recuperação:');
       if (!email) return;
 
-      if (!supabase) {
+      if (!sbClient) {
         alert('Serviço indisponível no momento.');
         return;
       }
 
       try {
-        const { error } = await supabase.auth.resetPasswordForEmail(email);
+        const { error } = await sbClient.auth.resetPasswordForEmail(email);
         if (error) throw error;
         alert('✓ Instruções de redefinição de chave foram enviadas para ' + email);
       } catch (err) {
