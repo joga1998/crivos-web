@@ -70,15 +70,21 @@ export async function onRequestPost(context) {
     const cleanPlan = (plan || 'tatico').toLowerCase();
     const amount = planPrices[cleanPlan] || 67.00;
 
-    // 1. Cria o registro inicial em `orders` com status `pending_payment`
+    // 1. Cria o registro inicial em `orders` com status `pending`
+    const generatedOrderId = `ORD-${Date.now()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+    const parsedHours = parseInt(String(availability || '20').match(/\d+/)?.[0] || '20', 10);
+    const safeHours = Number.isFinite(parsedHours) && parsedHours > 0 ? Math.min(168, parsedHours) : 20;
+
     const orderPayload = {
+      id: generatedOrderId,
       email: cleanEmail,
-      concurso: String(concurso).trim(),
+      concurso_nome: String(concurso).trim(),
       cargo: String(cargo).trim(),
-      availability_text: String(availability || '').trim(),
+      horas_semanais: safeHours,
       plan_tier: cleanPlan,
-      amount,
-      status: 'pending_payment',
+      amount_cents: Math.round(amount * 100),
+      status: 'pending',
+      notes: JSON.stringify({ availability: String(availability || '').trim() }),
     };
 
     const insertResult = await supabaseRest(env, '/orders', {
@@ -88,7 +94,7 @@ export async function onRequestPost(context) {
     });
 
     const newOrder = Array.isArray(insertResult) ? insertResult[0] : insertResult;
-    const orderId = newOrder?.id;
+    const orderId = newOrder?.id || generatedOrderId;
 
     // 2. Se houver arquivo de edital anexado, sobe para o bucket `intake-editais`
     let storagePath = null;
@@ -113,10 +119,10 @@ export async function onRequestPost(context) {
           editalMimeType || 'application/pdf'
         );
 
-        // Atualiza a coluna edital_storage_path na ordem
-        await supabaseRest(env, `/orders?id=eq.${orderId}`, {
+        // Atualiza a coluna edital_file_url na ordem
+        await supabaseRest(env, `/orders?id=eq.${encodeURIComponent(orderId)}`, {
           method: 'PATCH',
-          body: { edital_storage_path: storagePath },
+          body: { edital_file_url: storagePath, updated_at: new Date().toISOString() },
         });
       } catch (uploadErr) {
         console.warn('[save-intake] Falha ao salvar arquivo de edital:', uploadErr.message);

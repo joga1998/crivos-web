@@ -70,18 +70,22 @@ export async function onRequestPost(context) {
     });
 
     // 3. Cadastra os arquivos do aluno em `user_files`, se fornecidos
+    const validCategories = ['edital', 'material', 'bibliografia', 'simulado', 'projeto', 'outro'];
     if (Array.isArray(userFiles) && userFiles.length > 0) {
       for (const file of userFiles) {
-        if (file.filename && file.storage_path) {
+        if (file.filename && (file.storage_path || file.storage_url)) {
+          const rawCat = String(file.category || 'bibliografia').toLowerCase();
+          const safeCategory = validCategories.includes(rawCat) ? rawCat : 'bibliografia';
           await supabaseRest(env, '/user_files', {
             method: 'POST',
             body: {
               user_id: targetUserId,
               panel_id: panel.id,
-              category: file.category || 'texto',
+              category: safeCategory,
               title: file.title || file.filename,
               filename: file.filename,
-              storage_path: file.storage_path,
+              storage_path: file.storage_path || file.storage_url,
+              storage_url: file.storage_url || file.storage_path,
               priority: file.priority || 'ESSENCIAL',
               page_offset: file.page_offset || 0,
               sort_order: file.sort_order || 0,
@@ -91,16 +95,25 @@ export async function onRequestPost(context) {
       }
     }
 
-    // 4. Busca os dados do usuário para o disparo do E-mail #2
+    // 4. Busca os dados do usuário para o disparo do E-mail #2 e atualiza a ordem para 'delivered'
     const profiles = await supabaseRest(env, `/profiles?id=eq.${targetUserId}`);
     const profile = Array.isArray(profiles) && profiles.length > 0 ? profiles[0] : null;
 
-    const orders = panel.order_id ? await supabaseRest(env, `/orders?id=eq.${panel.order_id}`) : [];
+    if (panel.order_id) {
+      try {
+        await supabaseRest(env, `/orders?id=eq.${encodeURIComponent(panel.order_id)}`, {
+          method: 'PATCH',
+          body: { status: 'delivered', updated_at: now },
+        });
+      } catch (e) {}
+    }
+
+    const orders = panel.order_id ? await supabaseRest(env, `/orders?id=eq.${encodeURIComponent(panel.order_id)}`) : [];
     const order = Array.isArray(orders) && orders.length > 0 ? orders[0] : null;
 
     const email = profile?.email || order?.email;
-    const concurso = order?.concurso || panel.header_config?.title || 'Seu Concurso';
-    const cargo = order?.cargo || panel.header_config?.subtitle || '';
+    const concurso = order?.concurso_nome || order?.concurso || panel.concurso || panel.header_config?.title || 'Seu Concurso';
+    const cargo = order?.cargo || panel.cargo || panel.header_config?.subtitle || '';
     const planTier = panel.plan_tier || order?.plan_tier || 'tatico';
 
     const planTitles = {

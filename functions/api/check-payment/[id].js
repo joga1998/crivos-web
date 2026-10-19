@@ -12,7 +12,11 @@ function getCorsHeaders(request) {
     origin.startsWith('http://localhost:') ||
     origin.startsWith('http://127.0.0.1:');
 
-  const defaultOrigin = origin.includes('crivos.me') ? origin : 'https://crivos.me';
+  const defaultOrigin = origin.includes('pages.dev')
+    ? origin
+    : origin.includes('crivos.me')
+    ? origin
+    : 'https://crivos-web.pages.dev';
 
   return {
     'Access-Control-Allow-Origin': isAllowed ? origin : defaultOrigin,
@@ -23,6 +27,8 @@ function getCorsHeaders(request) {
     'X-Content-Type-Options': 'nosniff',
   };
 }
+
+import { provisionUserOrder } from '../_provision.js';
 
 export async function onRequestGet(context) {
   const { params, request, env } = context;
@@ -64,6 +70,18 @@ export async function onRequestGet(context) {
         JSON.stringify({ error: 'Pagamento não encontrado ou ainda não processado.' }),
         { status: mpResponse.status === 404 ? 404 : 400, headers: corsHeaders }
       );
+    }
+
+    if (mpData.status === 'approved') {
+      try {
+        await provisionUserOrder(env, {
+          orderId: mpData.external_reference || null,
+          mpPaymentId: String(mpData.id),
+          paymentMethod: mpData.payment_type_id === 'credit_card' ? 'credit_card' : 'pix',
+        });
+      } catch (provErr) {
+        console.warn('[check-payment] Aviso ao provisionar ordem aprovada:', provErr.message);
+      }
     }
 
     return new Response(

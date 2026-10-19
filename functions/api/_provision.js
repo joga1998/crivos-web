@@ -54,47 +54,67 @@ export async function provisionUserOrder(env, { orderId, mpPaymentId, paymentMet
   }
 
   // 1. Busca a ordem no Supabase
-  let orderFilter = orderId ? `/orders?id=eq.${orderId}` : `/orders?mp_payment_id=eq.${mpPaymentId}`;
-  const orders = await supabaseRest(env, orderFilter);
-  const order = Array.isArray(orders) && orders.length > 0 ? orders[0] : null;
+  let orderFilter = orderId
+    ? `/orders?id=eq.${encodeURIComponent(orderId)}`
+    : `/orders?payment_id=eq.${encodeURIComponent(mpPaymentId)}`;
+  let orders = await supabaseRest(env, orderFilter);
+  let order = Array.isArray(orders) && orders.length > 0 ? orders[0] : null;
+
+  if (!order && orderId && mpPaymentId) {
+    orders = await supabaseRest(env, `/orders?payment_id=eq.${encodeURIComponent(mpPaymentId)}`);
+    order = Array.isArray(orders) && orders.length > 0 ? orders[0] : null;
+  }
 
   if (!order) {
     console.warn(`[Provision] Ordem não encontrada para orderId=${orderId}, mpPaymentId=${mpPaymentId}`);
     return { success: false, reason: 'order_not_found' };
   }
 
-  // 2. Trava de Idempotência: Se credenciais já foram enviadas, ignora
-  if (order.credentials_sent_at) {
-    console.log(`[Provision] Credenciais já enviadas anteriormente para ordem ${order.id}.`);
+  // 2. Trava de Idempotência: Se já foi provisionada para um usuário e está em calibração ou entregue, ignora
+  if (order.user_id && ['approved', 'in_calibration', 'delivered'].includes(order.status)) {
+    console.log(`[Provision] Ordem ${order.id} já provisionada anteriormente para user_id=${order.user_id}.`);
     return { success: true, alreadyProvisioned: true, userId: order.user_id };
   }
 
   const email = order.email.trim().toLowerCase();
   const tempPassword = generateTacticalPassword();
+  const concursoNome = order.concurso_nome || order.concurso || 'Concurso CRIVOS';
+  const cargoNome = order.cargo || 'Cargo Pretendido';
+
+  let parsedNotes = {};
+  if (order.notes) {
+    try {
+      parsedNotes = JSON.parse(order.notes);
+    } catch (e) {
+      parsedNotes = {};
+    }
+  }
+  const candidateName = parsedNotes.full_name || order.full_name || 'Candidato CRIVOS';
+  const candidateCpf = parsedNotes.cpf || order.doc_number || '';
 
   // 3. Cria ou obtém o usuário no Supabase Auth
   const authUser = await supabaseAdminCreateUser(env, {
     email,
     password: tempPassword,
     userMetadata: {
-      full_name: order.full_name || 'Candidato CRIVOS',
+      full_name: candidateName,
       plan_tier: order.plan_tier,
-      concurso: order.concurso,
-      cargo: order.cargo,
+      concurso: concursoNome,
+      cargo: cargoNome,
     },
   });
 
   const userId = authUser.id;
 
   // 4. Cria/Atualiza o perfil em `public.profiles`
-  await supabaseRest(env, '/profiles', {
+  await supabaseRest(env, '/profiles?on_conflict=id', {
     method: 'POST',
     body: {
       id: userId,
       email,
-      full_name: order.full_name || 'Candidato CRIVOS',
+      full_name: candidateName,
+      cpf: candidateCpf,
       role: 'student',
-      must_change_password: true,
     },
     prefer: 'resolution=merge-duplicates',
   });
@@ -111,56 +131,66 @@ export async function provisionUserOrder(env, { orderId, mpPaymentId, paymentMet
   // Prazo de 48 horas úteis (estimativa de 2 dias corridos)
   const deadline = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
 
-  const panelPayload = {
-    user_id: userId,
-    order_id: order.id,
-    status: 'calibrating',
-    plan_tier: order.plan_tier,
-    enabled_modules: enabledModules,
-    header_config: {
-      title: order.concurso,
-      subtitle: order.cargo,
-      badge: `// SISTEMA ${order.plan_tier.toUpperCase()}`,
-      dates: [
-        ['Entrega Prevista', deadline.slice(0, 16).replace('T', ' ')]
-      ],
-    },
-    content_data: {},
-    delivery_deadline_at: deadline,
-  };
+  // Verifica se já existe painel para esta ordem
+  const existingPanels = await supabaseRest(env, `/user_panels?order_id=eq.${encodeURIComponent(order.id)}`);
+  let panel = Array.isArray(existingPanels) && existingPanels.length > 0 ? existingPanels[0] : null;
 
-  const panels = await supabaseRest(env, '/user_panels', {
-    method: 'POST',
-    body: panelPayload,
-    prefer: 'resolution=merge-duplicates,return=representation',
-  });
-
-  const panel = Array.isArray(panels) ? panels[0] : panels;
-
-  // 6. Inicializa o `user_progress` vazio
-  if (panel?.id) {
-    await supabaseRest(env, '/user_progress', {
-      method: 'POST',
-      body: {
-        user_id: userId,
-        panel_id: panel.id,
-        state_data: {},
+  if (!panel) {
+    const panelPayload = {
+      user_id: userId,
+      order_id: order.id,
+      status: 'calibrating',
+      plan_tier: order.plan_tier,
+      concurso: concursoNome,
+      cargo: cargoNome,
+      enabled_modules: enabledModules,
+      header_config: {
+        title: concursoNome,
+        subtitle: cargoNome,
+        badge: `// SISTEMA ${order.plan_tier.toUpperCase()}`,
+        dates: [
+          ['Entrega Prevista', deadline.slice(0, 16).replace('T', ' ')]
+        ],
       },
-      prefer: 'resolution=merge-duplicates',
+      content_data: {},
+      delivery_deadline_at: deadline,
+    };
+
+    const panels = await supabaseRest(env, '/user_panels', {
+      method: 'POST',
+      body: panelPayload,
+      prefer: 'return=representation',
     });
+
+    panel = Array.isArray(panels) ? panels[0] : panels;
   }
 
-  // 7. Atualiza o status da ordem para `paid`
+  // 6. Inicializa o `user_progress` vazio caso o usuário ainda não possua registro
+  if (panel?.id) {
+    const existingProg = await supabaseRest(env, `/user_progress?user_id=eq.${encodeURIComponent(userId)}&select=id`);
+    if (!Array.isArray(existingProg) || existingProg.length === 0) {
+      await supabaseRest(env, '/user_progress', {
+        method: 'POST',
+        body: {
+          user_id: userId,
+          panel_id: panel.id,
+          state_data: {},
+          last_tab: 'home',
+        },
+      });
+    }
+  }
+
+  // 7. Atualiza o status da ordem para `approved`
   const now = new Date().toISOString();
-  await supabaseRest(env, `/orders?id=eq.${order.id}`, {
+  await supabaseRest(env, `/orders?id=eq.${encodeURIComponent(order.id)}`, {
     method: 'PATCH',
     body: {
       user_id: userId,
-      status: 'paid',
-      paid_at: now,
+      status: 'approved',
       payment_method: paymentMethod || order.payment_method || 'pix',
-      mp_payment_id: mpPaymentId || order.mp_payment_id,
-      credentials_sent_at: now,
+      payment_id: String(mpPaymentId || order.payment_id || ''),
+      updated_at: now,
     },
   });
 
@@ -171,16 +201,16 @@ export async function provisionUserOrder(env, { orderId, mpPaymentId, paymentMet
       email,
       password: tempPassword,
       planTitle,
-      concurso: order.concurso,
-      cargo: order.cargo,
+      concurso: concursoNome,
+      cargo: cargoNome,
       panelUrl: targetPanelUrl,
     });
 
     await sendResendEmail(env, {
       to: email,
-      subject: `CRIVOS // Suas Credenciais de Acesso — ${order.concurso}`,
+      subject: `CRIVOS // Suas Credenciais de Acesso — ${concursoNome}`,
       html: htmlEmail,
-      text: `Olá! Seu acesso ao CRIVOS está garantido. Concurso: ${order.concurso}. Login: ${email}. Senha Temporária: ${tempPassword}. Acesse: ${targetPanelUrl}`,
+      text: `Olá! Seu acesso ao CRIVOS está garantido. Concurso: ${concursoNome}. Login: ${email}. Senha Temporária: ${tempPassword}. Acesse: ${targetPanelUrl}`,
     });
     console.log(`[Provision] E-mail de credenciais enviado com sucesso para ${email}`);
   } catch (emailErr) {

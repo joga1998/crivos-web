@@ -145,21 +145,21 @@ export async function onRequestPost(context) {
       );
     }
 
-    // Se temos orderId, vincula mp_payment_id e full_name na tabela orders
+    // Se temos orderId, vincula payment_id e dados do pagador na tabela orders
     if (orderId && mpData?.id) {
       try {
         const fullName = `${firstName || ''} ${lastName || ''}`.trim() || undefined;
-        await supabaseRest(env, `/orders?id=eq.${orderId}`, {
+        await supabaseRest(env, `/orders?id=eq.${encodeURIComponent(orderId)}`, {
           method: 'PATCH',
           body: {
-            mp_payment_id: String(mpData.id),
-            full_name: fullName,
-            doc_number: cleanDocNumber,
+            payment_id: String(mpData.id),
             payment_method: 'pix',
+            notes: JSON.stringify({ full_name: fullName, cpf: cleanDocNumber }),
+            updated_at: new Date().toISOString(),
           },
         });
       } catch (patchErr) {
-        console.warn('[process-pix] Falha ao atualizar orders com mp_payment_id:', patchErr.message);
+        console.warn('[process-pix] Falha ao atualizar orders com payment_id:', patchErr.message);
       }
     }
 

@@ -29,9 +29,9 @@ export async function onRequestPost(context) {
       await supabaseRest(env, '/webhook_events', {
         method: 'POST',
         body: {
-          event_id: eventId,
-          provider: 'mercadopago',
-          topic,
+          gateway: 'mercadopago',
+          event_type: String(topic || 'payment'),
+          external_event_id: String(paymentId || eventId),
           payload: { body, query: Object.fromEntries(url.searchParams) },
           processed: false,
         },

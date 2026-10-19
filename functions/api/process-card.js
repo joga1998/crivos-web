@@ -28,6 +28,7 @@ function getCorsHeaders(request) {
   };
 }
 
+import { supabaseRest } from './_supabase.js';
 import { provisionUserOrder } from './_provision.js';
 
 export async function onRequestPost(context) {
@@ -210,6 +211,23 @@ export async function onRequestPost(context) {
         }),
         { status: 200, headers: corsHeaders }
       );
+    }
+
+    // Se temos orderId, vincula payment_id na tabela orders
+    if (orderId && mpData?.id) {
+      try {
+        await supabaseRest(env, `/orders?id=eq.${encodeURIComponent(orderId)}`, {
+          method: 'PATCH',
+          body: {
+            payment_id: String(mpData.id),
+            payment_method: 'credit_card',
+            notes: JSON.stringify({ cpf: cleanDocNumber }),
+            updated_at: new Date().toISOString(),
+          },
+        });
+      } catch (patchErr) {
+        console.warn('[process-card] Falha ao atualizar orders com payment_id:', patchErr.message);
+      }
     }
 
     // Se aprovado imediatamente, já provisiona o usuário e envia o E-mail #1
