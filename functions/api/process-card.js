@@ -12,7 +12,11 @@ function getCorsHeaders(request) {
     origin.startsWith('http://localhost:') ||
     origin.startsWith('http://127.0.0.1:');
 
-  const defaultOrigin = origin.includes('crivos.me') ? origin : 'https://crivos.me';
+  const defaultOrigin = origin.includes('pages.dev')
+    ? origin
+    : origin.includes('crivos.me')
+    ? origin
+    : 'https://crivos-web.pages.dev';
 
   return {
     'Access-Control-Allow-Origin': isAllowed ? origin : defaultOrigin,
@@ -97,7 +101,7 @@ export async function onRequestPost(context) {
       payment_method_id,
       issuer_id: issuer_id ? String(issuer_id) : undefined,
       external_reference: orderId ? String(orderId) : undefined,
-      notification_url: 'https://crivos.me/api/webhook-mp',
+      notification_url: `${(env?.API_BASE_URL || 'https://crivos-web.pages.dev').replace(/\/+$/, '')}/api/webhook-mp`,
       payer: {
         email: email.trim(),
         identification: cleanDocNumber

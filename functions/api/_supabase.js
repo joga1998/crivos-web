@@ -14,7 +14,11 @@ export function getCorsHeaders(request) {
     origin.startsWith('http://localhost:') ||
     origin.startsWith('http://127.0.0.1:');
 
-  const defaultOrigin = origin.includes('crivos.me') ? origin : 'https://crivos.me';
+  const defaultOrigin = origin.includes('pages.dev')
+    ? origin
+    : origin.includes('crivos.me')
+    ? origin
+    : 'https://crivos-web.pages.dev';
 
   return {
     'Access-Control-Allow-Origin': isAllowed ? origin : defaultOrigin,
@@ -207,7 +211,7 @@ export function generateTacticalPassword() {
 }
 
 // Template HTML Editorial Suíço para E-mail #1: Credenciais & Status de Calibração
-export function renderEmailCredentials({ email, password, planTitle, concurso, cargo, panelUrl = 'https://painel.crivos.me' }) {
+export function renderEmailCredentials({ email, password, planTitle, concurso, cargo, panelUrl = 'https://crivos-painel.pages.dev' }) {
   return `
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -280,7 +284,7 @@ export function renderEmailCredentials({ email, password, planTitle, concurso, c
 }
 
 // Template HTML Editorial Suíço para E-mail #2: Liberação do Painel Pronto
-export function renderEmailPanelReady({ email, planTitle, concurso, cargo, panelUrl = 'https://painel.crivos.me' }) {
+export function renderEmailPanelReady({ email, planTitle, concurso, cargo, panelUrl = 'https://crivos-painel.pages.dev' }) {
   return `
 <!DOCTYPE html>
 <html lang="pt-BR">

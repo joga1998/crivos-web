@@ -166,20 +166,21 @@ export async function provisionUserOrder(env, { orderId, mpPaymentId, paymentMet
 
   // 8. Dispara E-mail #1 via Resend com as credenciais provisórias
   try {
+    const targetPanelUrl = (env?.PANEL_URL || 'https://crivos-painel.pages.dev').replace(/\/+$/, '');
     const htmlEmail = renderEmailCredentials({
       email,
       password: tempPassword,
       planTitle,
       concurso: order.concurso,
       cargo: order.cargo,
-      panelUrl: 'https://painel.crivos.me',
+      panelUrl: targetPanelUrl,
     });
 
     await sendResendEmail(env, {
       to: email,
       subject: `CRIVOS // Suas Credenciais de Acesso — ${order.concurso}`,
       html: htmlEmail,
-      text: `Olá! Seu acesso ao CRIVOS está garantido. Concurso: ${order.concurso}. Login: ${email}. Senha Temporária: ${tempPassword}. Acesse: https://painel.crivos.me`,
+      text: `Olá! Seu acesso ao CRIVOS está garantido. Concurso: ${order.concurso}. Login: ${email}. Senha Temporária: ${tempPassword}. Acesse: ${targetPanelUrl}`,
     });
     console.log(`[Provision] E-mail de credenciais enviado com sucesso para ${email}`);
   } catch (emailErr) {

@@ -42,7 +42,7 @@ No painel do Cloudflare Pages (Configurações do Projeto > Variáveis de Ambien
 
 No painel de desenvolvedores do Mercado Pago:
 1. Em **Notificações Webhook**:
-   - URL de Produção: `https://crivos.me/api/webhook-mp`
+   - URL de Produção: `https://crivos-web.pages.dev/api/webhook-mp` (ou `https://crivos.me/api/webhook-mp` quando o domínio for apontado)
    - Eventos selecionados: `payment` (Pagamentos).
 2. O webhook é idempotente e grava todo evento recebido na tabela `webhook_events`, identificando o pedido via `external_reference`.
 
@@ -116,7 +116,7 @@ node scripts/deploy-user-panel.js \
 
 ## 6. Modo Demonstração Público
 
-O painel suporta o parâmetro `?demo=1` na URL (`https://painel.crivos.me?demo=1`).
+O painel suporta o parâmetro `?demo=1` na URL (`https://crivos-painel.pages.dev?demo=1`).
 Nesse modo:
 - O sistema ignora a necessidade de login.
 - Carrega a demonstração completa do PPGHS/UERJ 2027 com nível ELITE desbloqueado.

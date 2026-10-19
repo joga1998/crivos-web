@@ -90,7 +90,7 @@ async function main() {
   const orderId = args['order-id'];
   const panelFilePath = args['panel-file'];
   const filesDir = args['files-dir'];
-  const apiUrl = args['api-url'] || process.env.CRIVOS_API_URL || 'https://crivos.me';
+  const apiUrl = args['api-url'] || process.env.CRIVOS_API_URL || 'https://crivos-web.pages.dev';
   const adminKey = args['admin-key'] || process.env.ADMIN_API_KEY;
   const supabaseUrl = args['supabase-url'] || process.env.SUPABASE_URL;
   const supabaseKey = args['supabase-key'] || process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -240,7 +240,7 @@ async function main() {
   console.log(`› Painel ID: ${resJson.panelId}`);
   console.log(`› Notificação enviada: ${resJson.emailSent ? 'Sim (Resend E-mail #2)' : 'Não / Desativada'}`);
   console.log(`› Arquivos catalogados: ${uploadedFiles.length}`);
-  console.log(`› Acesse: https://painel.crivos.me\n`);
+  console.log(`› Acesse: https://crivos-painel.pages.dev\n`);
 }
 
 main().catch(err => {

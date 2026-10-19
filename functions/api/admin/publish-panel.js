@@ -112,19 +112,20 @@ export async function onRequestPost(context) {
     let emailSent = false;
     if (email) {
       try {
+        const targetPanelUrl = (env?.PANEL_URL || 'https://crivos-painel.pages.dev').replace(/\/+$/, '');
         const htmlEmail = renderEmailPanelReady({
           email,
           planTitle: planTitles[planTier] || 'Sistema CRIVOS',
           concurso,
           cargo,
-          panelUrl: 'https://painel.crivos.me',
+          panelUrl: targetPanelUrl,
         });
 
         await sendResendEmail(env, {
           to: email,
           subject: `CRIVOS // Seu Sistema Operacional de Estudos está Pronto — ${concurso}`,
           html: htmlEmail,
-          text: `Seu Sistema Operacional de Estudos para ${concurso} foi concluído! Acesse agora: https://painel.crivos.me`,
+          text: `Seu Sistema Operacional de Estudos para ${concurso} foi concluído! Acesse agora: ${targetPanelUrl}`,
         });
         emailSent = true;
       } catch (errEmail) {

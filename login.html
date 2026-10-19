@@ -198,7 +198,7 @@
           <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-muted);display:block;margin-bottom:8px">
             ACESSO DE DEMONSTRAÇÃO PÚBLICA
           </span>
-          <a href="https://painel.crivos.me?demo=1" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="width:100%;padding:10px;font-size:11px;">
+          <a href="https://crivos-painel.pages.dev?demo=1" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="width:100%;padding:10px;font-size:11px;">
             ⚡ TESTAR DEMO AO VIVO (PPGHS) ↗
           </a>
         </div>
@@ -276,7 +276,7 @@
 
           // Redireciona diretamente para o painel com token de acesso para auto-login imediato
           setTimeout(() => {
-            const redirectUrl = `https://painel.crivos.me/#access_token=${encodeURIComponent(data.session.access_token)}&refresh_token=${encodeURIComponent(data.session.refresh_token)}&type=recovery`;
+            const redirectUrl = `https://crivos-painel.pages.dev/#access_token=${encodeURIComponent(data.session.access_token)}&refresh_token=${encodeURIComponent(data.session.refresh_token)}&type=recovery`;
             window.location.href = redirectUrl;
           }, 800);
         }
