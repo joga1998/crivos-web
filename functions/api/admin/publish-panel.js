@@ -33,8 +33,8 @@ export async function onRequestPost(context) {
       });
     }
 
-    // 1. Localiza o painel correspondente
-    let filter = userId ? `/user_panels?user_id=eq.${userId}` : `/user_panels?order_id=eq.${orderId}`;
+    // 1. Localiza o painel correspondente (prioriza orderId para não sobrescrever pedidos anteriores)
+    let filter = orderId ? `/user_panels?order_id=eq.${orderId}` : `/user_panels?user_id=eq.${userId}`;
     const panels = await supabaseRest(env, filter);
     const panel = Array.isArray(panels) && panels.length > 0 ? panels[0] : null;
 

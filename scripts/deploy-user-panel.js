@@ -209,7 +209,7 @@ async function main() {
   console.log(`\n› Disparando publicação no endpoint ${endpoint}...`);
 
   const payload = {
-    userId: targetUserId,
+    userId: orderId ? undefined : targetUserId,
     orderId: orderId,
     contentData: contentData,
     headerConfig: headerConfig,
