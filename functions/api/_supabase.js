@@ -113,6 +113,7 @@ export async function supabaseAdminCreateUser(env, { email, password, userMetada
 
   const data = await response.json();
 
+  if (!response.ok) {
     // Se o usuário já existe, pesquisa o ID dele e atualiza a senha para a nova credencial provisória
     if (data?.msg?.includes('already been registered') || data?.message?.includes('already exists')) {
       console.log(`[Supabase Auth] Usuário ${email} já existe. Buscando ID e atualizando senha...`);
