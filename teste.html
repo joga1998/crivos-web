@@ -1,0 +1,2682 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRIVOS // Sistema Operacional de Estudos na Nuvem</title>
+  <meta name="description" content="Planejamento tático e engenharia de estudos pós-edital sob demanda. Seu cronograma, flashcards SM-2 e metas diárias sincronizados na nuvem em qualquer dispositivo.">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23D92B2B'/></svg>">
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    (function() {
+      try {
+        var t = localStorage.getItem('crivos_web_theme');
+        if (t === 'dark' || (!t && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      } catch(e) {}
+    })();
+  </script>
+
+  <style>
+    /* ==========================================================================
+       DESIGN TOKENS // IDENTIDADE VISUAL CRIVOS (CINEMÁTICA + BORDAS AFIADAS)
+       ========================================================================== */
+    :root {
+      --bg-paper: #F4F4F0;
+      --bg-card: #FFFFFF;
+      --bg-card-subtle: #ECECE6;
+      --bg-dark: #101012;
+      --bg-darker: #080809;
+      --ink-primary: #111111;
+      --ink-muted: #555555;
+      --ink-dim: #777777;
+      --ink-inverted: #F4F4F0;
+      --border-color: #111111;
+      --border-subtle: #D4D4CC;
+      --border-glass: rgba(0, 0, 0, 0.08);
+      --crivos-red: #D92B2B;
+      --crivos-red-dark: #B71C1C;
+      --crivos-red-glow: rgba(217, 43, 43, 0.25);
+      --crivos-blue: #1D4ED8;
+      --crivos-blue-glow: rgba(29, 78, 216, 0.20);
+      --crivos-green: #10B981;
+      --crivos-yellow: #F59E0B;
+      --shadow-hard: 3px 3px 0px #111111;
+      --shadow-hard-lg: 6px 6px 0px #111111;
+      --shadow-glow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      --nav-bg: rgba(244, 244, 240, 0.94);
+      --card-highlight-bg: #FAFAF8;
+    }
+
+    [data-theme="dark"] {
+      --bg-paper: #0D0D0F;
+      --bg-card: #141416;
+      --bg-card-subtle: #1C1C20;
+      --bg-dark: #070708;
+      --bg-darker: #030304;
+      --ink-primary: #F0F0EC;
+      --ink-muted: #A0A09B;
+      --ink-dim: #6E6E69;
+      --ink-inverted: #0D0D0F;
+      --border-color: #2E2E34;
+      --border-subtle: #222226;
+      --border-glass: rgba(255, 255, 255, 0.08);
+      --crivos-red: #E53935;
+      --crivos-red-dark: #C62828;
+      --crivos-red-glow: rgba(229, 57, 53, 0.35);
+      --crivos-blue: #3B82F6;
+      --crivos-blue-glow: rgba(59, 130, 246, 0.25);
+      --crivos-green: #34D399;
+      --crivos-yellow: #FBBF24;
+      --shadow-hard: 3px 3px 0px #000000;
+      --shadow-hard-lg: 6px 6px 0px #000000;
+      --shadow-glow: 0 10px 30px rgba(0, 0, 0, 0.6);
+      --nav-bg: rgba(13, 13, 15, 0.94);
+      --card-highlight-bg: #18181C;
+    }
+
+    /* GLOBAL RESET - BORDAS VIVAS & ZERO CURVATURA */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      border-radius: 0px !important;
+    }
+
+    html {
+      background-color: var(--bg-paper);
+      color: var(--ink-primary);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    body {
+      background-color: var(--bg-paper);
+      color: var(--ink-primary);
+      line-height: 1.55;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    ::selection {
+      background: var(--crivos-red);
+      color: #FFFFFF;
+    }
+
+    /* TYPOGRAPHY UTILITIES */
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .font-sans { font-family: 'Inter', sans-serif; }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Inter', sans-serif;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: -0.03em;
+      color: var(--ink-primary);
+      line-height: 1.15;
+    }
+
+    p {
+      color: var(--ink-muted);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ==========================================================================
+       CINEMATIC BACKGROUND AMBIENCE (RADIAL LIGHT GRIDS)
+       ========================================================================== */
+    .ambient-glow {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 1400px;
+      height: 720px;
+      background: radial-gradient(circle at 50% 120px, rgba(217, 43, 43, 0.08), transparent 65%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    [data-theme="dark"] .ambient-glow {
+      background: radial-gradient(circle at 50% 120px, rgba(229, 57, 53, 0.14), rgba(29, 78, 216, 0.04) 50%, transparent 75%);
+    }
+
+    .ambient-grid {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 900px;
+      background-size: 40px 40px;
+      background-image: 
+        linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+      pointer-events: none;
+      z-index: 0;
+      mask-image: linear-gradient(to bottom, black 30%, transparent 95%);
+      -webkit-mask-image: linear-gradient(to bottom, black 30%, transparent 95%);
+    }
+
+    [data-theme="dark"] .ambient-grid {
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+    }
+
+    /* ==========================================================================
+       TOPBAR & NAVIGATION
+       ========================================================================== */
+    .topbar {
+      background: var(--bg-dark);
+      color: #F4F4F0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 8px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+      z-index: 50;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      letter-spacing: 0.05em;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .sq-red {
+      display: inline-block;
+      color: var(--crivos-red);
+      font-size: 11px;
+      animation: pulse-glow 2.5s infinite ease-in-out;
+    }
+
+    .theme-toggle-btn {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #F4F4F0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .theme-toggle-btn:hover {
+      background: #FFFFFF;
+      color: #111111;
+      border-color: #FFFFFF;
+    }
+
+    .main-nav {
+      position: sticky;
+      top: 0;
+      background: var(--nav-bg);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 40;
+      transition: background 0.3s ease, border-color 0.3s ease;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .nav-brand-logo {
+      width: 14px;
+      height: 14px;
+      background: var(--crivos-red);
+      box-shadow: 0 0 10px var(--crivos-red-glow);
+    }
+
+    .nav-brand-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 800;
+      font-size: 16px;
+      color: var(--ink-primary);
+      letter-spacing: -0.02em;
+    }
+
+    .nav-brand-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--ink-dim);
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 26px;
+    }
+
+    .nav-link {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink-muted);
+      letter-spacing: 0.02em;
+      position: relative;
+      padding: 4px 0;
+      transition: color 0.2s ease;
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background: var(--crivos-red);
+      transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .nav-link:hover {
+      color: var(--ink-primary);
+    }
+
+    .nav-link:hover::after {
+      width: 100%;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--ink-primary);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+
+    .mobile-nav-drawer {
+      display: none;
+      position: fixed;
+      top: 96px;
+      left: 0;
+      right: 0;
+      background: var(--bg-paper);
+      border-bottom: 2px solid var(--border-color);
+      padding: 20px 24px 28px;
+      flex-direction: column;
+      gap: 16px;
+      z-index: 39;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.25);
+    }
+
+    .mobile-nav-drawer.open {
+      display: flex;
+    }
+
+    .mobile-nav-link {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink-primary);
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    /* ==========================================================================
+       BUTTONS & INTERACTIVE ELEMENTS
+       ========================================================================== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 11px 18px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      border: 1px solid transparent;
+      white-space: nowrap;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(60deg, transparent 35%, rgba(255,255,255,0.15) 50%, transparent 65%);
+      transform: translateX(-100%);
+      transition: transform 0.6s ease;
+      pointer-events: none;
+    }
+
+    .btn:hover::after {
+      transform: translateX(100%);
+    }
+
+    .btn-primary {
+      background: var(--crivos-red);
+      color: #FFFFFF;
+      border-color: var(--crivos-red);
+      box-shadow: var(--shadow-hard);
+    }
+
+    .btn-primary:hover {
+      background: var(--crivos-red-dark);
+      border-color: var(--crivos-red-dark);
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow-hard-lg);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--ink-primary);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-hard);
+    }
+
+    .btn-outline:hover {
+      background: var(--ink-primary);
+      color: var(--ink-inverted);
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow-hard-lg);
+    }
+
+    .btn-lg {
+      padding: 15px 24px;
+      font-size: 13px;
+    }
+
+    /* ==========================================================================
+       HERO SECTION
+       ========================================================================== */
+    .hero-section {
+      padding: 70px 0 60px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .hero-cloud-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 6px 14px;
+      box-shadow: var(--shadow-hard);
+      margin-bottom: 24px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--ink-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .status-ping {
+      width: 8px;
+      height: 8px;
+      background: var(--crivos-green);
+      position: relative;
+      display: inline-block;
+    }
+
+    .status-ping::after {
+      content: '';
+      position: absolute;
+      top: -3px;
+      left: -3px;
+      right: -3px;
+      bottom: -3px;
+      border: 1px solid var(--crivos-green);
+      animation: ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 48px;
+      align-items: center;
+    }
+
+    .hero-headline {
+      font-size: clamp(30px, 4.4vw, 54px);
+      line-height: 1.08;
+      margin-bottom: 22px;
+      color: var(--ink-primary);
+      font-weight: 900;
+    }
+
+    .hero-headline .highlight-accent {
+      color: var(--crivos-red);
+      display: inline-block;
+      position: relative;
+    }
+
+    .hero-subhead {
+      font-size: clamp(15px, 1.2vw, 17px);
+      color: var(--ink-muted);
+      line-height: 1.65;
+      margin-bottom: 32px;
+      max-width: 600px;
+    }
+
+    .hero-cta-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+
+    .hero-guarantees {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--ink-dim);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .hero-guarantee-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hero-guarantee-item span {
+      color: var(--crivos-red);
+      font-weight: 800;
+    }
+
+    /* ==========================================================================
+       HERO MOCKUP (INTERACTIVE CINEMATIC CANVAS)
+       ========================================================================== */
+    .hero-mockup-wrapper {
+      position: relative;
+      perspective: 1200px;
+    }
+
+    .hero-mockup-frame {
+      background: var(--bg-card);
+      border: 2px solid var(--border-color);
+      box-shadow: var(--shadow-hard-lg);
+      position: relative;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+      overflow: hidden;
+    }
+
+    .hero-mockup-frame:hover {
+      transform: translateY(-4px);
+      box-shadow: 10px 10px 0px var(--border-color);
+    }
+
+    .mockup-window-header {
+      background: var(--bg-dark);
+      color: #F4F4F0;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-color);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+    }
+
+    .mockup-window-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .mockup-dot {
+      width: 9px;
+      height: 9px;
+      background: #333338;
+      border: 1px solid #44444C;
+    }
+
+    .mockup-dot:nth-child(1) { background: #E53935; border-color: #E53935; }
+    .mockup-dot:nth-child(2) { background: #FBBF24; border-color: #FBBF24; }
+    .mockup-dot:nth-child(3) { background: #34D399; border-color: #34D399; }
+
+    .mockup-sync-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid var(--crivos-green);
+      color: var(--crivos-green);
+      padding: 2px 8px;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .mockup-header-strip {
+      padding: 14px 18px;
+      background: var(--bg-card-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .mockup-user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .mockup-avatar {
+      width: 32px;
+      height: 32px;
+      background: var(--crivos-red);
+      color: #FFF;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+
+    .mockup-cand-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--ink-primary);
+    }
+
+    .mockup-plan-name {
+      font-size: 12px;
+      color: var(--ink-muted);
+    }
+
+    .mockup-countdown-pill {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 4px 10px;
+      text-align: right;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .mockup-cd-txt {
+      font-size: 9px;
+      color: var(--ink-dim);
+      display: block;
+    }
+
+    .mockup-cd-num {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--crivos-red);
+    }
+
+    .mockup-body-grid {
+      display: grid;
+      grid-template-columns: 1.3fr 0.9fr;
+      padding: 16px 18px;
+      gap: 16px;
+      background: var(--bg-card);
+    }
+
+    .mockup-widget-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--ink-dim);
+      margin-bottom: 10px;
+      letter-spacing: 0.05em;
+    }
+
+    .mockup-task-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border: 1px solid var(--border-subtle);
+      margin-bottom: 8px;
+      background: var(--bg-paper);
+      transition: all 0.2s ease;
+    }
+
+    .mockup-task-item:hover {
+      border-color: var(--border-color);
+      transform: translateX(2px);
+    }
+
+    .mockup-task-item.done {
+      border-left: 3px solid var(--crivos-green);
+      opacity: 0.8;
+    }
+
+    .mockup-task-item.current {
+      border-left: 3px solid var(--crivos-red);
+      background: var(--card-highlight-bg);
+      box-shadow: inset 0 0 12px rgba(217, 43, 43, 0.04);
+    }
+
+    .mockup-check {
+      color: var(--crivos-green);
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .mockup-play {
+      color: var(--crivos-red);
+      font-size: 10px;
+      animation: pulse-glow 1.5s infinite;
+    }
+
+    .mockup-task-text b {
+      display: block;
+      font-size: 12px;
+      color: var(--ink-primary);
+    }
+
+    .mockup-task-text span {
+      font-size: 11px;
+      color: var(--ink-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .mockup-body-right {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .mockup-stat-box {
+      background: var(--bg-paper);
+      border: 1px solid var(--border-subtle);
+      padding: 10px 12px;
+    }
+
+    .mockup-stat-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--crivos-blue);
+      display: block;
+      line-height: 1;
+    }
+
+    .mockup-stat-lbl {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      color: var(--ink-dim);
+      font-weight: 600;
+    }
+
+    .mockup-pomo-box {
+      background: var(--bg-paper);
+      border: 1px solid var(--border-subtle);
+      padding: 10px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .mockup-pomo-box span {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      color: var(--ink-muted);
+      font-weight: 700;
+    }
+
+    .mockup-pomo-box b {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 16px;
+      color: var(--crivos-red);
+    }
+
+    .mockup-footer-strip {
+      padding: 10px 18px;
+      background: var(--bg-card-subtle);
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--ink-dim);
+    }
+
+    .mockup-open-btn {
+      color: var(--crivos-red);
+      font-weight: 700;
+    }
+
+    .mockup-open-btn:hover {
+      text-decoration: underline;
+    }
+
+    /* ==========================================================================
+       TICKER BANNER (INFINITE HORIZONTAL STREAM)
+       ========================================================================== */
+    .ticker-banner {
+      background: var(--bg-dark);
+      color: #F4F4F0;
+      border-top: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 0;
+      overflow: hidden;
+      white-space: nowrap;
+      position: relative;
+      z-index: 20;
+    }
+
+    .ticker-track {
+      display: inline-flex;
+      animation: ticker-loop 34s linear infinite;
+    }
+
+    .ticker-track:hover {
+      animation-play-state: paused;
+    }
+
+    .ticker-item {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 0 28px;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      letter-spacing: 0.04em;
+    }
+
+    /* ==========================================================================
+       SECTION HEADERS & STRUCTURAL LAYOUT
+       ========================================================================== */
+    .section {
+      padding: 90px 0;
+      position: relative;
+    }
+
+    .section-alt {
+      background: var(--bg-card-subtle);
+      border-top: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .section-meta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--crivos-red);
+      margin-bottom: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title {
+      font-size: clamp(24px, 3.2vw, 38px);
+      margin-bottom: 16px;
+      color: var(--ink-primary);
+    }
+
+    .section-desc {
+      font-size: 16px;
+      color: var(--ink-muted);
+      max-width: 680px;
+      line-height: 1.6;
+      margin-bottom: 48px;
+    }
+
+    /* ==========================================================================
+       SECTION 01 // SINCRONIZAÇÃO EM NUVEM (CLOUD SYNC HIGHLIGHT)
+       ========================================================================== */
+    .sync-comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-bottom: 40px;
+    }
+
+    .sync-card {
+      background: var(--bg-card);
+      border: 2px solid var(--border-color);
+      padding: 32px;
+      box-shadow: var(--shadow-hard);
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .sync-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-hard-lg);
+    }
+
+    .sync-card.negative {
+      border-left: 6px solid var(--ink-dim);
+    }
+
+    .sync-card.positive {
+      border-left: 6px solid var(--crivos-green);
+      background: var(--card-highlight-bg);
+    }
+
+    .sync-badge-status {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 4px 10px;
+      display: inline-block;
+      margin-bottom: 16px;
+      letter-spacing: 0.04em;
+    }
+
+    .sync-card.negative .sync-badge-status {
+      background: var(--bg-paper);
+      color: var(--ink-muted);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .sync-card.positive .sync-badge-status {
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--crivos-green);
+      border: 1px solid var(--crivos-green);
+    }
+
+    .sync-card-title {
+      font-size: 20px;
+      margin-bottom: 14px;
+    }
+
+    .sync-card-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .sync-card-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .sync-card-item .icon {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 800;
+      margin-top: 2px;
+    }
+
+    .sync-card.negative .sync-card-item .icon { color: var(--ink-dim); }
+    .sync-card.positive .sync-card-item .icon { color: var(--crivos-green); }
+
+    /* REAL-TIME DEVICE ECOSYSTEM DIAGRAM */
+    .ecosystem-diagram {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 30px;
+      box-shadow: var(--shadow-hard);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      text-align: center;
+    }
+
+    .ecosystem-node {
+      border: 1px solid var(--border-subtle);
+      padding: 20px 16px;
+      background: var(--bg-paper);
+      position: relative;
+      transition: all 0.2s ease;
+    }
+
+    .ecosystem-node:hover {
+      border-color: var(--crivos-red);
+      transform: translateY(-2px);
+    }
+
+    .ecosystem-icon {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 24px;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .ecosystem-title {
+      font-family: 'Inter', sans-serif;
+      font-weight: 800;
+      font-size: 13px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .ecosystem-desc {
+      font-size: 12px;
+      color: var(--ink-muted);
+      line-height: 1.4;
+    }
+
+    /* ==========================================================================
+       SECTION 02 // O ENTREGÁVEL INTERATIVO (CANVAS & AUDITORIA)
+       ========================================================================== */
+    .demo-canvas {
+      background: var(--bg-card);
+      border: 2px solid var(--border-color);
+      box-shadow: var(--shadow-hard-lg);
+      overflow: hidden;
+      margin-top: 20px;
+    }
+
+    .demo-topbar {
+      background: var(--bg-dark);
+      color: #F4F4F0;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .demo-title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .demo-badge {
+      background: var(--crivos-red);
+      color: #FFF;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+    }
+
+    .demo-target {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .demo-metrics {
+      display: flex;
+      gap: 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+    }
+
+    .demo-metric-item span {
+      color: #888888;
+    }
+
+    .demo-tabs-bar {
+      background: var(--bg-card-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      overflow-x: auto;
+    }
+
+    .demo-tab-btn {
+      background: transparent;
+      border: none;
+      border-right: 1px solid var(--border-subtle);
+      padding: 14px 22px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--ink-muted);
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+
+    .demo-tab-btn.active {
+      background: var(--bg-card);
+      color: var(--crivos-red);
+      border-bottom: 2px solid var(--crivos-red);
+    }
+
+    .demo-tab-btn:hover:not(.active) {
+      color: var(--ink-primary);
+      background: rgba(0,0,0,0.03);
+    }
+
+    .demo-body-content {
+      padding: 28px;
+    }
+
+    .demo-tab-pane {
+      display: none;
+      animation: fadeIn 0.3s ease forwards;
+    }
+
+    .demo-tab-pane.active {
+      display: block;
+    }
+
+    /* DEMO COLUMNS */
+    .demo-columns {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .demo-col {
+      background: var(--bg-paper);
+      border: 1px solid var(--border-subtle);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .demo-col-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 14px;
+    }
+
+    .demo-col-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--ink-primary);
+    }
+
+    .demo-item-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px dotted var(--border-subtle);
+      font-size: 13px;
+    }
+
+    .demo-item-row:last-child {
+      border-bottom: none;
+    }
+
+    .weight-bar-wrapper {
+      width: 100%;
+      height: 6px;
+      background: var(--border-subtle);
+      margin-top: 6px;
+    }
+
+    .weight-bar-fill {
+      height: 100%;
+      background: var(--crivos-red);
+    }
+
+    /* FLASHCARD SM-2 SIMULATION */
+    .flashcard-preview-box {
+      border: 2px solid var(--border-color);
+      background: var(--bg-card);
+      padding: 24px;
+      box-shadow: var(--shadow-hard);
+      position: relative;
+    }
+
+    .flashcard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--ink-dim);
+    }
+
+    .flashcard-question {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--ink-primary);
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    .flashcard-answer-box {
+      background: var(--bg-paper);
+      border-left: 3px solid var(--crivos-blue);
+      padding: 14px;
+      font-size: 13px;
+      color: var(--ink-muted);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .flashcard-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .flashcard-btn {
+      flex: 1;
+      padding: 8px 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      text-align: center;
+      border: 1px solid var(--border-color);
+      background: var(--bg-card);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .flashcard-btn.again:hover { background: #FEE2E2; border-color: #EF4444; color: #991B1B; }
+    .flashcard-btn.hard:hover { background: #FEF3C7; border-color: #F59E0B; color: #92400E; }
+    .flashcard-btn.good:hover { background: #DBEAFE; border-color: #3B82F6; color: #1E40AF; }
+    .flashcard-btn.easy:hover { background: #D1FAE5; border-color: #10B981; color: #065F46; }
+
+    /* ==========================================================================
+       SECTION 03 // COMO FUNCIONA (FLUXO EM 3 ETAPAS)
+       ========================================================================== */
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+    }
+
+    .step-card {
+      background: var(--bg-card);
+      border: 2px solid var(--border-color);
+      padding: 32px 26px;
+      box-shadow: var(--shadow-hard);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .step-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-hard-lg);
+    }
+
+    .step-card.featured-step {
+      background: var(--card-highlight-bg);
+      border-color: var(--crivos-red);
+    }
+
+    .step-num-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--ink-primary);
+      margin-bottom: 12px;
+      line-height: 1;
+    }
+
+    .step-card.featured-step .step-num-badge {
+      color: var(--crivos-red);
+    }
+
+    .step-subtag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--crivos-red);
+      letter-spacing: 0.04em;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .step-title {
+      font-size: 18px;
+      margin-bottom: 14px;
+    }
+
+    .step-desc {
+      font-size: 14px;
+      color: var(--ink-muted);
+      line-height: 1.6;
+    }
+
+    .step-footer-meta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--ink-dim);
+      padding-top: 20px;
+      margin-top: 24px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    /* ==========================================================================
+       SECTION 04 // TABELA DE PREÇOS (ESCADA DE VALOR & CHECKOUT)
+       ========================================================================== */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+      align-items: stretch;
+    }
+
+    .price-card {
+      background: var(--bg-card);
+      border: 2px solid var(--border-color);
+      padding: 34px 28px;
+      box-shadow: var(--shadow-hard);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .price-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-hard-lg);
+    }
+
+    .price-card.featured {
+      border-color: var(--crivos-red);
+      box-shadow: 6px 6px 0px var(--crivos-red);
+      background: var(--card-highlight-bg);
+      transform: scale(1.02);
+      z-index: 5;
+    }
+
+    .price-card.featured:hover {
+      transform: scale(1.02) translateY(-4px);
+      box-shadow: 10px 10px 0px var(--crivos-red);
+    }
+
+    .price-card-badge {
+      position: absolute;
+      top: -14px;
+      left: 28px;
+      background: var(--crivos-red);
+      color: #FFF;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 4px 12px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      box-shadow: 2px 2px 0px #000;
+    }
+
+    .price-title {
+      font-size: 20px;
+      margin-bottom: 6px;
+    }
+
+    .price-focus {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--ink-dim);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      margin-bottom: 24px;
+    }
+
+    .price-box {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .price-currency {
+      font-family: 'Inter', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--ink-primary);
+    }
+
+    .price-amount {
+      font-family: 'Inter', sans-serif;
+      font-size: 46px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      color: var(--ink-primary);
+    }
+
+    .price-card.featured .price-amount {
+      color: var(--crivos-red);
+    }
+
+    .price-terms {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--ink-dim);
+      font-weight: 700;
+    }
+
+    .price-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .price-feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--ink-primary);
+      line-height: 1.45;
+    }
+
+    .price-check {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--crivos-red);
+      font-weight: 800;
+      margin-top: 1px;
+    }
+
+    /* ==========================================================================
+       SECTION 05 // PERGUNTAS FREQUENTES (FAQ)
+       ========================================================================== */
+    .faq-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      max-width: 860px;
+    }
+
+    .faq-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-hard);
+      transition: all 0.2s ease;
+    }
+
+    .faq-item:hover {
+      border-color: var(--crivos-red);
+    }
+
+    .faq-question {
+      padding: 18px 24px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+      list-style: none;
+    }
+
+    .faq-question::-webkit-details-marker {
+      display: none;
+    }
+
+    .faq-icon {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 800;
+      font-size: 16px;
+      color: var(--crivos-red);
+      transition: transform 0.2s ease;
+    }
+
+    details[open] .faq-icon {
+      transform: rotate(45deg);
+    }
+
+    .faq-answer {
+      padding: 0 24px 20px;
+      font-size: 14px;
+      color: var(--ink-muted);
+      line-height: 1.65;
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 14px;
+    }
+
+    /* ==========================================================================
+       FINAL CINEMATIC CALL-TO-ACTION
+       ========================================================================== */
+    .final-cta-section {
+      background: var(--bg-dark);
+      color: #F4F4F0;
+      padding: 90px 0;
+      border-top: 2px solid var(--border-color);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .final-cta-section::before {
+      content: '';
+      position: absolute;
+      top: -100px;
+      right: -100px;
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, var(--crivos-red-glow), transparent 70%);
+      pointer-events: none;
+    }
+
+    .final-cta-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 5px 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--crivos-red);
+      margin-bottom: 22px;
+    }
+
+    .final-cta-title {
+      font-size: clamp(26px, 3.8vw, 44px);
+      color: #FFFFFF;
+      max-width: 820px;
+      margin-bottom: 20px;
+    }
+
+    .final-cta-desc {
+      font-size: 16px;
+      color: #A0A09B;
+      max-width: 640px;
+      line-height: 1.6;
+      margin-bottom: 34px;
+    }
+
+    /* ==========================================================================
+       FOOTER
+       ========================================================================== */
+    .site-footer {
+      background: var(--bg-darker);
+      color: #F4F4F0;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 60px 0 30px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 50px;
+    }
+
+    .footer-brand p {
+      font-size: 13px;
+      color: #888888;
+      max-width: 420px;
+      margin-top: 12px;
+      line-height: 1.6;
+    }
+
+    .footer-col-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--crivos-red);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      letter-spacing: 0.05em;
+    }
+
+    .footer-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .footer-link {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #AAAAAA;
+      transition: color 0.2s ease;
+    }
+
+    .footer-link:hover {
+      color: #FFFFFF;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #666666;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    /* ==========================================================================
+       KEYFRAME ANIMATIONS
+       ========================================================================== */
+    @keyframes pulse-glow {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.65; transform: scale(0.92); }
+    }
+
+    @keyframes ping {
+      0% { transform: scale(1); opacity: 0.8; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+
+    @keyframes ticker-loop {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* SCROLL REVEAL UTILITIES */
+    .reveal-on-scroll {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal-on-scroll.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ==========================================================================
+       RESPONSIVE BREAKPOINTS
+       ========================================================================== */
+    @media (max-width: 992px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+      .sync-comparison-grid,
+      .steps-grid,
+      .pricing-grid {
+        grid-template-columns: 1fr;
+      }
+      .price-card.featured {
+        transform: none;
+      }
+      .price-card.featured:hover {
+        transform: translateY(-4px);
+      }
+      .demo-columns {
+        grid-template-columns: 1fr;
+      }
+      .ecosystem-diagram {
+        grid-template-columns: 1fr;
+      }
+      .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+      }
+      .nav-links {
+        display: none;
+      }
+      .mobile-menu-btn {
+        display: block;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .topbar {
+        font-size: 10px;
+        padding: 6px 16px;
+      }
+      .topbar-right span {
+        display: none;
+      }
+      .main-nav {
+        padding: 12px 16px;
+      }
+      .hero-section {
+        padding: 40px 0 40px;
+      }
+      .mockup-body-grid {
+        grid-template-columns: 1fr;
+      }
+      .demo-topbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .hero-cta-group {
+        flex-direction: column;
+        width: 100%;
+      }
+      .hero-cta-group .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- AMBIENT BACKGROUND GLOW & GEOMETRIC GRID -->
+  <div class="ambient-glow"></div>
+  <div class="ambient-grid"></div>
+
+  <!-- ======================================================== -->
+  <!-- TOPBAR INSTITUCIONAL                                     -->
+  <!-- ======================================================== -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <span class="sq-red">■</span> CRIVOS // ENGENHARIA DE ESTUDOS SOB DEMANDA
+    </div>
+    <div class="topbar-right">
+      <span>SINCRONIZAÇÃO EM NUVEM • ENTREGA EM ATÉ 48H</span>
+      <button type="button" id="theme-toggle-btn" class="theme-toggle-btn" title="Alternar Modo Escuro">[ ◐ TEMA ]</button>
+    </div>
+  </header>
+
+  <!-- ======================================================== -->
+  <!-- NAVEGAÇÃO PRINCIPAL                                      -->
+  <!-- ======================================================== -->
+  <nav class="main-nav">
+    <a href="#" class="nav-brand">
+      <div class="nav-brand-logo"></div>
+      <span class="nav-brand-text">CRIVOS</span>
+      <span class="nav-brand-badge">// SISTEMAS EM NUVEM</span>
+    </a>
+
+    <div class="nav-links">
+      <a href="#como-funciona" class="nav-link">01. Como Funciona</a>
+      <a href="#sincronizacao" class="nav-link">02. Nuvem em Tempo Real</a>
+      <a href="#demonstracao" class="nav-link">03. Demonstração</a>
+      <a href="#precos" class="nav-link">04. Planos</a>
+      <a href="#faq" class="nav-link">05. FAQ</a>
+    </div>
+
+    <div class="nav-actions">
+      <a href="/login.html" class="btn btn-outline" style="font-size:11px;padding:7px 12px;">Área do Candidato ↗</a>
+      <a href="#precos" class="btn btn-primary">Montar Meu Plano →</a>
+      <button type="button" id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Abrir Menu">☰ MENU</button>
+    </div>
+  </nav>
+
+  <!-- DRAWER MOBILE DE NAVEGAÇÃO -->
+  <div id="mobile-nav-drawer" class="mobile-nav-drawer">
+    <a href="#como-funciona" class="mobile-nav-link">01. Como Funciona</a>
+    <a href="#sincronizacao" class="mobile-nav-link">02. Sincronização em Nuvem</a>
+    <a href="#demonstracao" class="mobile-nav-link">03. Demonstração Ao Vivo</a>
+    <a href="#precos" class="mobile-nav-link">04. Tabela de Preços</a>
+    <a href="#faq" class="mobile-nav-link">05. Perguntas Frequentes (FAQ)</a>
+    <a href="/login.html" class="btn btn-outline" style="width:100%;margin-top:8px;">ÁREA DO CANDIDATO ↗</a>
+    <a href="#precos" class="btn btn-primary" style="width:100%;margin-top:6px;">Montar Meu Plano →</a>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- HERO SECTION // A GRANDE PROMESSA CINEMÁTICA             -->
+  <!-- ======================================================== -->
+  <section class="hero-section">
+    <div class="container">
+      
+      <div class="hero-cloud-badge">
+        <span class="status-ping"></span>
+        <span>NOVA GERAÇÃO // SINCRONIZAÇÃO EM NUVEM EM TEMPO REAL</span>
+      </div>
+
+      <div class="hero-grid">
+        <div>
+          <h1 class="hero-headline">
+            VOCÊ NOS ENTREGA SEU EDITAL E SUA ROTINA. NÓS ENTREGAMOS SEU <span class="highlight-accent">SISTEMA DIÁRIO DE APROVAÇÃO</span> NA NUVEM.
+          </h1>
+
+          <p class="hero-subhead">
+            Engenharia de estudos tática sob demanda (Done-For-You). Não é um template genérico de Notion nem um app vazio: é um Sistema Operacional de Estudos individual, calibrado para as horas reais da sua semana e sincronizado na nuvem para você alternar livremente entre computador, tablet e celular.
+          </p>
+
+          <div class="hero-cta-group">
+            <a href="#precos" class="btn btn-primary btn-lg">
+              [ MONTAR MEU PLANO EM 48H ] →
+            </a>
+            <a href="https://crivos-demo.pages.dev" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-lg">
+              [ TESTAR DEMONSTRAÇÃO AO VIVO ] ↗
+            </a>
+          </div>
+
+          <div class="hero-guarantees">
+            <div class="hero-guarantee-item">
+              <span>■</span> Entrega em até 48h
+            </div>
+            <span>•</span>
+            <div class="hero-guarantee-item">
+              <span>■</span> Sincronização instantânea na nuvem
+            </div>
+            <span>•</span>
+            <div class="hero-guarantee-item">
+              <span>■</span> 7 dias de garantia de calibração
+            </div>
+          </div>
+        </div>
+
+        <!-- MOCKUP VISUAL INTERATIVO // SISTEMA CRIVOS NA NUVEM -->
+        <div class="hero-mockup-wrapper">
+          <div class="hero-mockup-frame">
+            <div class="mockup-window-header">
+              <div class="mockup-window-dots">
+                <span class="mockup-dot"></span>
+                <span class="mockup-dot"></span>
+                <span class="mockup-dot"></span>
+              </div>
+              <div class="mockup-sync-indicator">
+                <span class="status-ping" style="width:6px;height:6px;"></span>
+                <span>NUVEM SINCRONIZADA • 24ms</span>
+              </div>
+            </div>
+
+            <div class="mockup-header-strip">
+              <div class="mockup-user-info">
+                <div class="mockup-avatar">CR</div>
+                <div>
+                  <div class="mockup-cand-label">PAINEL CANDIDATO: <b>AUDITOR // FISCAL</b></div>
+                  <div class="mockup-plan-name">EDITAL ALVO: SEFAZ 2026 • 24H SEMANAIS</div>
+                </div>
+              </div>
+              <div class="mockup-countdown-pill">
+                <span class="mockup-cd-txt">PROVA EM</span>
+                <span class="mockup-cd-num">86 DIAS</span>
+              </div>
+            </div>
+
+            <div class="mockup-body-grid">
+              <div>
+                <div class="mockup-widget-title">METAS DE HOJE • CICLO ELÁSTICO (3.5H)</div>
+                
+                <div class="mockup-task-item done">
+                  <span class="mockup-check">✓</span>
+                  <div class="mockup-task-text">
+                    <b>DIREITO TRIBUTÁRIO // ICMS</b>
+                    <span>Mapeamento Cebraspe • 25 Questões Concluídas</span>
+                  </div>
+                </div>
+
+                <div class="mockup-task-item current">
+                  <span class="mockup-play">►</span>
+                  <div class="mockup-task-text">
+                    <b>TI E BANCO DE DADOS (EM CURSO)</b>
+                    <span>Modelagem Relacional e Normalização • 45m</span>
+                  </div>
+                </div>
+
+                <div class="mockup-task-item">
+                  <span style="font-family:'JetBrains Mono';font-size:11px;color:var(--ink-dim);">03</span>
+                  <div class="mockup-task-text">
+                    <b>REVISÃO SM-2 // DIREITO CONSTITUCIONAL</b>
+                    <span>32 Flashcards pendentes para retenção</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mockup-body-right">
+                <div class="mockup-widget-title">RETENÇÃO &amp; FOCO</div>
+                
+                <div class="mockup-stat-box">
+                  <span class="mockup-stat-val">94.8%</span>
+                  <span class="mockup-stat-lbl">ÍNDICE DE ACERTO NA BANCA</span>
+                </div>
+
+                <div class="mockup-pomo-box">
+                  <div>
+                    <span>POMODORO // ATIVO</span>
+                    <div style="font-size:9px;color:var(--crivos-green);font-family:'JetBrains Mono';">FOCO TOTAL</div>
+                  </div>
+                  <b>25:00</b>
+                </div>
+
+                <div class="mockup-stat-box" style="padding:8px 12px;">
+                  <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono';font-size:9px;margin-bottom:4px;">
+                    <span>COBERTURA DO EDITAL</span>
+                    <b>68.4%</b>
+                  </div>
+                  <div class="weight-bar-wrapper">
+                    <div class="weight-bar-fill" style="width:68.4%;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mockup-footer-strip">
+              <span>CRIVOS CLOUD OS • DADOS PERSISTENTES EM QUALQUER DISPOSITIVO</span>
+              <a href="https://crivos-demo.pages.dev" target="_blank" rel="noopener noreferrer" class="mockup-open-btn">[TESTAR AO VIVO ↗]</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================== -->
+  <!-- LIVE TICKER TÉCNICO // STREAM DE INFORMAÇÕES CONTÍNUAS   -->
+  <!-- ======================================================== -->
+  <div class="ticker-banner">
+    <div class="ticker-track">
+      <div class="ticker-item"><span class="sq-red">■</span> SINCRONIZAÇÃO EM NUVEM EM TEMPO REAL</div>
+      <div class="ticker-item">ENTREGA INDIVIDUAL EM ATÉ 48H</div>
+      <div class="ticker-item">TAXA MÉDIA DE ADERÊNCIA: 93.4%</div>
+      <div class="ticker-item">ALGORITMO DE REPETIÇÃO ESPAÇADA SM-2 NATIVO</div>
+      <div class="ticker-item">ACESSO EM QUALQUER COMPUTADOR, TABLET OU CELULAR</div>
+      <div class="ticker-item">SEM APLICATIVOS PESADOS</div>
+      <div class="ticker-item"><span class="sq-red">■</span> BANCA MAPEADA: CEBRASPE // FGV // FCC // VUNESP // CARREIRAS FISCAIS &amp; POLICIAIS</div>
+      <!-- Repetição para loop infinito -->
+      <div class="ticker-item"><span class="sq-red">■</span> SINCRONIZAÇÃO EM NUVEM EM TEMPO REAL</div>
+      <div class="ticker-item">ENTREGA INDIVIDUAL EM ATÉ 48H</div>
+      <div class="ticker-item">TAXA MÉDIA DE ADERÊNCIA: 93.4%</div>
+      <div class="ticker-item">ALGORITMO DE REPETIÇÃO ESPAÇADA SM-2 NATIVO</div>
+      <div class="ticker-item">ACESSO EM QUALQUER COMPUTADOR, TABLET OU CELULAR</div>
+      <div class="ticker-item">SEM APLICATIVOS PESADOS</div>
+      <div class="ticker-item"><span class="sq-red">■</span> BANCA MAPEADA: CEBRASPE // FGV // FCC // VUNESP // CARREIRAS FISCAIS &amp; POLICIAIS</div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- SEÇÃO 01 // A NOVA ARQUITETURA EM NUVEM                  -->
+  <!-- ======================================================== -->
+  <section class="section section-alt" id="sincronizacao">
+    <div class="container">
+      <div class="section-meta">
+        <span class="sq-red">■</span> 01 // SINCRONIZAÇÃO NATIVA EM NUVEM
+      </div>
+      <h2 class="section-title">SEUS ESTUDOS SALVOS NA NUVEM, ACESSÍVEIS ONDE VOCÊ ESTIVER</h2>
+      <p class="section-desc">
+        Chega de perder horas montando planilhas desatualizadas ou depender de navegadores locais. Com a arquitetura em nuvem da CRIVOS, cada questão marcada, cada minuto de Pomodoro e cada revisão espaçada são salvos instantaneamente no seu perfil de candidato.
+      </p>
+
+      <div class="sync-comparison-grid reveal-on-scroll">
+        <!-- Card 1: Como o mercado faz -->
+        <div class="sync-card negative">
+          <span class="sync-badge-status">MODELO TRADICIONAL &amp; PLANILHAS</span>
+          <h3 class="sync-card-title">PLANILHAS SOLTAS E MEMÓRIA LOCAL</h3>
+          <p style="font-size:14px;color:var(--ink-muted);">
+            Se você estuda no trabalho ou no celular, seu progresso não acompanha. Um cache limpo ou troca de dispositivo apaga seu histórico de questões e desajusta todo o cronograma.
+          </p>
+
+          <ul class="sync-card-list">
+            <li class="sync-card-item">
+              <span class="icon">✕</span>
+              <span>Dados presos no navegador do aparelho onde foram preenchidos</span>
+            </li>
+            <li class="sync-card-item">
+              <span class="icon">✕</span>
+              <span>Risco de perda total de métricas ao limpar cookies ou trocar de celular</span>
+            </li>
+            <li class="sync-card-item">
+              <span class="icon">✕</span>
+              <span>Falta de continuidade entre o estudo no computador e revisões móveis</span>
+            </li>
+            <li class="sync-card-item">
+              <span class="icon">✕</span>
+              <span>Tempo desperdiçado preenchendo tabelas ao invés de fixar conteúdo</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Card 2: Como a CRIVOS entrega -->
+        <div class="sync-card positive">
+          <span class="sync-badge-status">CRIVOS CLOUD OS • ATUALIZADO</span>
+          <h3 class="sync-card-title">SISTEMA CONECTADO E PERSISTENTE</h3>
+          <p style="font-size:14px;color:var(--ink-muted);">
+            Infraestrutura em nuvem segura com autenticação individual. Você inicia uma bateria de questões no desktop, revisa seus flashcards no celular no trajeto e o sistema mantém tudo rigorosamente calibrado.
+          </p>
+
+          <ul class="sync-card-list">
+            <li class="sync-card-item">
+              <span class="icon">✓</span>
+              <span>Sincronização em milissegundos entre smartphone, tablet e PC</span>
+            </li>
+            <li class="sync-card-item">
+              <span class="icon">✓</span>
+              <span>Histórico de acertos, ciclos e cartões SM-2 preservados na nuvem</span>
+            </li>
+            <li class="sync-card-item">
+              <span class="icon">✓</span>
+              <span>Login direto pela Área do Candidato sem necessidade de instalar aplicativos</span>
+            </li>
+            <li class="sync-card-item">
+              <span class="icon">✓</span>
+              <span>Reagendamento automático: atrasou um dia? O sistema redistribui a carga</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ECOSSISTEMA MULTI-DISPOSITIVO -->
+      <div class="ecosystem-diagram reveal-on-scroll">
+        <div class="ecosystem-node">
+          <span class="ecosystem-icon">💻</span>
+          <h4 class="ecosystem-title">COMPUTADOR DE MESA</h4>
+          <p class="ecosystem-desc">Sessões densas de teoria, simulados cronometrados e resolução aprofundada de questões de prova.</p>
+        </div>
+
+        <div class="ecosystem-node" style="border-color:var(--crivos-red);">
+          <span class="ecosystem-icon">☁️</span>
+          <h4 class="ecosystem-title" style="color:var(--crivos-red);">NUVEM CRIVOS</h4>
+          <p class="ecosystem-desc">Sincroniza status, curva de esquecimento SM-2 e horas registradas automaticamente a cada clique.</p>
+        </div>
+
+        <div class="ecosystem-node">
+          <span class="ecosystem-icon">📱</span>
+          <h4 class="ecosystem-title">SMARTPHONE OU TABLET</h4>
+          <p class="ecosystem-desc">Revisões rápidas de flashcards no transporte, consulta do checklist do dia e áudios de memorização.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ======================================================== -->
+  <!-- SEÇÃO 02 // DEMONSTRAÇÃO DO ENTREGÁVEL INTERATIVO        -->
+  <!-- ======================================================== -->
+  <section class="section" id="demonstracao">
+    <div class="container">
+      <div class="section-meta">
+        <span class="sq-red">■</span> 02 // O ENTREGÁVEL INTERATIVO
+      </div>
+      <h2 class="section-title">PAINEL DE AUDITORIA &amp; EXECUÇÃO EM TEMPO REAL</h2>
+      <p class="section-desc">
+        Explore abaixo a interface real do entregável. Sem tabelas frias: cada disciplina mapeada pela incidência histórica na banca, com alocação elástica de horas e banco de repetição espaçada.
+      </p>
+
+      <div class="demo-canvas reveal-on-scroll">
+        <div class="demo-topbar">
+          <div class="demo-title-group">
+            <span class="demo-badge">PAINEL AO VIVO</span>
+            <span class="demo-target">SIMULAÇÃO: AUDITOR FISCAL DA RECEITA // CEBRASPE</span>
+          </div>
+
+          <div class="demo-metrics">
+            <div class="demo-metric-item">
+              <span>DISPONIBILIDADE:</span> <strong>28H / SEMANA</strong>
+            </div>
+            <div class="demo-metric-item">
+              <span>PROVA EM:</span> <strong style="color:var(--crivos-red);">86 DIAS</strong>
+            </div>
+            <div class="demo-metric-item">
+              <span>ADERÊNCIA DA SEMANA:</span> <strong style="color:var(--crivos-green);">96.2%</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- TABS DE NAVEGAÇÃO DO PAINEL -->
+        <div class="demo-tabs-bar">
+          <button type="button" class="demo-tab-btn active" onclick="switchDemoTab('tab-cronograma', this)">01. Cronograma &amp; Metas</button>
+          <button type="button" class="demo-tab-btn" onclick="switchDemoTab('tab-sm2', this)">02. Repetição Espaçada (SM-2)</button>
+          <button type="button" class="demo-tab-btn" onclick="switchDemoTab('tab-pesos', this)">03. Raio-X por Peso da Banca</button>
+        </div>
+
+        <div class="demo-body-content">
+          <!-- TAB 1: CRONOGRAMA & CICLO -->
+          <div id="tab-cronograma" class="demo-tab-pane active">
+            <div class="demo-columns">
+              <div class="demo-col">
+                <div class="demo-col-header">
+                  <span class="demo-col-title">HOJE • CICLO ELÁSTICO</span>
+                  <span style="font-family:'JetBrains Mono';font-size:10px;color:var(--crivos-green);">3.5H PROGRAMADAS</span>
+                </div>
+                
+                <div class="demo-item-row">
+                  <div>
+                    <b style="display:block;font-size:12px;">DIR. TRIBUTÁRIO</b>
+                    <span style="font-size:11px;color:var(--ink-muted);">Princípios Constitucionais</span>
+                  </div>
+                  <span style="font-family:'JetBrains Mono';font-size:11px;color:var(--crivos-green);font-weight:700;">CONCLUÍDO</span>
+                </div>
+
+                <div class="demo-item-row">
+                  <div>
+                    <b style="display:block;font-size:12px;">CONTABILIDADE GERAL</b>
+                    <span style="font-size:11px;color:var(--ink-muted);">DVA e DFC • Resolução de Questões</span>
+                  </div>
+                  <span style="font-family:'JetBrains Mono';font-size:11px;color:var(--crivos-red);font-weight:700;">AGORA</span>
+                </div>
+
+                <div class="demo-item-row">
+                  <div>
+                    <b style="display:block;font-size:12px;">LEGISLAÇÃO ADUANEIRA</b>
+                    <span style="font-size:11px;color:var(--ink-muted);">Regimes Especiais Aduaneiros</span>
+                  </div>
+                  <span style="font-family:'JetBrains Mono';font-size:11px;color:var(--ink-dim);">PENDENTE</span>
+                </div>
+              </div>
+
+              <div class="demo-col">
+                <div class="demo-col-header">
+                  <span class="demo-col-title">AMANHÃ • DISTRIBUIÇÃO</span>
+                  <span style="font-family:'JetBrains Mono';font-size:10px;color:var(--ink-dim);">CALCULADO</span>
+                </div>
+
+                <div class="demo-item-row">
+                  <div>
+                    <b style="display:block;font-size:12px;">DIR. ADMINISTRATIVO</b>
+                    <span style="font-size:11px;color:var(--ink-muted);">Licitações Lei 14.133/21</span>
+                  </div>
+                  <span style="font-family:'JetBrains Mono';font-size:11px;">1h 30m</span>
+                </div>
+
+                <div class="demo-item-row">
+                  <div>
+                    <b style="display:block;font-size:12px;">AUDITORIA FISCAL</b>
+                    <span style="font-size:11px;color:var(--ink-muted);">Técnicas de Amostragem</span>
+                  </div>
+                  <span style="font-family:'JetBrains Mono';font-size:11px;">1h 15m</span>
+                </div>
+
+                <div class="demo-item-row">
+                  <div>
+                    <b style="display:block;font-size:12px;">REVISÃO ACUMULADA</b>
+                    <span style="font-size:11px;color:var(--ink-muted);">Flashcards D+7</span>
+                  </div>
+                  <span style="font-family:'JetBrains Mono';font-size:11px;">45m</span>
+                </div>
+              </div>
+
+              <div class="demo-col">
+                <div class="demo-col-header">
+                  <span class="demo-col-title">REAGENDAMENTO ELÁSTICO</span>
+                  <span style="font-family:'JetBrains Mono';font-size:10px;color:var(--crivos-blue);">AUTOMÁTICO</span>
+                </div>
+                <p style="font-size:12px;line-height:1.5;color:var(--ink-muted);margin-bottom:12px;">
+                  Surgiu um imprevisto? Marque o dia como "imprevisto" e o sistema recalcula os blocos restantes nos próximos dias sem empilhar matérias nem comprometer a data da prova.
+                </p>
+                <div style="background:var(--bg-card);border:1px solid var(--border-subtle);padding:10px;font-family:'JetBrains Mono';font-size:10px;color:var(--crivos-blue);">
+                  ✓ CARGA EQUILIBRADA ATÉ O DIA D-1 DA PROVA
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 2: FLASHCARDS SM-2 -->
+          <div id="tab-sm2" class="demo-tab-pane">
+            <div style="max-width:680px;margin:0 auto;">
+              <div class="flashcard-preview-box">
+                <div class="flashcard-header">
+                  <span>DISCIPLINA: DIREITO TRIBUTÁRIO // CRÉDITO TRIBUTÁRIO</span>
+                  <span>CARD 14 DE 48</span>
+                </div>
+                <div class="flashcard-question">
+                  Qual é a distinção técnica entre as hipóteses de "Suspensão da Exigibilidade" (Art. 151 CTN) e de "Extinção do Crédito Tributário" (Art. 156 CTN) quanto à decadência e prescrição?
+                </div>
+                <div class="flashcard-answer-box">
+                  <b>RESPOSTA RESUMIDA:</b> A suspensão da exigibilidade obsta a cobrança (execução fiscal), mas não impede a Fazenda de constituir o crédito tributário para evitar a decadência. A extinção põe fim à obrigação tributária principal.
+                </div>
+                <div class="flashcard-actions">
+                  <button type="button" class="flashcard-btn again" onclick="feedbackCard('Repetir em 10m')">[1] Errei</button>
+                  <button type="button" class="flashcard-btn hard" onclick="feedbackCard('Repetir em 1 dia')">[2] Difícil</button>
+                  <button type="button" class="flashcard-btn good" onclick="feedbackCard('Repetir em 4 dias')">[3] Bom</button>
+                  <button type="button" class="flashcard-btn easy" onclick="feedbackCard('Repetir em 12 dias')">[4] Fácil</button>
+                </div>
+              </div>
+              <p style="text-align:center;font-family:'JetBrains Mono';font-size:11px;color:var(--ink-dim);margin-top:14px;">
+                O intervalo do próximo card é calculado em tempo real com base na sua resposta pelo algoritmo SuperMemo-2.
+              </p>
+            </div>
+          </div>
+
+          <!-- TAB 3: PESO NA BANCA -->
+          <div id="tab-pesos" class="demo-tab-pane">
+            <div class="demo-columns">
+              <div class="demo-col">
+                <div class="demo-col-header">
+                  <span class="demo-col-title">TOP MATÉRIAS // CEBRASPE</span>
+                  <span style="font-family:'JetBrains Mono';font-size:10px;color:var(--crivos-red);">58% DA PONTUAÇÃO</span>
+                </div>
+                <div style="margin-bottom:14px;">
+                  <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;">
+                    <span>DIREITO TRIBUTÁRIO</span>
+                    <span>22% DA PROVA</span>
+                  </div>
+                  <div class="weight-bar-wrapper">
+                    <div class="weight-bar-fill" style="width:85%;"></div>
+                  </div>
+                </div>
+                <div style="margin-bottom:14px;">
+                  <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;">
+                    <span>CONTABILIDADE GERAL</span>
+                    <span>20% DA PROVA</span>
+                  </div>
+                  <div class="weight-bar-wrapper">
+                    <div class="weight-bar-fill" style="width:78%;"></div>
+                  </div>
+                </div>
+                <div>
+                  <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;">
+                    <span>TI &amp; ANÁLISE DE DADOS</span>
+                    <span>16% DA PROVA</span>
+                  </div>
+                  <div class="weight-bar-wrapper">
+                    <div class="weight-bar-fill" style="width:65%;"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="demo-col">
+                <div class="demo-col-header">
+                  <span class="demo-col-title">ESTRATÉGIA DE PONTOS</span>
+                  <span style="font-family:'JetBrains Mono';font-size:10px;color:var(--ink-dim);">AUDITORIA</span>
+                </div>
+                <p style="font-size:12px;line-height:1.5;color:var(--ink-muted);margin-bottom:12px;">
+                  Candidatos amadores dividem as horas igualmente entre todas as matérias. Nossa engenharia aloca mais de 60% do seu tempo nas matérias que decidem os primeiros lugares na sua banca específica.
+                </p>
+                <div style="border-left:2px solid var(--crivos-red);padding-left:10px;font-size:12px;color:var(--ink-primary);font-weight:600;">
+                  "Não se estuda tudo com a mesma intensidade. Estuda-se para colocar os pontos no bolso."
+                </div>
+              </div>
+
+              <div class="demo-col">
+                <div class="demo-col-header">
+                  <span class="demo-col-title">SIMULADOR AO VIVO</span>
+                  <span style="font-family:'JetBrains Mono';font-size:10px;color:var(--crivos-green);">DISPONÍVEL</span>
+                </div>
+                <p style="font-size:12px;line-height:1.5;color:var(--ink-muted);margin-bottom:16px;">
+                  Você pode abrir uma versão completa da aplicação no seu dispositivo e testar todas as abas sem custo.
+                </p>
+                <a href="https://crivos-demo.pages.dev" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="width:100%;text-align:center;">
+                  Abrir Demo Completa ↗
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ======================================================== -->
+  <!-- SEÇÃO 03 // COMO FUNCIONA EM 3 ETAPAS EXATAS             -->
+  <!-- ======================================================== -->
+  <section class="section section-alt" id="como-funciona">
+    <div class="container">
+      <div class="section-meta">
+        <span class="sq-red">■</span> 03 // FLUXO OPERACIONAL
+      </div>
+      <h2 class="section-title">COMO FUNCIONA O PROCESSO EM 3 ETAPAS</h2>
+      <p class="section-desc">
+        Você gasta menos de 5 minutos preenchendo o diagnóstico inicial. Todo o trabalho analítico de cruzamento de pesos, cálculo de semanas e modelagem das metas é executado pela nossa engenharia.
+      </p>
+
+      <div class="steps-grid reveal-on-scroll">
+        <!-- Passo 1 -->
+        <div class="step-card">
+          <div>
+            <div class="step-num-badge">01</div>
+            <span class="step-subtag">ENTRADA // 5 MINUTOS</span>
+            <h3 class="step-title">DIAGNÓSTICO E ROTINA</h3>
+            <p class="step-desc">
+              Você envia o PDF do edital (ou indica o concurso e cargo pretendido) e declara sua disponibilidade real na semana: turnos, folgas e total de horas líquidas diárias.
+            </p>
+          </div>
+          <div class="step-footer-meta">FORMULÁRIO SEGURO E RÁPIDO</div>
+        </div>
+
+        <!-- Passo 2 -->
+        <div class="step-card featured-step">
+          <div>
+            <div class="step-num-badge">02</div>
+            <span class="step-subtag">PROCESSAMENTO // ATÉ 48H</span>
+            <h3 class="step-title">ENGENHARIA E PESOS DE BANCA</h3>
+            <p class="step-desc">
+              Cruzamos a ementa do edital com o histórico estatístico de cobrança da banca examinadora (Cebraspe, FGV, FCC, etc.). O conteúdo é fragmentado em blocos diários e sincronizado na nuvem.
+            </p>
+          </div>
+          <div class="step-footer-meta" style="color:var(--crivos-red);">ANÁLISE DE DADOS + AUDITORIA TÉCNICA</div>
+        </div>
+
+        <!-- Passo 3 -->
+        <div class="step-card">
+          <div>
+            <div class="step-num-badge">03</div>
+            <span class="step-subtag">ACESSO // LINK EXCLUSIVO</span>
+            <h3 class="step-title">ENTREGA E CALIBRAÇÃO</h3>
+            <p class="step-desc">
+              Em até 48 horas você recebe as credenciais da sua Área do Candidato. Basta abrir no celular, tablet ou computador: seu estudo do dia já estará ordenado, com 7 dias de garantia de ajustes.
+            </p>
+          </div>
+          <div class="step-footer-meta">GARANTIA DE ADAPTAÇÃO TOTAL</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ======================================================== -->
+  <!-- SEÇÃO 04 // TABELA DE PREÇOS (ESCADA DE VALOR)           -->
+  <!-- ======================================================== -->
+  <section class="section" id="precos">
+    <div class="container">
+      <div class="section-meta">
+        <span class="sq-red">■</span> 04 // PLANOS SOB DEMANDA
+      </div>
+      <h2 class="section-title">ESCOLHA SEU NÍVEL DE PREPARAÇÃO</h2>
+      <p class="section-desc">
+        Investimento único e transparente. Sem mensalidades recorrentes nem renovações surpresa: você paga uma única vez e o painel em nuvem é seu até o dia da prova.
+      </p>
+
+      <div class="pricing-grid reveal-on-scroll">
+        <!-- NÍVEL 1: TÁTICO -->
+        <div class="price-card">
+          <div>
+            <h3 class="price-title">NÍVEL 1: TÁTICO</h3>
+            <div class="price-focus">FOCO EM EXECUÇÃO &amp; ROTINA</div>
+
+            <div class="price-box">
+              <span class="price-currency">R$</span>
+              <span class="price-amount">67</span>
+              <span class="price-terms">/ PAGAMENTO ÚNICO</span>
+            </div>
+
+            <ul class="price-features">
+              <li class="price-feature-item">
+                <span class="price-check">■</span>
+                <span>Painel individual calibrado para o seu edital e horas semanais</span>
+              </li>
+              <li class="price-feature-item">
+                <span class="price-check">■</span>
+                <span>Sincronização em nuvem contínua entre PC, celular e tablet</span>
+              </li>
+              <li class="price-feature-item">
+                <span class="price-check">■</span>
+                <span>Cronograma Diário com Reagendamento Elástico contra imprevistos</span>
+              </li>
+              <li class="price-feature-item">
+                <span class="price-check">■</span>
+                <span>Pomodoro integrado com contador de horas líquidas e checklist de prova</span>
+              </li>
+              <li class="price-feature-item">
+                <span class="price-check">■</span>
+                <span>Entrega completa em até 48 horas no seu e-mail e WhatsApp</span>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <a href="/payment.html?produto=tatico" class="btn btn-outline" style="width:100%;">
+              ADQUIRIR NÍVEL TÁTICO
+            </a>
+          </div>
+        </div>
+
+        <!-- NÍVEL 2: ARSENAL (DESTACADO) -->
+        <div class="price-card featured">
+          <div class="price-card-badge">MAIS ESCOLHIDO • ALTA RETENÇÃO</div>
+          
+          <div>
+            <h3 class="price-title">NÍVEL 2: ARSENAL</h3>
+            <div class="price-focus">FOCO EM MEMÓRIA DE LONGO PRAZO</div>
+
+            <div class="price-box">
+              <span class="price-currency">R$</span>
+              <span class="price-amount">124</span>
+              <span class="price-terms">/ PAGAMENTO ÚNICO</span>
+            </div>
+
+            <ul class="price-features">
+              <li class="price-feature-item">
+                <span class="price-check">■</span>
+                <b style="color:var(--crivos-red);">Tudo do Nível Tático incluído</b>
+              </li>
+              <li class="price-feature-item">
+                <span class="price-check">■</span>
+                <span>Mapeamento dos Top Tópicos por relevância estatística na banca</span>
+              </li>
+              <li class="price-feature-item">
+                <span class="price-check">■</span>
+                <span>Banco de Flashcards calibrados com algoritmo SuperMemo-2 (SM-2)</span>
+              </li>
+              <li class="price-feature-item">
+                <span class="price-check">■</span>
+                <span>Ciclos automáticos de revisão espaçada (D+1, D+7, D+14, D+28)</span>
+              </li>
+              <li class="price-feature-item">
+                <span class="price-check">■</span>
+                <span>Mapa de conexões conceituais interativo para fixação visual</span>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <a href="/payment.html?produto=arsenal" class="btn btn-primary" style="width:100%;">
+              ADQUIRIR PACOTE ARSENAL →
+            </a>
+          </div>
+        </div>
+
+        <!-- NÍVEL 3: ELITE -->
+        <div class="price-card">
+          <div>
+            <h3 class="price-title">NÍVEL 3: ELITE</h3>
+            <div class="price-focus">FOCO EM DISCURSIVAS &amp; BANCA</div>
+
+            <div class="price-box">
+              <span class="price-currency">R$</span>
+              <span class="price-amount">221</span>
+              <span class="price-terms">/ PAGAMENTO ÚNICO</span>
+            </div>
+
+            <ul class="price-features">
+              <li class="price-feature-item">
+                <span class="price-check">■</span>
+                <b style="color:var(--crivos-red);">Tudo do Nível Arsenal incluído</b>
+              </li>
+              <li class="price-feature-item">
+                <span class="price-check">■</span>
+                <span>Simulador de questões discursivas e redações cronometrado</span>
+              </li>
+              <li class="price-feature-item">
+                <span class="price-check">■</span>
+                <span>Grade técnica de autocorreção espelhada nos critérios da banca</span>
+              </li>
+              <li class="price-feature-item">
+                <span class="price-check">■</span>
+                <span>Módulo de Treino de Prova Oral / Defesa de Caso</span>
+              </li>
+              <li class="price-feature-item">
+                <span class="price-check">■</span>
+                <span>Prioridade máxima na fila de engenharia (entrega em até 24h)</span>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <a href="/payment.html?produto=elite" class="btn btn-outline" style="width:100%;">
+              PACOTE COMPLETO ELITE
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ======================================================== -->
+  <!-- SEÇÃO 05 // FAQ (PERGUNTAS FREQUENTES)                   -->
+  <!-- ======================================================== -->
+  <section class="section section-alt" id="faq">
+    <div class="container">
+      <div class="section-meta">
+        <span class="sq-red">■</span> 05 // DÚVIDAS RECORRENTES
+      </div>
+      <h2 class="section-title">PERGUNTAS FREQUENTES</h2>
+      <p class="section-desc">
+        Respostas transparentes e diretas sobre a metodologia, entrega e infraestrutura técnica da CRIVOS.
+      </p>
+
+      <div class="faq-list reveal-on-scroll">
+        <!-- FAQ 1 -->
+        <details class="faq-item" open>
+          <summary class="faq-question">
+            <span>01. COMO FUNCIONA A SINCRONIZAÇÃO EM NUVEM?</span>
+            <span class="faq-icon">+</span>
+          </summary>
+          <div class="faq-answer">
+            Ao adquirir seu plano, uma conta exclusiva é gerada para você na Área do Candidato da CRIVOS. Todo o seu cronograma, marcações de questões, flashcards e minutos de estudo são armazenados em um banco de dados em nuvem em tempo real. Isso significa que você pode estudar no computador, sair de casa e continuar revisando pelo celular ou tablet exatamente de onde parou, sem perigo de perder dados.
+          </div>
+        </details>
+
+        <!-- FAQ 2 -->
+        <details class="faq-item">
+          <summary class="faq-question">
+            <span>02. O EDITAL DO MEU CONCURSO ESPECÍFICO É ATENDIDO?</span>
+            <span class="faq-icon">+</span>
+          </summary>
+          <div class="faq-answer">
+            Sim. Cobrimos concursos federais, estaduais e municipais (fiscais, policiais, tribunais, controle, administrativos, legislativos), exames de conselho (OAB, CFC, CRM), vestibulares de alta densidade (Medicina, ITA/IME, ENEM) e seleções de pós-graduação stricto sensu. Nossa equipe analisa a ementa oficial e as peculiaridades da banca examinadora para estruturar seu plano sob medida.
+          </div>
+        </details>
+
+        <!-- FAQ 3 -->
+        <details class="faq-item">
+          <summary class="faq-question">
+            <span>03. PRECISO INSTALAR ALGUM PROGRAMA OU APLICATIVO?</span>
+            <span class="faq-icon">+</span>
+          </summary>
+          <div class="faq-answer">
+            Não. A plataforma CRIVOS é uma aplicação web de ponta que roda diretamente no seu navegador de preferência (Chrome, Safari, Edge, Firefox, Brave). Ela é ultraleve, consome quase zero de bateria e adapta-se perfeitamente a telas de computadores, tablets ou celulares sem ocupar espaço de memória no seu aparelho.
+          </div>
+        </details>
+
+        <!-- FAQ 4 -->
+        <details class="faq-item">
+          <summary class="faq-question">
+            <span>04. COMO RECEBO O ACESSO APÓS O PAGAMENTO?</span>
+            <span class="faq-icon">+</span>
+          </summary>
+          <div class="faq-answer">
+            Assim que seu pagamento for confirmado, você é redirecionado imediatamente para o nosso formulário de calibração, onde informa seu edital e seus horários semanais. Em até 48 horas (ou 24h no plano Elite), nossa engenharia conclui a modelagem e você recebe por e-mail e WhatsApp suas credenciais de acesso seguro à Área do Candidato.
+          </div>
+        </details>
+
+        <!-- FAQ 5 -->
+        <details class="faq-item">
+          <summary class="faq-question">
+            <span>05. O QUE ACONTECE SE MINHA ROTINA MUDAR OU SE O EDITAL FOR RETIFICADO?</span>
+            <span class="faq-icon">+</span>
+          </summary>
+          <div class="faq-answer">
+            Você conta com uma garantia incondicional de 7 dias de calibração gratuita. Se você mudar de turno no trabalho, alterar sua disponibilidade ou se a banca publicar uma retificação de conteúdo, basta solicitar pelo nosso suporte que recalibramos o seu sistema sem nenhum custo adicional.
+          </div>
+        </details>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ======================================================== -->
+  <!-- BANNER FINAL CINEMÁTICO DE CONVERSÃO                     -->
+  <!-- ======================================================== -->
+  <section class="final-cta-section">
+    <div class="container">
+      <div class="final-cta-badge">
+        <span class="sq-red">■</span> SLOTS DE CALIBRAÇÃO ABERTOS ESTA SEMANA
+      </div>
+
+      <h2 class="final-cta-title">
+        PARE DE DESPERDIÇAR SEMANAS MONTANDO CRONOGRAMAS. SEU PAPEL É SENTAR E ESTUDAR. O NOSSO É DIZER EXATAMENTE O QUE CAI.
+      </h2>
+
+      <p class="final-cta-desc">
+        Receba em até 48 horas seu plano cirúrgico, estruturado com os pesos estatísticos da sua banca examinadora e calibrado para suas horas reais na nuvem.
+      </p>
+
+      <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center;">
+        <a href="#precos" class="btn btn-primary btn-lg">
+          [ MONTAR MEU PLANO EM 48H ] →
+        </a>
+        <a href="/login.html" class="btn btn-outline btn-lg" style="color:#FFF;border-color:rgba(255,255,255,0.3);">
+          Já sou Candidato: Acessar Área ↗
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================== -->
+  <!-- RODAPÉ INSTITUCIONAL                                     -->
+  <!-- ======================================================== -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="nav-brand-logo"></div>
+            <span style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:16px;letter-spacing:-0.02em;">CRIVOS // SISTEMAS NA NUVEM</span>
+          </div>
+          <p>
+            Engenharia de estudos pós-edital individual e sob demanda. Metodologia orientada a dados, relevância estatística de banca e calibração para rotinas reais com sincronização contínua na nuvem.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">NAVEGAÇÃO RÁPIDA</h4>
+          <ul class="footer-links">
+            <li><a href="#como-funciona" class="footer-link">01. Como Funciona</a></li>
+            <li><a href="#sincronizacao" class="footer-link">02. Nuvem em Tempo Real</a></li>
+            <li><a href="#demonstracao" class="footer-link">03. Demonstração Interativa</a></li>
+            <li><a href="#precos" class="footer-link">04. Tabela de Planos</a></li>
+            <li><a href="#faq" class="footer-link">05. Perguntas Frequentes</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">ACESSO &amp; SUPORTE</h4>
+          <ul class="footer-links">
+            <li><a href="/login.html" class="footer-link">Área do Candidato ↗</a></li>
+            <li><a href="https://crivos-demo.pages.dev" target="_blank" rel="noopener noreferrer" class="footer-link">Demonstração Online ↗</a></li>
+            <li><a href="mailto:contato@crivos.com.br" class="footer-link">Suporte Técnico</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>
+          &copy; 2026 CRIVOS. Todos os direitos reservados.
+        </div>
+        <div>
+          INFRAESTRUTURA EM NUVEM DE ALTA DISPONIBILIDADE
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ======================================================== -->
+  <!-- INTERACTIVE SCRIPTS & CINEMATIC MOTION                   -->
+  <!-- ======================================================== -->
+  <script>
+    // THEME TOGGLE (LIGHT / DARK) COM PERSISTÊNCIA
+    const themeBtn = document.getElementById('theme-toggle-btn');
+    themeBtn.addEventListener('click', function() {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('crivos_web_theme', newTheme);
+    });
+
+    // MOBILE MENU DRAWER
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    const drawer = document.getElementById('mobile-nav-drawer');
+    if (menuBtn && drawer) {
+      menuBtn.addEventListener('click', function() {
+        drawer.classList.toggle('open');
+      });
+      // Fechar ao clicar em qualquer link
+      drawer.querySelectorAll('a').forEach(function(link) {
+        link.addEventListener('click', function() {
+          drawer.classList.remove('open');
+        });
+      });
+    }
+
+    // DEMO TAB SWITCHER
+    function switchDemoTab(tabId, btnElement) {
+      document.querySelectorAll('.demo-tab-pane').forEach(function(pane) {
+        pane.classList.remove('active');
+      });
+      document.querySelectorAll('.demo-tab-btn').forEach(function(btn) {
+        btn.classList.remove('active');
+      });
+
+      const targetPane = document.getElementById(tabId);
+      if (targetPane) targetPane.classList.add('active');
+      if (btnElement) btnElement.classList.add('active');
+    }
+
+    // FLASHCARD FEEDBACK INTERACTION
+    function feedbackCard(message) {
+      alert('Algoritmo SM-2 acionado: ' + message + '. O próximo ciclo foi reagendado e sincronizado na nuvem.');
+    }
+
+    // SCROLL REVEAL COM INTERSECTION OBSERVER (FLUID MOTIONS)
+    document.addEventListener('DOMContentLoaded', function() {
+      const revealElements = document.querySelectorAll('.reveal-on-scroll');
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(function(entries) {
+          entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('revealed');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1 });
+
+        revealElements.forEach(function(el) {
+          observer.observe(el);
+        });
+      } else {
+        revealElements.forEach(function(el) {
+          el.classList.add('revealed');
+        });
+      }
+    });
+  </script>
+</body>
+</html>
