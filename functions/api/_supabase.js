@@ -32,8 +32,8 @@ export function getCorsHeaders(request) {
 
 export function getSupabaseConfig(env) {
   const url = (env?.SUPABASE_URL || 'https://dmmtmfjlieqeqwlhtgrr.supabase.co').replace(/\/$/, '');
-  const serviceKey = env?.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRtbXRtZmpsaWVxZXF3bGh0Z3JyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc5MjM2MDA2MywiZXhwIjoyMTA3OTM2MDYzfQ.eE_OaaD9SXBYP1OW_EnCPxVuyNq1RdVYen-7Cr-0hJ8';
-  const anonKey = env?.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRtbXRtZmpsaWVxZXF3bGh0Z3JyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIzNjAwNjMsImV4cCI6MjEwNzkzNjA2M30.62ItYAgrweWcK9zqdMqtYlD6lOZ8TesQv2ygGe-xJI8';
+  const serviceKey = env?.SUPABASE_SERVICE_ROLE_KEY || '';
+  const anonKey = env?.SUPABASE_ANON_KEY || 'sb_publishable_pRdJFHU4VWrjVOOSUcNB5Q_9ZnJw7g';
 
   return { url, serviceKey, anonKey };
 }
