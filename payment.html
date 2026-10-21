@@ -1178,25 +1178,50 @@
 
 <script>
 
+    // ==========================================
+    // REINICIALIZAÇÃO DO BRICK DE CARTÃO AO ALTERAR TEMA OU VALOR
+    // ==========================================
+    async function reloadCardBrick() {
+      if (cardBrickController) {
+        try {
+          await cardBrickController.unmount();
+        } catch (e) {
+          console.warn("[CRIVOS] Erro ao desmontar Brick:", e);
+        }
+        cardBrickController = null;
+        cardBrickInitialized = false;
+      }
+      const container = document.getElementById('cardPaymentBrick_container');
+      if (container) {
+        container.innerHTML = '';
+      }
+      if (currentMethod === 'card') {
+        initCardForm();
+      }
+    }
+
     // Gerenciador de Tema
-    function toggleTheme() {
+    async function toggleTheme() {
       const html = document.documentElement;
       const current = html.getAttribute('data-theme');
       const next = current === 'dark' ? 'light' : 'dark';
-      html.setAttribute('data-theme', next);
+      if (next === 'dark') {
+        html.setAttribute('data-theme', 'dark');
+      } else {
+        html.removeAttribute('data-theme');
+      }
+      localStorage.setItem('crivos_theme', next);
       localStorage.setItem('crivos_web_theme', next);
 
-      // Se o terminal de cartão estiver montado, recria com a paleta do novo tema
-      if (cardBrickController) {
-        try {
-          cardBrickController.unmount();
-        } catch (e) {}
-        cardBrickController = null;
-        cardBrickInitialized = false;
-        if (currentMethod === 'card') {
-          initCardForm();
-        }
+      const themeIcon = document.getElementById('theme-icon');
+      if (themeIcon) {
+        themeIcon.textContent = next === 'dark' ? '◑' : '◐';
+        themeIcon.style.transform = 'rotate(180deg)';
+        setTimeout(() => { themeIcon.style.transform = 'none'; }, 350);
       }
+
+      // Se o terminal de cartão estiver montado, recria com a paleta do novo tema
+      await reloadCardBrick();
     }
     const initialTheme = localStorage.getItem('crivos_web_theme') || 'light';
     document.documentElement.setAttribute('data-theme', initialTheme);
@@ -1256,17 +1281,7 @@
 
     productSelect.addEventListener('change', () => {
       const newPrice = updatePlanUI();
-      // Se o brick já tiver sido renderizado, desmonta para recriar com o novo valor se trocar de aba
-      if (cardBrickController) {
-        cardBrickInitialized = false;
-        try {
-          cardBrickController.unmount();
-        } catch (e) {}
-        cardBrickController = null;
-        if (currentMethod === 'card') {
-          initCardForm();
-        }
-      }
+      reloadCardBrick();
     });
 
     // Controle de Envio do Edital (Upload Opcional)
@@ -1738,20 +1753,8 @@
 
   if (themeBtn) {
     themeBtn.onclick = function() {
-      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-      const next = isDark ? 'light' : 'dark';
-      if (next === 'dark') {
-        document.documentElement.setAttribute('data-theme', 'dark');
-      } else {
-        document.documentElement.removeAttribute('data-theme');
-      }
-      localStorage.setItem('crivos_theme', next);
-      localStorage.setItem('crivos_web_theme', next);
-      updateThemeIcon(next === 'dark');
-
-      if (themeIcon) {
-        themeIcon.style.transform = 'rotate(180deg)';
-        setTimeout(() => { themeIcon.style.transform = 'none'; }, 350);
+      if (typeof toggleTheme === 'function') {
+        toggleTheme();
       }
     };
   }
