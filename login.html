@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CRIVOS // ÁREA DO CANDIDATO — ACESSO AO PAINEL</title>
-  <meta name="description" content="ACESSE SEU SISTEMA OPERACIONAL DE ESTUDOS CRIVOS COM SEU E-MAIL E CHAVE DE ACESSO TÁTICA.">
+  <title>CRIVOS // Área do Candidato — Acesso ao Painel</title>
+  <meta name="description" content="Acesse seu Sistema Operacional de Estudos CRIVOS com seu e-mail e chave de acesso tática.">
   
   <!-- Favicon oficial: Quadrado Vermelho Brutalista -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%23D92B2B'/></svg>">
@@ -86,23 +86,7 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      text-transform: uppercase;
       -webkit-font-smoothing: antialiased;
-    }
-
-    input, textarea, select, button {
-      font-family: inherit;
-    }
-
-    /* Manter digitação de credenciais fiel */
-    input[type="email"],
-    input[type="password"] {
-      text-transform: none !important;
-    }
-
-    input::placeholder,
-    textarea::placeholder {
-      text-transform: uppercase !important;
     }
 
     /* TOPBAR INSTITUCIONAL */
@@ -147,6 +131,7 @@
       font-weight: 900;
       font-size: 1.25rem;
       letter-spacing: -0.04em;
+      text-transform: uppercase;
     }
 
     .brand-tag {
@@ -157,6 +142,7 @@
       border-left: 1px solid var(--border-subtle);
       padding-left: 0.6rem;
       margin-left: 0.2rem;
+      text-transform: uppercase;
     }
 
     .nav-actions {
@@ -179,6 +165,7 @@
       display: inline-flex;
       align-items: center;
       gap: 0.35rem;
+      text-transform: uppercase;
     }
 
     .nav-link-btn:hover {
@@ -229,6 +216,7 @@
       font-size: 0.95rem;
       letter-spacing: 0.04em;
       line-height: 1.2;
+      text-transform: uppercase;
     }
 
     .login-brand-subtitle {
@@ -236,10 +224,11 @@
       font-size: 0.7rem;
       color: var(--text-muted);
       letter-spacing: 0.02em;
+      text-transform: uppercase;
     }
 
     .login-intro {
-      font-size: 0.85rem;
+      font-size: 0.88rem;
       line-height: 1.55;
       color: var(--text-muted);
       margin-bottom: 1.5rem;
@@ -255,6 +244,7 @@
       font-size: 0.72rem;
       font-weight: 700;
       letter-spacing: 0.05em;
+      text-transform: uppercase;
       margin-bottom: 0.45rem;
       color: var(--text-primary);
     }
@@ -312,6 +302,7 @@
       font-size: 0.85rem;
       font-weight: 800;
       letter-spacing: 0.04em;
+      text-transform: uppercase;
       cursor: pointer;
       box-shadow: var(--shadow-sm);
       transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.15s ease;
@@ -372,6 +363,7 @@
       border: 1px solid var(--border-color);
       box-shadow: var(--shadow-sm);
       text-align: center;
+      text-transform: uppercase;
       transition: transform 0.1s ease, box-shadow 0.1s ease;
     }
 
@@ -426,6 +418,7 @@
       font-size: 0.72rem;
       color: var(--text-muted);
       text-align: center;
+      text-transform: uppercase;
     }
   </style>
 </head>
@@ -459,7 +452,7 @@
       </div>
 
       <p class="login-intro">
-        INFORME O E-MAIL CADASTRADO NA CONTRATAÇÃO E SUA CHAVE DE ACESSO ENVIADA POR E-MAIL APÓS A CONFIRMAÇÃO DO PAGAMENTO.
+        Informe o e-mail cadastrado na contratação e sua chave de acesso enviada por e-mail após a confirmação do pagamento.
       </p>
 
       <form id="login-form">
@@ -483,8 +476,8 @@
 
       <div class="login-footer-actions">
         <div class="login-footer-row">
-          <a href="#" id="link-forgot" class="login-link-secondary">ESQUECEU SUA CHAVE DE ACESSO?</a>
-          <a href="/" class="login-link-secondary">← VOLTAR À VITRINE</a>
+          <a href="#" id="link-forgot" class="login-link-secondary">Esqueceu sua chave de acesso?</a>
+          <a href="/" class="login-link-secondary">← Voltar à Vitrine</a>
         </div>
         
         <a href="https://crivos-demo.pages.dev" target="_blank" rel="noopener noreferrer" class="demo-callout-btn">
@@ -527,7 +520,7 @@
     function showFeedback(msg, isError = true) {
       feedback.style.display = 'block';
       feedback.className = 'login-feedback ' + (isError ? 'error' : 'success');
-      feedback.textContent = (isError ? '⚠ ' : '✓ ') + msg.toUpperCase();
+      feedback.textContent = (isError ? '⚠ ' : '✓ ') + msg;
     }
 
     form.addEventListener('submit', async (e) => {
@@ -582,20 +575,20 @@
 
     linkForgot.addEventListener('click', async (e) => {
       e.preventDefault();
-      const email = emailInput.value.trim() || prompt('INFORME SEU E-MAIL CADASTRADO PARA ENVIARMOS INSTRUÇÕES DE RECUPERAÇÃO:');
+      const email = emailInput.value.trim() || prompt('Informe seu e-mail cadastrado para enviarmos instruções de recuperação:');
       if (!email) return;
 
       if (!sbClient) {
-        alert('SERVIÇO INDISPONÍVEL NO MOMENTO.');
+        alert('Serviço indisponível no momento.');
         return;
       }
 
       try {
         const { error } = await sbClient.auth.resetPasswordForEmail(email);
         if (error) throw error;
-        alert('✓ INSTRUÇÕES DE REDEFINIÇÃO DE CHAVE FORAM ENVIADAS PARA ' + email.toUpperCase());
+        alert('✓ Instruções de redefinição de chave foram enviadas para ' + email);
       } catch (err) {
-        alert('ERRO AO SOLICITAR REDEFINIÇÃO: ' + (err.message || 'FALHA NO ENVIO.').toUpperCase());
+        alert('Erro ao solicitar redefinição: ' + (err.message || 'Falha no envio.'));
       }
     });
 
