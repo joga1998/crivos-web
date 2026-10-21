@@ -736,12 +736,11 @@
 
           const container = document.getElementById('google-btn-container');
           if (container) {
-            // Renderiza o botão oficial do Google perfeitamente integrado
-            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            // Renderiza o botão oficial do Google persistente no modo escuro (filled_black)
             container.innerHTML = '';
             window.google.accounts.id.renderButton(container, {
               type: 'standard',
-              theme: isDark ? 'filled_black' : 'outline',
+              theme: 'filled_black',
               size: 'large',
               text: 'signin_with',
               shape: 'rectangular',
