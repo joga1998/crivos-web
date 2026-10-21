@@ -116,7 +116,7 @@ node scripts/deploy-user-panel.js \
 
 ## 6. Modo Demonstração Público
 
-O painel suporta o parâmetro `?demo=1` na URL (`https://crivos-painel.pages.dev?demo=1`).
+O painel suporta o parâmetro `?demo=1` na URL (`https://app.crivos.me?demo=1` ou `https://crivos-painel.pages.dev?demo=1`).
 Nesse modo:
 - O sistema ignora a necessidade de login.
 - Carrega a demonstração completa do PPGHS/UERJ 2027 com nível ELITE desbloqueado.
