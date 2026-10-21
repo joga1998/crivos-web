@@ -323,6 +323,67 @@
       cursor: not-allowed;
     }
 
+    /* BOTAO LOGIN GOOGLE & DIVISOR TÁTICO */
+    .btn-google {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      padding: 0.75rem 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.12s ease;
+      margin-bottom: 1.25rem;
+    }
+
+    .btn-google:hover:not(:disabled) {
+      background: var(--bg-elevated);
+      transform: translate(-1px, -1px);
+      box-shadow: var(--shadow-hard);
+    }
+
+    .btn-google:active {
+      transform: translate(1px, 1px);
+      box-shadow: none;
+    }
+
+    .btn-google:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin-bottom: 1.25rem;
+    }
+
+    .auth-divider::before,
+    .auth-divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .auth-divider span {
+      padding: 0 10px;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+
     .login-footer-actions {
       margin-top: 1.5rem;
       padding-top: 1.25rem;
@@ -430,7 +491,7 @@
       <a href="/" class="brand">
         <span class="brand-sq"></span>
         <span class="brand-name">CRIVOS</span>
-        <span class="brand-tag">// ACESSO</span>
+        <span class="brand-tag">// v26.2</span>
       </a>
 
       <div class="nav-actions">
@@ -447,13 +508,22 @@
         <div class="login-brand-sq" aria-hidden="true"></div>
         <div>
           <div class="login-brand-title">PORTAL DO CANDIDATO</div>
-          <div class="login-brand-subtitle">AUTENTICAÇÃO TÁTICA DO ALUNO</div>
         </div>
       </div>
 
-      <p class="login-intro">
-        Informe o e-mail cadastrado na contratação e sua chave de acesso enviada por e-mail após a confirmação do pagamento.
-      </p>
+      <button type="button" id="btn-google-login" class="btn-google">
+        <svg width="18" height="18" viewBox="0 0 24 24" style="flex-shrink:0;">
+          <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+          <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.28v3.15C3.27 21.36 7.36 24 12 24z"/>
+          <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.28C.46 8.2 0 10.04 0 12s.46 3.8 1.28 5.42l4-3.15z"/>
+          <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.36 0 3.27 2.64 1.28 6.58l4 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+        </svg>
+        <span>ENTRAR COM O GOOGLE</span>
+      </button>
+
+      <div class="auth-divider">
+        <span>OU COM CHAVE DE ACESSO</span>
+      </div>
 
       <form id="login-form">
         <div class="form-group">
@@ -592,6 +662,40 @@
         alert('Erro ao solicitar redefinição: ' + (err.message || 'Falha no envio.'));
       }
     });
+
+    const googleBtn = document.getElementById('btn-google-login');
+    if (googleBtn) {
+      googleBtn.addEventListener('click', async () => {
+        if (!sbClient) {
+          showFeedback('Falha na conexão com o servidor. Tente novamente em instantes.');
+          return;
+        }
+        try {
+          googleBtn.disabled = true;
+          googleBtn.innerHTML = '<span>[ CONECTANDO AO GOOGLE... ]</span>';
+          const { error } = await sbClient.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+              redirectTo: 'https://app.crivos.me'
+            }
+          });
+          if (error) throw error;
+        } catch (err) {
+          console.error('[OAuth Google]', err);
+          showFeedback('Falha ao conectar com o Google: ' + (err.message || 'Erro inesperado.'));
+          googleBtn.disabled = false;
+          googleBtn.innerHTML = `
+            <svg width="18" height="18" viewBox="0 0 24 24" style="flex-shrink:0;">
+              <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+              <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.28v3.15C3.27 21.36 7.36 24 12 24z"/>
+              <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.28C.46 8.2 0 10.04 0 12s.46 3.8 1.28 5.42l4-3.15z"/>
+              <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.36 0 3.27 2.64 1.28 6.58l4 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+            </svg>
+            <span>ENTRAR COM O GOOGLE</span>
+          `;
+        }
+      });
+    }
 
     // Theme toggle sincronizado
     const themeBtn = document.getElementById('theme-toggle');
