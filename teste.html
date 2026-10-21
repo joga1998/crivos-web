@@ -564,56 +564,80 @@
         .mobile-menu-btn {
             display: none;
             align-items: center;
-            gap: 0.45rem;
+            gap: 0.5rem;
             font-family: var(--font-mono);
             font-size: 0.74rem;
             font-weight: 800;
             text-transform: uppercase;
-            padding: 0.55rem 0.85rem;
+            padding: 0.55rem 0.9rem;
             border: 2px solid var(--border-color);
             background: var(--bg-surface);
             color: var(--text-primary);
             box-shadow: var(--shadow-sm);
             cursor: pointer;
-            transition: all 0.12s ease;
+            transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
             white-space: nowrap;
         }
 
         .mobile-menu-btn:hover {
             background: var(--bg-elevated);
-            transform: translate(-1px, -1px);
+        }
+
+        .mobile-menu-btn.active {
+            background: var(--accent-red);
+            color: #FFFFFF;
+            border-color: var(--border-color);
+        }
+
+        /* Animação de clique da caixa do botão menu */
+        .mobile-menu-btn.btn-pulse {
+            animation: menu-btn-recoil 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes menu-btn-recoil {
+            0% { transform: scale(0.92); }
+            45% { transform: scale(1.12); }
+            100% { transform: scale(1); }
         }
 
         .mobile-menu-btn .menu-icon {
-            font-size: 1rem;
+            font-size: 1.05rem;
             line-height: 1;
+            display: inline-block;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        /* Gaveta Mobile (Drawer) */
+        .mobile-menu-btn.active .menu-icon {
+            transform: rotate(90deg);
+        }
+
+        /* Gaveta Mobile (Drawer de Comando Tático) */
         .mobile-drawer {
             position: fixed;
             top: 70px;
             left: 0;
             width: 100%;
             height: calc(100dvh - 70px);
-            background-color: var(--bg-primary);
-            border-bottom: 2px solid var(--border-color);
+            background-color: var(--bg-surface);
+            border-bottom: 3px solid var(--border-color);
             z-index: 998;
-            padding: 1.5rem;
+            padding: 1.5rem clamp(1.25rem, 4vw, 2.5rem);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             overflow-y: auto;
-            transform: translateY(-115%);
             opacity: 0;
+            visibility: hidden;
             pointer-events: none;
-            transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s ease;
+            clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+            transition: clip-path 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease, visibility 0.35s;
         }
 
         .mobile-drawer.open {
-            transform: translateY(0);
             opacity: 1;
+            visibility: visible;
             pointer-events: all;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
         }
 
         .mobile-drawer-top {
@@ -626,7 +650,7 @@
         }
 
         .mobile-drawer-close {
-            background: var(--bg-surface);
+            background: var(--bg-primary);
             border: 2px solid var(--border-color);
             color: var(--text-primary);
             font-family: var(--font-mono);
@@ -646,7 +670,7 @@
         .mobile-drawer-nav {
             display: flex;
             flex-direction: column;
-            gap: 0.6rem;
+            gap: 0.65rem;
             flex: 1;
             margin-bottom: 1.5rem;
         }
@@ -656,17 +680,32 @@
             align-items: center;
             justify-content: space-between;
             gap: 0.75rem;
-            padding: 0.95rem 1rem;
-            background: var(--bg-surface);
+            padding: 1rem 1.15rem;
+            background: var(--bg-primary);
             border: 1px solid var(--border-color);
             box-shadow: 2px 2px 0px var(--border-color);
             text-decoration: none;
             color: var(--text-primary);
             font-family: var(--font-mono);
-            font-size: 0.8rem;
+            font-size: 0.82rem;
             font-weight: 800;
-            transition: transform 0.12s ease, background-color 0.12s ease;
+            /* Cascata de entrada animada */
+            transform: translateX(-18px);
+            opacity: 0;
+            transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.32s ease, background-color 0.12s ease;
         }
+
+        .mobile-drawer.open .mobile-drawer-link {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .mobile-drawer.open .mobile-drawer-link:nth-child(1) { transition-delay: 0.05s; }
+        .mobile-drawer.open .mobile-drawer-link:nth-child(2) { transition-delay: 0.09s; }
+        .mobile-drawer.open .mobile-drawer-link:nth-child(3) { transition-delay: 0.13s; }
+        .mobile-drawer.open .mobile-drawer-link:nth-child(4) { transition-delay: 0.17s; }
+        .mobile-drawer.open .mobile-drawer-link:nth-child(5) { transition-delay: 0.21s; }
+        .mobile-drawer.open .mobile-drawer-link:nth-child(6) { transition-delay: 0.25s; }
 
         .mobile-drawer-link:hover,
         .mobile-drawer-link:active {
@@ -685,6 +724,14 @@
             gap: 0.75rem;
             padding-top: 1.25rem;
             border-top: 2px solid var(--border-color);
+            transform: translateY(16px);
+            opacity: 0;
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) 0.28s, opacity 0.35s ease 0.28s;
+        }
+
+        .mobile-drawer.open .mobile-drawer-actions {
+            transform: translateY(0);
+            opacity: 1;
         }
 
         /* Botão Flutuante de Modo Claro / Escuro (Sempre visível no canto inferior direito da tela) */
@@ -2090,6 +2137,10 @@
             .nav-links {
                 display: none;
             }
+            .nav-actions .nav-cta,
+            .nav-actions .nav-login {
+                display: none;
+            }
             .mobile-menu-btn {
                 display: inline-flex;
             }
@@ -3485,7 +3536,7 @@
             });
 
             /* ------------------------------------------------------------------
-               8. MOBILE MENU DRAWER CONTROLLER
+               8. MOBILE MENU DRAWER CONTROLLER (COM ANIMAÇÃO DE PULSO & TRANSIÇÃO)
                ------------------------------------------------------------------ */
             const mobileMenuBtn = document.getElementById('mobile-menu-btn');
             const mobileDrawer = document.getElementById('mobile-drawer');
@@ -3493,19 +3544,39 @@
 
             function toggleMobileDrawer(open) {
                 if (!mobileDrawer) return;
+
                 if (open) {
                     mobileDrawer.classList.add('open');
                     mobileDrawer.setAttribute('aria-hidden', 'false');
+                    if (mobileMenuBtn) {
+                        mobileMenuBtn.classList.add('active');
+                        const labelSpan = mobileMenuBtn.querySelector('span:last-child');
+                        if (labelSpan) labelSpan.textContent = 'FECHAR';
+                        const iconSpan = mobileMenuBtn.querySelector('.menu-icon');
+                        if (iconSpan) iconSpan.textContent = '✕';
+                    }
                     document.body.style.overflow = 'hidden';
                 } else {
                     mobileDrawer.classList.remove('open');
                     mobileDrawer.setAttribute('aria-hidden', 'true');
+                    if (mobileMenuBtn) {
+                        mobileMenuBtn.classList.remove('active');
+                        const labelSpan = mobileMenuBtn.querySelector('span:last-child');
+                        if (labelSpan) labelSpan.textContent = 'MENU';
+                        const iconSpan = mobileMenuBtn.querySelector('.menu-icon');
+                        if (iconSpan) iconSpan.textContent = '☰';
+                    }
                     document.body.style.overflow = '';
                 }
             }
 
             if (mobileMenuBtn) {
                 mobileMenuBtn.addEventListener('click', () => {
+                    // Micro-animação de recoil tátil na caixa do botão menu
+                    mobileMenuBtn.classList.remove('btn-pulse');
+                    void mobileMenuBtn.offsetWidth; // Força reflow
+                    mobileMenuBtn.classList.add('btn-pulse');
+
                     const isOpen = mobileDrawer && mobileDrawer.classList.contains('open');
                     toggleMobileDrawer(!isOpen);
                 });
@@ -3513,6 +3584,11 @@
 
             if (mobileDrawerClose) {
                 mobileDrawerClose.addEventListener('click', () => {
+                    if (mobileMenuBtn) {
+                        mobileMenuBtn.classList.remove('btn-pulse');
+                        void mobileMenuBtn.offsetWidth;
+                        mobileMenuBtn.classList.add('btn-pulse');
+                    }
                     toggleMobileDrawer(false);
                 });
             }
