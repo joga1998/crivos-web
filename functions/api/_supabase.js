@@ -227,7 +227,7 @@ export function generateTacticalPassword() {
 }
 
 // Template HTML Editorial Suíço para E-mail #1: Credenciais & Status de Calibração
-export function renderEmailCredentials({ email, password, planTitle, concurso, cargo, panelUrl = 'https://crivos-painel.pages.dev' }) {
+export function renderEmailCredentials({ email, password, planTitle, concurso, cargo, panelUrl = 'https://app.crivos.me' }) {
   return `
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -300,7 +300,7 @@ export function renderEmailCredentials({ email, password, planTitle, concurso, c
 }
 
 // Template HTML Editorial Suíço para E-mail #2: Liberação do Painel Pronto
-export function renderEmailPanelReady({ email, planTitle, concurso, cargo, panelUrl = 'https://crivos-painel.pages.dev' }) {
+export function renderEmailPanelReady({ email, planTitle, concurso, cargo, panelUrl = 'https://app.crivos.me' }) {
   return `
 <!DOCTYPE html>
 <html lang="pt-BR">

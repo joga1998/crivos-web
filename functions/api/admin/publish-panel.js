@@ -125,7 +125,7 @@ export async function onRequestPost(context) {
     let emailSent = false;
     if (email) {
       try {
-        const targetPanelUrl = (env?.PANEL_URL || 'https://crivos-painel.pages.dev').replace(/\/+$/, '');
+        const targetPanelUrl = (env?.PANEL_URL || 'https://app.crivos.me').replace(/\/+$/, '');
         const htmlEmail = renderEmailPanelReady({
           email,
           planTitle: planTitles[planTier] || 'Sistema CRIVOS',

@@ -197,7 +197,7 @@ export async function provisionUserOrder(env, { orderId, mpPaymentId, paymentMet
 
   // 8. Dispara E-mail #1 via Resend com as credenciais provisórias
   try {
-    const targetPanelUrl = (env?.PANEL_URL || 'https://crivos-painel.pages.dev').replace(/\/+$/, '');
+    const targetPanelUrl = (env?.PANEL_URL || 'https://app.crivos.me').replace(/\/+$/, '');
     const htmlEmail = renderEmailCredentials({
       email,
       password: tempPassword,

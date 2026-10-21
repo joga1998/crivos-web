@@ -435,7 +435,7 @@
 
       <div class="nav-actions">
         <a href="/" class="nav-link-btn">← INÍCIO</a>
-        <a href="https://crivos-demo.pages.dev" target="_blank" rel="noopener noreferrer" class="nav-link-btn" style="background:var(--bg-elevated)">DEMO AO VIVO ↗</a>
+        <a href="https://demo.crivos.me" target="_blank" rel="noopener noreferrer" class="nav-link-btn" style="background:var(--bg-elevated)">DEMO AO VIVO ↗</a>
       </div>
     </div>
   </header>
@@ -480,7 +480,7 @@
           <a href="/" class="login-link-secondary">← Voltar à Vitrine</a>
         </div>
         
-        <a href="https://crivos-demo.pages.dev" target="_blank" rel="noopener noreferrer" class="demo-callout-btn">
+        <a href="https://demo.crivos.me" target="_blank" rel="noopener noreferrer" class="demo-callout-btn">
           ⚡ TESTAR DEMONSTRAÇÃO AO VIVO (PPGHS) ↗
         </a>
       </div>
@@ -559,7 +559,7 @@
 
           // Redireciona diretamente para o painel com token de acesso para auto-login cross-domain
           setTimeout(() => {
-            const redirectUrl = `https://crivos-painel.pages.dev/#access_token=${encodeURIComponent(data.session.access_token)}&refresh_token=${encodeURIComponent(data.session.refresh_token)}&type=recovery`;
+            const redirectUrl = `https://app.crivos.me/#access_token=${encodeURIComponent(data.session.access_token)}&refresh_token=${encodeURIComponent(data.session.refresh_token)}&type=recovery`;
             window.location.href = redirectUrl;
           }, 500);
         }

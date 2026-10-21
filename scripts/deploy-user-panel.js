@@ -240,7 +240,7 @@ async function main() {
   console.log(`› Painel ID: ${resJson.panelId}`);
   console.log(`› Notificação enviada: ${resJson.emailSent ? 'Sim (Resend E-mail #2)' : 'Não / Desativada'}`);
   console.log(`› Arquivos catalogados: ${uploadedFiles.length}`);
-  console.log(`› Acesse: https://crivos-painel.pages.dev\n`);
+  console.log(`› Acesse: https://app.crivos.me\n`);
 }
 
 main().catch(err => {
