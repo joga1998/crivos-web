@@ -640,33 +640,6 @@
             clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
         }
 
-        .mobile-drawer-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 1.15rem;
-            border-bottom: 2px solid var(--border-color);
-            margin-bottom: 1.25rem;
-        }
-
-        .mobile-drawer-close {
-            background: var(--bg-primary);
-            border: 2px solid var(--border-color);
-            color: var(--text-primary);
-            font-family: var(--font-mono);
-            font-size: 0.72rem;
-            font-weight: 800;
-            padding: 0.45rem 0.75rem;
-            cursor: pointer;
-            box-shadow: var(--shadow-sm);
-            transition: all 0.12s ease;
-        }
-
-        .mobile-drawer-close:hover {
-            background: var(--accent-red);
-            color: #FFFFFF;
-        }
-
         .mobile-drawer-nav {
             display: flex;
             flex-direction: column;
@@ -2268,10 +2241,6 @@
 
             <!-- GAVETA DE MENU MOBILE (AGLUTINANDO NAVEGAÇÃO DA HEADBAR) -->
             <div class="mobile-drawer" id="mobile-drawer" aria-hidden="true">
-                <div class="mobile-drawer-top">
-                    <span class="mono-tag dark">NAVEGAÇÃO TÁTICA</span>
-                    <button class="mobile-drawer-close" id="mobile-drawer-close" type="button" aria-label="Fechar Menu">[ ✕ FECHAR ]</button>
-                </div>
                 <nav class="mobile-drawer-nav" aria-label="Navegação Mobile">
                     <a href="#demonstracao" class="mobile-drawer-link">
                         <span><strong class="m-link-num">01.</strong> SIMULADOR E RAIO-X</span>
@@ -3540,7 +3509,6 @@
                ------------------------------------------------------------------ */
             const mobileMenuBtn = document.getElementById('mobile-menu-btn');
             const mobileDrawer = document.getElementById('mobile-drawer');
-            const mobileDrawerClose = document.getElementById('mobile-drawer-close');
 
             function toggleMobileDrawer(open) {
                 if (!mobileDrawer) return;
@@ -3579,17 +3547,6 @@
 
                     const isOpen = mobileDrawer && mobileDrawer.classList.contains('open');
                     toggleMobileDrawer(!isOpen);
-                });
-            }
-
-            if (mobileDrawerClose) {
-                mobileDrawerClose.addEventListener('click', () => {
-                    if (mobileMenuBtn) {
-                        mobileMenuBtn.classList.remove('btn-pulse');
-                        void mobileMenuBtn.offsetWidth;
-                        mobileMenuBtn.classList.add('btn-pulse');
-                    }
-                    toggleMobileDrawer(false);
                 });
             }
 
