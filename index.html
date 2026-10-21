@@ -1,839 +1,3588 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CRIVOS // Sistemas de Estudo Sob Demanda</title>
-  <meta name="description" content="Engenharia de estudos e planejamento tático pós-edital sob demanda (Done-For-You). Receba seu Sistema Operacional de Estudos calibrado para a sua rotina em até 48h.">
-  
-  <!-- Favicon -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23D92B2B'/></svg>">
-
-  <!-- Google Fonts: Inter & JetBrains Mono -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <script>
-    (function() {
-      try {
-        var t = localStorage.getItem('crivos_web_theme');
-        if (t === 'dark' || (!t && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-          document.documentElement.setAttribute('data-theme', 'dark');
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>CRIVOS // Inteligência para Concursos e Exames</title>
+    <meta name="description" content="Mapeamento cirúrgico de editais, cronograma elástico adaptado à sua rotina real e repetição espaçada SM-2. Seu plano individual pronto para execução em até 24 horas.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- GSAP & ScrollTrigger for high-precision animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+    <style>
+        /* ==========================================================================
+           CRIVOS // DESIGN SYSTEM & TOKENS (LIGHT & REFINED DARK MODE)
+           ========================================================================== */
+        :root {
+            --bg-primary: #F4F4F0;
+            --bg-surface: #FFFFFF;
+            --bg-elevated: #EAEAE4;
+            --bg-dark-block: #111111;
+            --text-primary: #111111;
+            --text-secondary: #383838;
+            --text-muted: #666666;
+            --text-on-dark: #F4F4F0;
+            --accent-red: #D92B2B;
+            --accent-red-hover: #B91C1C;
+            --accent-blue: #1D4ED8;
+            --accent-green: #22C55E;
+            --border-color: #111111;
+            --border-subtle: rgba(17, 17, 17, 0.15);
+            --shadow-sm: 3px 3px 0px #111111;
+            --shadow-hard: 4px 4px 0px #111111;
+            --shadow-lg: 8px 8px 0px #111111;
+            --shadow-red: 4px 4px 0px #D92B2B;
+            --priority-row-bg: rgba(217, 43, 43, 0.08);
+            --crivos-col-bg: rgba(29, 78, 216, 0.05);
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
         }
-      } catch(e) {}
-    })();
-  </script>
-  <!-- Estilos Oficiais CRIVOS (Editorial Suíço / Brutalista) -->
-  <link rel="stylesheet" href="style.css">
+
+        /* Composição visual de Modo Escuro calibrada (Grafite / Obsidiana Técnica, sem inversão bruta) */
+        [data-theme="dark"] {
+            --bg-primary: #0B0C0E;
+            --bg-surface: #131519;
+            --bg-elevated: #1B1E24;
+            --bg-dark-block: #070809;
+            --text-primary: #F2F2EE;
+            --text-secondary: #B0B6C3;
+            --text-muted: #767E8F;
+            --text-on-dark: #F2F2EE;
+            --accent-red: #E53935;
+            --accent-red-hover: #D32F2F;
+            --accent-blue: #3B82F6;
+            --accent-green: #22C55E;
+            --border-color: #2C313C;
+            --border-subtle: rgba(242, 242, 238, 0.1);
+            --shadow-sm: 3px 3px 0px #000000;
+            --shadow-hard: 4px 4px 0px #000000;
+            --shadow-lg: 8px 8px 0px #000000;
+            --shadow-red: 4px 4px 0px #E53935;
+            --priority-row-bg: rgba(229, 57, 53, 0.14);
+            --crivos-col-bg: rgba(59, 130, 246, 0.09);
+        }
+
+        /* Strict Zero Border-Radius Rule */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            border-radius: 0px !important;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            position: relative;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        ::selection {
+            background-color: var(--accent-red);
+            color: #FFFFFF;
+        }
+
+        /* ==========================================================================
+           1. CINEMATIC BOOT / INTRO SEQUENCE OVERLAY (100% RESPONSIVE)
+           ========================================================================== */
+        #boot-overlay {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100dvh;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: clamp(1rem, 3.5vw, 3rem);
+            color: #F4F4F0;
+            font-family: var(--font-mono);
+            pointer-events: all;
+            overflow: hidden;
+        }
+
+        .boot-shutter-container {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .boot-shutter {
+            background-color: #0E0F12;
+            border-right: 1px solid rgba(244, 244, 240, 0.07);
+            height: 100%;
+            width: 100%;
+            transform-origin: top;
+        }
+
+        .boot-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 1px solid rgba(244, 244, 240, 0.18);
+            padding-bottom: 0.9rem;
+            flex-wrap: wrap;
+        }
+
+        .boot-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            font-family: var(--font-sans);
+            font-weight: 900;
+            font-size: clamp(0.85rem, 2vw, 1.05rem);
+            letter-spacing: -0.02em;
+            text-transform: uppercase;
+        }
+
+        .boot-brand-sq {
+            width: 14px;
+            height: 14px;
+            aspect-ratio: 1 / 1;
+            background: #D92B2B;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        .boot-skip-btn {
+            background: rgba(255, 255, 255, 0.05);
+            color: #CCCCCC;
+            border: 1px solid rgba(244, 244, 240, 0.3);
+            padding: 0.4rem 0.75rem;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            flex-shrink: 0;
+        }
+
+        .boot-skip-btn:hover {
+            color: #FFFFFF;
+            border-color: #FFFFFF;
+            background: rgba(255, 255, 255, 0.14);
+        }
+
+        .boot-terminal {
+            max-width: 720px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 0.55rem;
+            font-size: clamp(0.7rem, 1.8vw, 0.88rem);
+            margin: auto 0;
+        }
+
+        .boot-line {
+            opacity: 0;
+            transform: translateY(6px);
+            display: flex;
+            align-items: flex-start;
+            gap: 0.55rem;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+        .boot-tag-ok {
+            color: #22C55E;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .boot-tag-alert {
+            color: #D92B2B;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .boot-tag-info {
+            color: #3B82F6;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .boot-bottom {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+            border-top: 1px solid rgba(244, 244, 240, 0.18);
+            padding-top: 1rem;
+        }
+
+        .boot-counter-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 1rem;
+        }
+
+        .boot-status-label {
+            font-size: clamp(0.65rem, 1.5vw, 0.78rem);
+            color: #AAAAAA;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .boot-counter {
+            font-size: clamp(2.75rem, 9vw, 6.5rem);
+            font-weight: 800;
+            line-height: 0.85;
+            letter-spacing: -0.04em;
+            color: #F4F4F0;
+        }
+
+        .boot-bar-track {
+            width: 100%;
+            height: 8px;
+            background: rgba(244, 244, 240, 0.12);
+            overflow: hidden;
+        }
+
+        .boot-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: #D92B2B;
+        }
+
+        .glitch-slice {
+            animation: glitch-flash 0.25s steps(2, end) forwards;
+        }
+
+        @keyframes glitch-flash {
+            0% { transform: translate(0); }
+            40% { transform: translate(-3px, 1px); }
+            80% { transform: translate(3px, -1px); }
+            100% { transform: translate(0); }
+        }
+
+        /* ==========================================================================
+           2. INTERACTIVE COORDINATE CANVAS & SCROLL PROGRESS
+           ========================================================================== */
+        #coord-canvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            display: block;
+        }
+
+        .scroll-progress-track {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: transparent;
+            z-index: 1001;
+        }
+
+        .scroll-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--accent-red);
+        }
+
+        /* ==========================================================================
+           3. LAYOUT & TYPOGRAPHY PRIMITIVES
+           ========================================================================== */
+        .page-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: var(--font-sans);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.03em;
+            line-height: 1.04;
+            color: var(--text-primary);
+        }
+
+        .mono-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.74rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 0.3rem 0.65rem;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-surface);
+            color: var(--text-primary);
+            letter-spacing: 0.04em;
+        }
+
+        .mono-tag.red {
+            background-color: var(--accent-red);
+            color: #FFFFFF;
+            border-color: var(--border-color);
+        }
+
+        .mono-tag.blue {
+            background-color: var(--accent-blue);
+            color: #FFFFFF;
+            border-color: var(--border-color);
+        }
+
+        .mono-tag.dark {
+            background-color: var(--bg-dark-block);
+            color: var(--text-on-dark);
+            border-color: var(--border-color);
+        }
+
+        [data-theme="dark"] .mono-tag.dark {
+            background-color: var(--bg-elevated);
+            border-color: var(--accent-red);
+        }
+
+        .section-header {
+            margin-bottom: 3.25rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 1.6rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+        }
+
+        .section-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .section-coord {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .section-title {
+            font-size: clamp(1.85rem, 4vw, 3.15rem);
+            max-width: 860px;
+        }
+
+        .section-subtitle {
+            font-size: 1.04rem;
+            color: var(--text-secondary);
+            max-width: 720px;
+            font-weight: 500;
+            line-height: 1.65;
+        }
+
+        /* ==========================================================================
+           4. BUTTONS
+           ========================================================================== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.7rem;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 0.86rem;
+            text-transform: uppercase;
+            text-decoration: none;
+            padding: 0.95rem 1.5rem;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+            transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease, color 0.12s ease;
+            box-shadow: var(--shadow-hard);
+            letter-spacing: 0.02em;
+            position: relative;
+            text-align: center;
+        }
+
+        .btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px var(--border-color);
+        }
+
+        [data-theme="dark"] .btn:hover {
+            box-shadow: 6px 6px 0px #000000;
+        }
+
+        .btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 0px 0px 0px var(--border-color);
+        }
+
+        .btn-primary {
+            background-color: var(--accent-red);
+            color: #FFFFFF;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-red-hover);
+        }
+
+        .btn-secondary {
+            background-color: var(--bg-surface);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--bg-elevated);
+        }
+
+        .btn-dark {
+            background-color: var(--bg-dark-block);
+            color: var(--text-on-dark);
+        }
+
+        [data-theme="dark"] .btn-dark {
+            background-color: var(--bg-elevated);
+            border-color: var(--accent-blue);
+        }
+
+        .btn-dark:hover {
+            background-color: var(--accent-red);
+            color: #FFFFFF;
+            border-color: var(--border-color);
+        }
+
+        /* ==========================================================================
+           5. STICKY TOPBAR NAVIGATION (EDGE-TO-EDGE & BALANCED SPACING)
+           ========================================================================== */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background-color: var(--bg-primary);
+            border-bottom: 2px solid var(--border-color);
+            transition: background-color 0.2s ease;
+            width: 100%;
+        }
+
+        .topbar-container {
+            width: 100%;
+            padding: 0 clamp(1.25rem, 3.5vw, 3.5rem);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+            gap: 1.5rem;
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.7rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            flex-shrink: 0;
+        }
+
+        /* Quadrado perfeito em vermelho CRIVOS */
+        .brand-sq {
+            width: 18px;
+            height: 18px;
+            aspect-ratio: 1 / 1;
+            background-color: var(--accent-red);
+            display: inline-block;
+            flex-shrink: 0;
+            transition: transform 0.2s ease;
+        }
+
+        .brand:hover .brand-sq {
+            transform: rotate(90deg);
+        }
+
+        /* Fonte Inter pesada em caixa alta */
+        .brand-name {
+            font-family: var(--font-sans);
+            font-weight: 900;
+            font-size: 1.4rem;
+            letter-spacing: -0.04em;
+            text-transform: uppercase;
+            line-height: 1;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: clamp(1rem, 1.8vw, 2.2rem);
+            flex: 1;
+        }
+
+        .nav-link {
+            font-family: var(--font-mono);
+            font-size: clamp(0.7rem, 0.85vw, 0.78rem);
+            font-weight: 700;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: var(--text-secondary);
+            transition: color 0.15s ease;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-red);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        /* Botão do Menu Mobile */
+        .mobile-menu-btn {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.74rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 0.55rem 0.9rem;
+            border: 2px solid var(--border-color);
+            background: var(--bg-surface);
+            color: var(--text-primary);
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+            transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+            white-space: nowrap;
+        }
+
+        .mobile-menu-btn:hover {
+            background: var(--bg-elevated);
+        }
+
+        .mobile-menu-btn.active {
+            background: var(--accent-red);
+            color: #FFFFFF;
+            border-color: var(--border-color);
+        }
+
+        /* Animação de clique da caixa do botão menu */
+        .mobile-menu-btn.btn-pulse {
+            animation: menu-btn-recoil 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes menu-btn-recoil {
+            0% { transform: scale(0.92); }
+            45% { transform: scale(1.12); }
+            100% { transform: scale(1); }
+        }
+
+        .mobile-menu-btn .menu-icon {
+            font-size: 1.05rem;
+            line-height: 1;
+            display: inline-block;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .mobile-menu-btn.active .menu-icon {
+            transform: rotate(90deg);
+        }
+
+        /* Gaveta Mobile (Drawer de Comando Tático) */
+        .mobile-drawer {
+            position: fixed;
+            top: 70px;
+            left: 0;
+            width: 100%;
+            height: calc(100dvh - 70px);
+            background-color: var(--bg-surface);
+            border-bottom: 3px solid var(--border-color);
+            z-index: 998;
+            padding: 1.5rem clamp(1.25rem, 4vw, 2.5rem);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow-y: auto;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+            transition: clip-path 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease, visibility 0.35s;
+        }
+
+        .mobile-drawer.open {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: all;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        }
+
+        .mobile-drawer-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+            flex: 1;
+            margin-bottom: 1.5rem;
+        }
+
+        .mobile-drawer-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            padding: 1rem 1.15rem;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            box-shadow: 2px 2px 0px var(--border-color);
+            text-decoration: none;
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            font-weight: 800;
+            /* Cascata de entrada animada */
+            transform: translateX(-18px);
+            opacity: 0;
+            transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.32s ease, background-color 0.12s ease;
+        }
+
+        .mobile-drawer.open .mobile-drawer-link {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .mobile-drawer.open .mobile-drawer-link:nth-child(1) { transition-delay: 0.05s; }
+        .mobile-drawer.open .mobile-drawer-link:nth-child(2) { transition-delay: 0.09s; }
+        .mobile-drawer.open .mobile-drawer-link:nth-child(3) { transition-delay: 0.13s; }
+        .mobile-drawer.open .mobile-drawer-link:nth-child(4) { transition-delay: 0.17s; }
+        .mobile-drawer.open .mobile-drawer-link:nth-child(5) { transition-delay: 0.21s; }
+        .mobile-drawer.open .mobile-drawer-link:nth-child(6) { transition-delay: 0.25s; }
+
+        .mobile-drawer-link:hover,
+        .mobile-drawer-link:active {
+            transform: translateX(4px);
+            background: var(--bg-elevated);
+            color: var(--accent-red);
+        }
+
+        .mobile-drawer-link .m-link-num {
+            color: var(--accent-red);
+        }
+
+        .mobile-drawer-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            padding-top: 1.25rem;
+            border-top: 2px solid var(--border-color);
+            transform: translateY(16px);
+            opacity: 0;
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) 0.28s, opacity 0.35s ease 0.28s;
+        }
+
+        .mobile-drawer.open .mobile-drawer-actions {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Botão Flutuante de Modo Claro / Escuro (Sempre visível no canto inferior direito da tela) */
+        .theme-floating-btn {
+            position: fixed !important;
+            bottom: 1.75rem !important;
+            right: 1.75rem !important;
+            z-index: 99999 !important;
+            width: 52px;
+            height: 52px;
+            background: var(--bg-surface);
+            border: 2px solid var(--border-color);
+            box-shadow: var(--shadow-hard);
+            color: var(--text-primary);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s ease, background-color 0.2s ease, border-color 0.2s ease;
+            user-select: none;
+        }
+
+        .theme-floating-btn:hover {
+            transform: translate(-3px, -3px) scale(1.06);
+            box-shadow: 6px 6px 0px var(--border-color);
+        }
+
+        [data-theme="dark"] .theme-floating-btn:hover {
+            box-shadow: 6px 6px 0px #000000;
+        }
+
+        .theme-floating-btn:active {
+            transform: translate(2px, 2px) scale(0.94);
+            box-shadow: 1px 1px 0px var(--border-color);
+        }
+
+        /* Animaçãozinha elástica da box */
+        .theme-floating-btn.theme-box-bounce {
+            animation: theme-box-bounce-anim 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes theme-box-bounce-anim {
+            0% { transform: scale(1) rotate(0deg); }
+            30% { transform: scale(1.2) rotate(-8deg); }
+            65% { transform: scale(0.92) rotate(4deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        /* Animaçãozinha do ícone */
+        .theme-icon-wrap {
+            display: inline-block;
+            font-family: var(--font-mono);
+            font-size: 1.35rem;
+            line-height: 1;
+            transform-origin: center center;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .theme-icon-wrap.theme-icon-spin {
+            animation: theme-icon-spin-anim 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes theme-icon-spin-anim {
+            0% { transform: rotate(0deg) scale(0.7); opacity: 0.6; }
+            50% { transform: rotate(180deg) scale(1.35); opacity: 1; }
+            100% { transform: rotate(360deg) scale(1); opacity: 1; }
+        }
+
+        .nav-login {
+            font-family: var(--font-mono);
+            font-size: 0.74rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: var(--text-primary);
+            padding: 0.55rem 0.9rem;
+            border: 2px solid var(--border-color);
+            background: var(--bg-surface);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.12s ease;
+            white-space: nowrap;
+        }
+
+        .nav-login:hover {
+            background: var(--bg-elevated);
+            transform: translate(-1px, -1px);
+        }
+
+        .nav-cta {
+            font-family: var(--font-mono);
+            font-size: 0.74rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: #FFFFFF;
+            padding: 0.55rem 1rem;
+            border: 2px solid var(--border-color);
+            background: var(--accent-red);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.12s ease;
+            white-space: nowrap;
+        }
+
+        .nav-cta:hover {
+            background: var(--accent-red-hover);
+            transform: translate(-1px, -1px);
+        }
+
+        /* ==========================================================================
+           6. HERO SECTION + INTERACTIVE LIVE PANEL
+           ========================================================================== */
+        .hero {
+            padding: 4.25rem 0 4.75rem;
+            border-bottom: 2px solid var(--border-color);
+            position: relative;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1.12fr 0.88fr;
+            gap: 3.25rem;
+            align-items: center;
+        }
+
+        .hero-eyebrow {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.55rem;
+            margin-bottom: 1.4rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent-green);
+            display: inline-block;
+            animation: pulse-dot 1.8s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.35; }
+        }
+
+        .hero-title {
+            font-size: clamp(2.25rem, 5vw, 4.25rem);
+            margin-bottom: 1.4rem;
+            line-height: 0.99;
+        }
+
+        .hero-title .highlight-red {
+            color: var(--accent-red);
+            text-decoration: underline;
+            text-decoration-thickness: 4px;
+            text-underline-offset: 6px;
+        }
+
+        .hero-title .highlight-box {
+            background-color: var(--bg-dark-block);
+            color: var(--text-on-dark);
+            padding: 0 0.35rem;
+            display: inline-block;
+            border: 1px solid var(--border-color);
+        }
+
+        [data-theme="dark"] .hero-title .highlight-box {
+            background-color: var(--bg-elevated);
+            border-color: var(--accent-red);
+            color: #FFFFFF;
+        }
+
+        .hero-lead {
+            font-size: clamp(1rem, 1.4vw, 1.12rem);
+            color: var(--text-secondary);
+            margin-bottom: 1.9rem;
+            max-width: 610px;
+            font-weight: 500;
+            line-height: 1.65;
+        }
+
+        .hero-lead strong {
+            color: var(--text-primary);
+            font-weight: 800;
+        }
+
+        .hero-cta-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.9rem;
+            margin-bottom: 2.15rem;
+        }
+
+        .hero-metrics-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            border: 2px solid var(--border-color);
+            background: var(--bg-surface);
+            box-shadow: var(--shadow-hard);
+        }
+
+        .hero-metric-cell {
+            padding: 0.85rem 1rem;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .hero-metric-cell:last-child {
+            border-right: none;
+        }
+
+        .hero-metric-val {
+            font-family: var(--font-mono);
+            font-size: 1.18rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            display: block;
+        }
+
+        .hero-metric-lbl {
+            font-family: var(--font-mono);
+            font-size: 0.66rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        /* Interactive Hero Panel Mockup */
+        .interactive-panel {
+            background-color: var(--bg-surface);
+            border: 2px solid var(--border-color);
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            width: 100%;
+        }
+
+        .panel-topbar {
+            background-color: var(--bg-dark-block);
+            color: var(--text-on-dark);
+            padding: 0.75rem 1.1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            font-weight: 700;
+            border-bottom: 2px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+
+        .panel-interactive-hint {
+            background: var(--accent-red);
+            color: #FFFFFF;
+            padding: 0.15rem 0.45rem;
+            font-size: 0.64rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+        }
+
+        .panel-tabs {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            border-bottom: 2px solid var(--border-color);
+            background: var(--bg-elevated);
+        }
+
+        .panel-tab-btn {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 0.7rem 0.5rem;
+            border: none;
+            border-right: 1px solid var(--border-color);
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .panel-tab-btn:last-child {
+            border-right: none;
+        }
+
+        .panel-tab-btn.active {
+            background: var(--bg-surface);
+            color: var(--text-primary);
+            box-shadow: inset 0 -3px 0 var(--accent-red);
+        }
+
+        .panel-body {
+            padding: 1.25rem;
+        }
+
+        .panel-view {
+            display: none;
+        }
+
+        .panel-view.active {
+            display: block;
+        }
+
+        .panel-progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 0.5rem;
+            font-family: var(--font-mono);
+            gap: 0.5rem;
+        }
+
+        .panel-progress-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .panel-progress-pct {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--accent-blue);
+        }
+
+        .panel-progress-track {
+            width: 100%;
+            height: 10px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            margin-bottom: 1.15rem;
+        }
+
+        .panel-progress-fill {
+            height: 100%;
+            width: 67%;
+            background: var(--accent-blue);
+            transition: width 0.3s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.2s ease;
+        }
+
+        .task-list-label {
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 0.6rem;
+            display: flex;
+            justify-content: space-between;
+            gap: 0.5rem;
+        }
+
+        .interactive-task {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.65rem;
+            padding: 0.75rem 0.8rem;
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            margin-bottom: 0.55rem;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.1s ease, background-color 0.15s ease;
+        }
+
+        .interactive-task:hover {
+            transform: translateX(2px);
+            background: var(--bg-elevated);
+        }
+
+        .interactive-task.done {
+            opacity: 0.65;
+            background: var(--bg-surface);
+        }
+
+        .interactive-task.done .task-title {
+            text-decoration: line-through;
+        }
+
+        .task-left {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            min-width: 0;
+        }
+
+        .task-checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border-color);
+            background: var(--bg-surface);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            font-weight: 900;
+            flex-shrink: 0;
+        }
+
+        .interactive-task.done .task-checkbox {
+            background: var(--accent-green);
+            color: #111111;
+        }
+
+        .task-title {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.35;
+        }
+
+        .task-badge {
+            font-family: var(--font-mono);
+            font-size: 0.64rem;
+            font-weight: 700;
+            padding: 0.15rem 0.4rem;
+            border: 1px solid var(--border-color);
+            background: var(--bg-surface);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .task-badge.high {
+            background: var(--accent-red);
+            color: #FFFFFF;
+        }
+
+        /* Mini Pomodoro Widget inside Hero Panel */
+        .panel-pomo-bar {
+            margin-top: 0.95rem;
+            padding: 0.8rem;
+            border: 2px solid var(--border-color);
+            background: var(--bg-elevated);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .pomo-display {
+            font-family: var(--font-mono);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .pomo-label {
+            font-size: 0.62rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .pomo-timer {
+            font-size: 1.3rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: var(--text-primary);
+        }
+
+        .pomo-btn {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 0.5rem 0.85rem;
+            border: 2px solid var(--border-color);
+            background: var(--bg-surface);
+            color: var(--text-primary);
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.12s ease;
+        }
+
+        .pomo-btn.running {
+            background: var(--accent-red);
+            color: #FFFFFF;
+        }
+
+        /* Flashcard Mini View inside Hero Panel */
+        .flashcard-box {
+            border: 2px solid var(--border-color);
+            background: var(--bg-primary);
+            padding: 1.15rem;
+            min-height: 190px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: transform 0.12s ease;
+        }
+
+        .flashcard-box:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: var(--shadow-hard);
+        }
+
+        .fc-meta {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            font-family: var(--font-mono);
+            font-size: 0.66rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .fc-text {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.5;
+            margin-bottom: 0.9rem;
+        }
+
+        .fc-answer {
+            display: none;
+            font-size: 0.84rem;
+            color: var(--accent-blue);
+            font-weight: 600;
+            border-top: 1px dashed var(--border-color);
+            padding-top: 0.7rem;
+            margin-top: 0.45rem;
+        }
+
+        .flashcard-box.flipped .fc-answer {
+            display: block;
+        }
+
+        .fc-actions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            margin-top: 0.85rem;
+        }
+
+        .fc-rate-btn {
+            font-family: var(--font-mono);
+            font-size: 0.66rem;
+            font-weight: 800;
+            padding: 0.45rem;
+            border: 1px solid var(--border-color);
+            background: var(--bg-surface);
+            color: var(--text-primary);
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .fc-rate-btn:hover {
+            background: var(--accent-red);
+            color: #FFFFFF;
+        }
+
+        /* ==========================================================================
+           7. TECHNICAL TICKER
+           ========================================================================== */
+        .ticker-wrap {
+            background-color: var(--bg-dark-block);
+            color: var(--text-on-dark);
+            border-bottom: 2px solid var(--border-color);
+            overflow: hidden;
+            padding: 0.8rem 0;
+            font-family: var(--font-mono);
+            font-size: 0.76rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .ticker-track {
+            display: inline-block;
+            animation: ticker-scroll 30s linear infinite;
+        }
+
+        .ticker-item {
+            display: inline-block;
+            margin-right: 3rem;
+        }
+
+        .ticker-sep {
+            color: var(--accent-red);
+            margin-right: 0.5rem;
+        }
+
+        @keyframes ticker-scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* ==========================================================================
+           8. INTERACTIVE SIMULATOR & EDITAL RAIO-X (#demonstracao)
+           ========================================================================== */
+        .section {
+            padding: 5.5rem 0;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .section-alt {
+            background-color: var(--bg-surface);
+        }
+
+        .sim-controls-bar {
+            display: grid;
+            grid-template-columns: 1.3fr 0.7fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            padding: 1.4rem;
+            border: 2px solid var(--border-color);
+            background: var(--bg-primary);
+            box-shadow: var(--shadow-hard);
+        }
+
+        .sim-control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+        }
+
+        .sim-control-label {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .sim-profile-btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .sim-profile-btn {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 0.55rem 0.85rem;
+            border: 2px solid var(--border-color);
+            background: var(--bg-surface);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.12s ease;
+        }
+
+        .sim-profile-btn:hover {
+            background: var(--bg-elevated);
+        }
+
+        .sim-profile-btn.active {
+            background: var(--accent-red);
+            color: #FFFFFF;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .sim-slider-wrap {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .sim-slider-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            font-family: var(--font-mono);
+        }
+
+        .sim-hours-val {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--accent-blue);
+        }
+
+        input[type="range"].brutal-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 10px;
+            background: var(--bg-surface);
+            border: 2px solid var(--border-color);
+            outline: none;
+            cursor: pointer;
+        }
+
+        input[type="range"].brutal-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            background: var(--accent-red);
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+        }
+
+        input[type="range"].brutal-slider::-moz-range-thumb {
+            width: 22px;
+            height: 22px;
+            background: var(--accent-red);
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+        }
+
+        .sim-showcase-grid {
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 2rem;
+            align-items: stretch;
+        }
+
+        .raiox-card {
+            border: 2px solid var(--border-color);
+            background: var(--bg-primary);
+            box-shadow: var(--shadow-hard);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-width: 0;
+        }
+
+        .raiox-card-head {
+            padding: 0.95rem 1.2rem;
+            background: var(--bg-dark-block);
+            color: var(--text-on-dark);
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            font-weight: 800;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .raiox-table-wrap {
+            overflow-x: auto;
+            padding: 1.15rem;
+        }
+
+        .raiox-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--font-mono);
+            font-size: 0.76rem;
+        }
+
+        .raiox-table th,
+        .raiox-table td {
+            border: 1px solid var(--border-color);
+            padding: 0.65rem 0.7rem;
+            text-align: left;
+        }
+
+        .raiox-table th {
+            background: var(--bg-elevated);
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 0.68rem;
+            color: var(--text-primary);
+        }
+
+        .raiox-table tr.priority-max {
+            background: var(--priority-row-bg);
+            font-weight: 700;
+        }
+
+        .badge-prio {
+            display: inline-block;
+            padding: 0.15rem 0.45rem;
+            font-size: 0.64rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            border: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        .badge-prio.crit {
+            background: var(--accent-red);
+            color: #FFFFFF;
+        }
+
+        .badge-prio.high {
+            background: var(--accent-blue);
+            color: #FFFFFF;
+        }
+
+        .badge-prio.opt {
+            background: var(--bg-surface);
+            color: var(--text-muted);
+        }
+
+        /* Right column of simulator: Pareto impact telemetry */
+        .sim-telemetry-box {
+            border: 2px solid var(--border-color);
+            background: var(--bg-primary);
+            box-shadow: var(--shadow-hard);
+            padding: 1.4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 1.2rem;
+        }
+
+        .telemetry-kpis {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.9rem;
+        }
+
+        .telemetry-kpi {
+            border: 2px solid var(--border-color);
+            background: var(--bg-surface);
+            padding: 0.95rem;
+        }
+
+        .telemetry-kpi-num {
+            font-family: var(--font-mono);
+            font-size: clamp(1.4rem, 2.5vw, 1.8rem);
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: 0.35rem;
+            display: block;
+        }
+
+        .telemetry-kpi-num.red { color: var(--accent-red); }
+        .telemetry-kpi-num.blue { color: var(--accent-blue); }
+
+        .telemetry-kpi-desc {
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .pareto-visual {
+            border: 1px solid var(--border-color);
+            background: var(--bg-surface);
+            padding: 1.1rem;
+        }
+
+        .pareto-visual-title {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .pareto-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+        }
+
+        .pareto-bar-row {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+        }
+
+        .pareto-bar-track {
+            width: 100%;
+            height: 12px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-color);
+        }
+
+        .pareto-bar-fill {
+            height: 100%;
+            transition: width 0.35s ease;
+        }
+
+        /* ==========================================================================
+           9. ARQUITETURA DO SISTEMA (#anatomia) - 4 BRUTALIST CARDS
+           ========================================================================== */
+        .anatomy-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.85rem;
+        }
+
+        .anatomy-card {
+            background-color: var(--bg-surface);
+            border: 2px solid var(--border-color);
+            box-shadow: var(--shadow-hard);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            position: relative;
+        }
+
+        .anatomy-card:hover {
+            transform: translate(-3px, -3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .anatomy-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.35rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid var(--border-color);
+            gap: 0.5rem;
+        }
+
+        .anatomy-index {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: var(--accent-red);
+        }
+
+        .anatomy-badge {
+            font-family: var(--font-mono);
+            font-size: 0.66rem;
+            font-weight: 700;
+            padding: 0.2rem 0.5rem;
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            text-transform: uppercase;
+        }
+
+        .anatomy-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .anatomy-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 1.4rem;
+            line-height: 1.65;
+        }
+
+        .anatomy-spec {
+            font-family: var(--font-mono);
+            font-size: 0.74rem;
+            padding: 0.8rem 0.95rem;
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--accent-blue);
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* ==========================================================================
+           10. COMPARATIVO DIRETO (ESTUDO COMUM VS CRIVOS)
+           ========================================================================== */
+        .compare-table-wrap {
+            border: 2px solid var(--border-color);
+            background: var(--bg-surface);
+            box-shadow: var(--shadow-lg);
+            overflow-x: auto;
+        }
+
+        .compare-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        .compare-table th,
+        .compare-table td {
+            border: 1px solid var(--border-color);
+            padding: 1.1rem 1.25rem;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        .compare-table th {
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+        }
+
+        .compare-table th.col-crivos {
+            background: var(--bg-dark-block);
+            color: var(--text-on-dark);
+        }
+
+        .compare-table td.col-metric {
+            font-family: var(--font-mono);
+            font-weight: 800;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            background: var(--bg-primary);
+            width: 24%;
+        }
+
+        .compare-table td.col-old {
+            color: var(--text-muted);
+            width: 38%;
+        }
+
+        .compare-table td.col-crivos {
+            font-weight: 700;
+            background: var(--crivos-col-bg);
+            width: 38%;
+        }
+
+        /* ==========================================================================
+           11. COMO FUNCIONA EM 3 ETAPAS (#como-funciona)
+           ========================================================================== */
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            border: 2px solid var(--border-color);
+            background-color: var(--bg-surface);
+            box-shadow: var(--shadow-hard);
+        }
+
+        .step-col {
+            padding: 2.25rem 1.85rem;
+            border-right: 2px solid var(--border-color);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .step-col:last-child {
+            border-right: none;
+        }
+
+        .step-num-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.4rem;
+            gap: 0.5rem;
+        }
+
+        .step-num {
+            font-family: var(--font-mono);
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 0.9;
+            color: var(--text-primary);
+            border-bottom: 4px solid var(--accent-red);
+            padding-bottom: 0.25rem;
+        }
+
+        .step-time-tag {
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            font-weight: 800;
+            padding: 0.25rem 0.55rem;
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            text-transform: uppercase;
+        }
+
+        .step-col h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .step-col p {
+            color: var(--text-secondary);
+            font-size: 0.93rem;
+            line-height: 1.65;
+        }
+
+        /* ==========================================================================
+           12. TABELA DE PLANOS E INVESTIMENTO (#precos)
+           ========================================================================== */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.85rem;
+            align-items: stretch;
+        }
+
+        .price-card {
+            background-color: var(--bg-surface);
+            border: 2px solid var(--border-color);
+            box-shadow: var(--shadow-hard);
+            padding: 2.15rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            transition: transform 0.15s ease;
+        }
+
+        .price-card:hover {
+            transform: translate(-3px, -3px);
+        }
+
+        .price-card.featured {
+            border-width: 3px;
+            border-color: var(--accent-red);
+            box-shadow: var(--shadow-red);
+            transform: translateY(-6px);
+        }
+
+        .price-card.featured:hover {
+            transform: translate(-3px, -9px);
+        }
+
+        .featured-ribbon {
+            position: absolute;
+            top: -14px;
+            right: 1.15rem;
+            background-color: var(--accent-red);
+            color: #FFFFFF;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 0.22rem 0.7rem;
+            border: 2px solid var(--border-color);
+            text-transform: uppercase;
+        }
+
+        .price-tier-label {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 0.35rem;
+        }
+
+        .price-tier-title {
+            font-size: 1.6rem;
+            margin-bottom: 1.1rem;
+        }
+
+        .price-value-box {
+            padding: 1.1rem 0;
+            border-top: 2px solid var(--border-color);
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 1.4rem;
+        }
+
+        .price-amount {
+            font-family: var(--font-mono);
+            font-size: 2.65rem;
+            font-weight: 800;
+            line-height: 1;
+            color: var(--text-primary);
+        }
+
+        .price-amount small {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .price-payment-note {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 0.4rem;
+            font-weight: 600;
+        }
+
+        .price-features {
+            list-style: none;
+            margin-bottom: 1.85rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .price-features li {
+            font-size: 0.88rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.6rem;
+            color: var(--text-secondary);
+            line-height: 1.45;
+        }
+
+        .price-features li strong {
+            color: var(--text-primary);
+        }
+
+        .check-sq {
+            font-family: var(--font-mono);
+            font-weight: 900;
+            color: var(--accent-red);
+            flex-shrink: 0;
+        }
+
+        .guarantee-strip {
+            margin-top: 2.75rem;
+            border: 2px solid var(--border-color);
+            background: var(--bg-surface);
+            box-shadow: var(--shadow-hard);
+            padding: 1.5rem 1.85rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .guarantee-left {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            max-width: 780px;
+        }
+
+        .guarantee-badge {
+            font-family: var(--font-mono);
+            font-size: 1.3rem;
+            font-weight: 900;
+            padding: 0.65rem 1rem;
+            background: var(--bg-dark-block);
+            color: var(--text-on-dark);
+            border: 2px solid var(--border-color);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        /* ==========================================================================
+           13. FAQ ACCORDION (#faq)
+           ========================================================================== */
+        .faq-list {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.95rem;
+        }
+
+        .faq-item {
+            border: 2px solid var(--border-color);
+            background-color: var(--bg-primary);
+            box-shadow: var(--shadow-hard);
+        }
+
+        .faq-trigger {
+            width: 100%;
+            text-align: left;
+            padding: 1.2rem 1.4rem;
+            background: none;
+            border: none;
+            font-family: var(--font-sans);
+            font-size: 0.98rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .faq-trigger:hover {
+            background-color: var(--bg-elevated);
+        }
+
+        .faq-icon {
+            font-family: var(--font-mono);
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--accent-red);
+            transition: transform 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .faq-item.open .faq-icon {
+            transform: rotate(45deg);
+        }
+
+        .faq-content {
+            display: none;
+            padding: 1.15rem 1.4rem 1.4rem;
+            color: var(--text-secondary);
+            font-size: 0.94rem;
+            border-top: 1px solid var(--border-color);
+            line-height: 1.68;
+        }
+
+        .faq-content strong {
+            color: var(--text-primary);
+        }
+
+        .faq-item.open .faq-content {
+            display: block;
+        }
+
+        /* ==========================================================================
+           14. FINAL CTA BANNER & FOOTER (CRIVOS EM INTER)
+           ========================================================================== */
+        .cta-banner {
+            padding: 5rem 0;
+            background-color: var(--bg-dark-block);
+            color: var(--text-on-dark);
+            border-bottom: 2px solid var(--border-color);
+            text-align: center;
+        }
+
+        .cta-banner h2 {
+            color: var(--text-on-dark);
+            font-size: clamp(2rem, 4.3vw, 3.35rem);
+            max-width: 820px;
+            margin: 1.2rem auto;
+        }
+
+        .cta-banner p {
+            color: #B8BEC9;
+            max-width: 610px;
+            margin: 0 auto 2.25rem;
+            font-size: 1.02rem;
+        }
+
+        .footer {
+            padding: 3.75rem 0 2.5rem;
+            background-color: var(--bg-primary);
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+        }
+
+        .footer-grid {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 2.25rem;
+            padding-bottom: 2.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1.75rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-red);
+        }
+
+        .footer-bottom {
+            padding-top: 1.85rem;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            color: var(--text-muted);
+        }
+
+        /* ==========================================================================
+           15. RESPONSIVE BREAKPOINTS (MOBILE, TABLET, DESKTOP)
+           ========================================================================== */
+        @media (max-width: 1024px) {
+            .hero-grid,
+            .sim-showcase-grid,
+            .sim-controls-bar,
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+            .steps-grid {
+                grid-template-columns: 1fr;
+            }
+            .step-col {
+                border-right: none;
+                border-bottom: 2px solid var(--border-color);
+            }
+            .step-col:last-child {
+                border-bottom: none;
+            }
+            .price-card.featured {
+                transform: none;
+            }
+            .price-card.featured:hover {
+                transform: translate(-2px, -2px);
+            }
+            .nav-links {
+                display: none;
+            }
+            .nav-actions .nav-cta,
+            .nav-actions .nav-login {
+                display: none;
+            }
+            .mobile-menu-btn {
+                display: inline-flex;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .boot-shutter-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .boot-shutter:nth-child(4),
+            .boot-shutter:nth-child(5) {
+                display: none;
+            }
+            .container {
+                padding: 0 1.15rem;
+            }
+            .anatomy-grid {
+                grid-template-columns: 1fr;
+            }
+            .hero-metrics-bar {
+                grid-template-columns: 1fr;
+            }
+            .hero-metric-cell {
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+            .hero-metric-cell:last-child {
+                border-bottom: none;
+            }
+            .telemetry-kpis {
+                grid-template-columns: 1fr;
+            }
+            .guarantee-left {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .nav-login {
+                display: none;
+            }
+            .hero {
+                padding: 2.5rem 0 3.25rem;
+            }
+            .section {
+                padding: 3.75rem 0;
+            }
+            .hero-cta-group .btn {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
 
-  <!-- ======================================================== -->
-  <!-- A. TOPBAR INSTITUCIONAL                                 -->
-  <!-- ======================================================== -->
-  <header class="crivos-topbar">
-    <div class="crivos-topbar-left">
-      <span class="sq-red">■</span> CRIVOS // INTELIGÊNCIA PARA CONCURSOS E EXAMES
+    <!-- 1. CINEMATIC INTRO SEQUENCE OVERLAY -->
+    <div id="boot-overlay" aria-label="Inicializando Sistema CRIVOS">
+        <div class="boot-shutter-container">
+            <div class="boot-shutter"></div>
+            <div class="boot-shutter"></div>
+            <div class="boot-shutter"></div>
+            <div class="boot-shutter"></div>
+            <div class="boot-shutter"></div>
+        </div>
+
+        <div class="boot-top">
+            <div class="boot-brand">
+                <span class="boot-brand-sq"></span>
+                <span>CRIVOS</span>
+            </div>
+            <button class="boot-skip-btn" id="boot-skip" type="button">[ PULAR INTRO ↵ ]</button>
+        </div>
+
+        <div class="boot-terminal" id="boot-terminal">
+            <div class="boot-line"><span class="boot-tag-ok">[OK]</span> <span>CARREGANDO MATRIZ DE INCIDÊNCIA DO EDITAL PUBLICADO...</span></div>
+            <div class="boot-line"><span class="boot-tag-info">[BANCAS]</span> <span>CEBRASPE // FGV // FCC // VUNESP // CESGRANRIO // ENEM // OAB</span></div>
+            <div class="boot-line"><span class="boot-tag-alert">[FILTRO]</span> <span>CORTE DE PARETO ATIVO: ISOLANDO OS TÓPICOS QUE CONCENTRAM 80% DOS PONTOS</span></div>
+            <div class="boot-line"><span class="boot-tag-ok">[SM-2]</span> <span>CONTAGEM REGRESSIVA ATÉ A PROVA E REPETIÇÃO ESPAÇADA SINCRONIZADAS</span></div>
+            <div class="boot-line"><span class="boot-tag-ok">[PRONTO]</span> <span>LIBERANDO AMBIENTE DE ALTA PERFORMANCE...</span></div>
+        </div>
+
+        <div class="boot-bottom">
+            <div class="boot-counter-row">
+                <span class="boot-status-label" id="boot-status-text">CALIBRANDO DADOS DE PROVA...</span>
+                <span class="boot-counter" id="boot-counter">00%</span>
+            </div>
+            <div class="boot-bar-track">
+                <div class="boot-bar-fill" id="boot-bar-fill"></div>
+            </div>
+        </div>
     </div>
-    <div class="crivos-topbar-right">
-      <span>SISTEMAS DE ESTUDO PÓS-EDITAL SOB DEMANDA</span>
-      <button type="button" id="theme-toggle-btn" class="theme-toggle-btn" title="Alternar Modo Escuro">[ ◐ DIA ]</button>
+
+    <!-- 2. SCROLL PROGRESS & INTERACTIVE COORDINATE GRID CANVAS -->
+    <div class="scroll-progress-track">
+        <div class="scroll-progress-bar" id="scroll-progress-bar"></div>
     </div>
-  </header>
+    <canvas id="coord-canvas"></canvas>
 
-  <!-- NAVEGAÇÃO PRINCIPAL -->
-  <nav class="main-nav">
-    <a href="#" class="nav-brand">
-      <div class="nav-brand-logo"></div>
-      <span class="nav-brand-text">CRIVOS</span>
-      <span class="nav-brand-badge">// SISTEMAS SOB DEMANDA</span>
-    </a>
+    <div class="page-wrapper" id="page-wrapper">
 
-    <div class="nav-links">
-      <a href="#como-funciona" class="nav-link">01. Como Funciona</a>
-      <a href="#anatomia" class="nav-link">02. Anatomia</a>
-      <a href="#demonstracao" class="nav-link">03. Demonstração</a>
-      <a href="#precos" class="nav-link">04. Preços</a>
-      <a href="#faq" class="nav-link">05. FAQ</a>
+        <!-- 3. STICKY TOPBAR NAVIGATION (QUADRADO PERFEITO + CRIVOS EM INTER) -->
+        <header class="topbar">
+            <div class="topbar-container">
+                <a href="#" class="brand">
+                    <span class="brand-sq"></span>
+                    <span class="brand-name">CRIVOS</span>
+                </a>
+
+                <nav class="nav-links" aria-label="Navegação Principal">
+                    <a href="#demonstracao" class="nav-link">01. Simulador</a>
+                    <a href="#anatomia" class="nav-link">02. O Sistema</a>
+                    <a href="#comparativo" class="nav-link">03. Comparativo</a>
+                    <a href="#como-funciona" class="nav-link">04. Como Funciona</a>
+                    <a href="#precos" class="nav-link">05. Planos</a>
+                    <a href="#faq" class="nav-link">06. Dúvidas</a>
+                </nav>
+
+                <div class="nav-actions">
+                    <a href="/login.html" class="nav-login">Área do Candidato ↗</a>
+                    <a href="#precos" class="nav-cta">Montar Meu Plano →</a>
+                    <button class="mobile-menu-btn" id="mobile-menu-btn" type="button" aria-label="Abrir Menu de Navegação">
+                        <span class="menu-icon">☰</span>
+                        <span>MENU</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- GAVETA DE MENU MOBILE (AGLUTINANDO NAVEGAÇÃO DA HEADBAR) -->
+            <div class="mobile-drawer" id="mobile-drawer" aria-hidden="true">
+                <nav class="mobile-drawer-nav" aria-label="Navegação Mobile">
+                    <a href="#demonstracao" class="mobile-drawer-link">
+                        <span><strong class="m-link-num">01.</strong> SIMULADOR E RAIO-X</span>
+                        <span>↗</span>
+                    </a>
+                    <a href="#anatomia" class="mobile-drawer-link">
+                        <span><strong class="m-link-num">02.</strong> ARQUITETURA DO SISTEMA</span>
+                        <span>↗</span>
+                    </a>
+                    <a href="#comparativo" class="mobile-drawer-link">
+                        <span><strong class="m-link-num">03.</strong> COMPARATIVO DIRETO</span>
+                        <span>↗</span>
+                    </a>
+                    <a href="#como-funciona" class="mobile-drawer-link">
+                        <span><strong class="m-link-num">04.</strong> COMO FUNCIONA EM 3 ETAPAS</span>
+                        <span>↗</span>
+                    </a>
+                    <a href="#precos" class="mobile-drawer-link">
+                        <span><strong class="m-link-num">05.</strong> PLANOS E INVESTIMENTO</span>
+                        <span>↗</span>
+                    </a>
+                    <a href="#faq" class="mobile-drawer-link">
+                        <span><strong class="m-link-num">06.</strong> DÚVIDAS FREQUENTES</span>
+                        <span>↗</span>
+                    </a>
+                </nav>
+                <div class="mobile-drawer-actions">
+                    <a href="/login.html" class="btn btn-secondary" style="width: 100%;">Área do Candidato ↗</a>
+                    <a href="#precos" class="btn btn-primary" style="width: 100%;">Montar Meu Plano Agora →</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- 4. HERO SECTION -->
+        <section class="hero">
+            <div class="container hero-grid">
+                <div class="hero-content">
+                    <div class="hero-eyebrow">
+                        <span class="mono-tag dark"><span class="status-dot"></span> ENTREGA INDIVIDUAL EM ATÉ 24H (6H NO ELITE)</span>
+                        <span class="mono-tag">PAGAMENTO ÚNICO</span>
+                    </div>
+
+                    <h1 class="hero-title">
+                        SEU EDITAL <span class="highlight-red">DISSECADO</span>.<br>
+                        SUA ROTINA <span class="highlight-box">BLINDADA.</span>
+                    </h1>
+
+                    <p class="hero-lead">
+                        Quando o edital sai, cada dia perdido em planilhas ou tópicos com 1% de incidência custa a sua vaga. A <strong>CRIVOS</strong> cruza o peso estatístico de cada matéria com as horas reais da sua semana e entrega seu <strong>sistema individual calculado até o dia da prova</strong>.
+                    </p>
+
+                    <div class="hero-cta-group">
+                        <a href="#precos" class="btn btn-primary">Montar Meu Plano Agora →</a>
+                        <a href="https://crivos-demo.pages.dev" target="_blank" rel="noopener" class="btn btn-secondary">Testar Painel Real ↗</a>
+                    </div>
+
+                    <div class="hero-metrics-bar">
+                        <div class="hero-metric-cell">
+                            <span class="hero-metric-val">ATÉ 24H</span>
+                            <span class="hero-metric-lbl">Entrega rápida (6h no Elite)</span>
+                        </div>
+                        <div class="hero-metric-cell">
+                            <span class="hero-metric-val">PARETO 80/20</span>
+                            <span class="hero-metric-lbl">Foco nos pontos decisivos</span>
+                        </div>
+                        <div class="hero-metric-cell">
+                            <span class="hero-metric-val">CICLO ATÉ D+1</span>
+                            <span class="hero-metric-lbl">Rota exata até o pós-prova</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- INTERACTIVE HERO MOCKUP -->
+                <div class="interactive-panel" aria-label="Demonstração Interativa do Painel">
+                    <div class="panel-topbar">
+                        <span>PAINEL DO CANDIDATO // DEMONSTRAÇÃO AO VIVO</span>
+                        <span class="panel-interactive-hint">CLIQUE PARA TESTAR</span>
+                    </div>
+
+                    <div class="panel-tabs">
+                        <button type="button" class="panel-tab-btn active" data-tab="tab-rotina">01. META DE HOJE</button>
+                        <button type="button" class="panel-tab-btn" data-tab="tab-flashcard">02. RETENÇÃO SM-2 (3)</button>
+                    </div>
+
+                    <div class="panel-body">
+                        <!-- TAB 1: DAILY CHECKLIST & POMODORO -->
+                        <div class="panel-view active" id="tab-rotina">
+                            <div class="panel-progress-header">
+                                <span class="panel-progress-title">EXECUÇÃO DA META DIÁRIA</span>
+                                <span class="panel-progress-pct" id="hero-progress-pct">67% CONCLUÍDO</span>
+                            </div>
+                            <div class="panel-progress-track">
+                                <div class="panel-progress-fill" id="hero-progress-fill" style="width: 67%;"></div>
+                            </div>
+
+                            <div class="task-list-label">
+                                <span>TAREFAS CALIBRADAS PARA HOJE</span>
+                                <span>TOQUE PARA MARCAR ✓</span>
+                            </div>
+
+                            <div class="interactive-task done" data-weight="33">
+                                <div class="task-left">
+                                    <span class="task-checkbox">✓</span>
+                                    <span class="task-title">Direito Constitucional: Controle de Constitucionalidade</span>
+                                </div>
+                                <span class="task-badge high">PESO 24.5%</span>
+                            </div>
+
+                            <div class="interactive-task done" data-weight="34">
+                                <div class="task-left">
+                                    <span class="task-checkbox">✓</span>
+                                    <span class="task-title">Bateria de 25 Questões Comentadas (Filtro Banca)</span>
+                                </div>
+                                <span class="task-badge">BLOCO 45M</span>
+                            </div>
+
+                            <div class="interactive-task" data-weight="33">
+                                <div class="task-left">
+                                    <span class="task-checkbox"></span>
+                                    <span class="task-title">Direito Administrativo: Licitações (Lei 14.133/21)</span>
+                                </div>
+                                <span class="task-badge high">ALTA INCIDÊNCIA</span>
+                            </div>
+
+                            <div class="panel-pomo-bar">
+                                <div class="pomo-display">
+                                    <span class="pomo-label">CRONÔMETRO DE BLOCO INTEGRADO</span>
+                                    <span class="pomo-timer" id="hero-pomo-timer">25:00</span>
+                                </div>
+                                <button type="button" class="pomo-btn" id="hero-pomo-btn">[ ▶ INICIAR BLOCO ]</button>
+                            </div>
+                        </div>
+
+                        <!-- TAB 2: SM-2 FLASHCARD PREVIEW -->
+                        <div class="panel-view" id="tab-flashcard">
+                            <div class="task-list-label">
+                                <span>REVISÃO ESPAÇADA AUTOMÁTICA</span>
+                                <span>TOQUE NO CARD PARA VIRAR</span>
+                            </div>
+
+                            <div class="flashcard-box" id="hero-flashcard">
+                                <div>
+                                    <div class="fc-meta">
+                                        <span>DISCIPLINA: DIR. ADMINISTRATIVO</span>
+                                        <span>INTERVALO ATUAL: 4 DIAS</span>
+                                    </div>
+                                    <div class="fc-text">
+                                        Qual é o prazo mínimo para apresentação de propostas no Pregão para aquisição de bens comuns (critério menor preço)?
+                                    </div>
+                                    <div class="fc-answer">
+                                        <strong>RESPOSTA AUDITADA (Art. 55, I, "a", Lei 14.133/21):</strong><br>
+                                        No mínimo <strong>8 (oito) dias úteis</strong>, contados a partir da data de divulgação do edital de licitação.
+                                    </div>
+                                </div>
+                                <div style="font-family: var(--font-mono); font-size: 0.66rem; color: var(--text-muted); text-transform: uppercase;">
+                                    [ TOQUE NO CARTÃO PARA REVELAR A RESPOSTA ]
+                                </div>
+                            </div>
+
+                            <div class="fc-actions">
+                                <button type="button" class="fc-rate-btn" data-next="REVISAR EM 10 MIN">ERREI (10M)</button>
+                                <button type="button" class="fc-rate-btn" data-next="REVISAR EM 3 DIAS">BOM (3D)</button>
+                                <button type="button" class="fc-rate-btn" data-next="REVISAR EM 9 DIAS">FÁCIL (9D)</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. TECHNICAL LIVE TICKER -->
+        <div class="ticker-wrap" aria-hidden="true">
+            <div class="ticker-track">
+                <span class="ticker-item"><span class="ticker-sep">■</span> PRAZO DE ENTREGA: ATÉ 24H (OU ATÉ 6H NO NÍVEL ELITE)</span>
+                <span class="ticker-item"><span class="ticker-sep">■</span> BANCAS MAPEADAS: CEBRASPE // FGV // FCC // VUNESP // CESGRANRIO // ENEM // OAB</span>
+                <span class="ticker-item"><span class="ticker-sep">■</span> ENGENHARIA PÓS-EDITAL CALCULADA ATÉ O D+1 PÓS-PROVA</span>
+                <span class="ticker-item"><span class="ticker-sep">■</span> RETENÇÃO DE LONGO PRAZO COM ALGORITMO SM-2 NATIVO</span>
+                <span class="ticker-item"><span class="ticker-sep">■</span> 7 DIAS GRÁTIS DE CALIBRAÇÃO E AJUSTE FINO DE ROTINA</span>
+                <!-- Duplicate for seamless loop -->
+                <span class="ticker-item"><span class="ticker-sep">■</span> PRAZO DE ENTREGA: ATÉ 24H (OU ATÉ 6H NO NÍVEL ELITE)</span>
+                <span class="ticker-item"><span class="ticker-sep">■</span> BANCAS MAPEADAS: CEBRASPE // FGV // FCC // VUNESP // CESGRANRIO // ENEM // OAB</span>
+                <span class="ticker-item"><span class="ticker-sep">■</span> ENGENHARIA PÓS-EDITAL CALCULADA ATÉ O D+1 PÓS-PROVA</span>
+                <span class="ticker-item"><span class="ticker-sep">■</span> RETENÇÃO DE LONGO PRAZO COM ALGORITMO SM-2 NATIVO</span>
+                <span class="ticker-item"><span class="ticker-sep">■</span> 7 DIAS GRÁTIS DE CALIBRAÇÃO E AJUSTE FINO DE ROTINA</span>
+            </div>
+        </div>
+
+        <!-- 6. SIMULADOR DE IMPACTO & RAIO-X (#demonstracao) -->
+        <section id="demonstracao" class="section section-alt">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-header-top">
+                        <span class="mono-tag red">01 // RAIO-X E SIMULAÇÃO</span>
+                        <span class="section-coord">MATRIZ DE PRIORIZAÇÃO ESTATÍSTICA</span>
+                    </div>
+                    <h2 class="section-title">VEJA COMO CALIBRAMOS SEU EDITAL PARA A SUA ROTINA REAL.</h2>
+                    <p class="section-subtitle">
+                        Selecione um perfil de prova abaixo e ajuste sua disponibilidade diária. Veja em tempo real como o sistema distribui sua carga horária nas disciplinas que decidem a aprovação.
+                    </p>
+                </div>
+
+                <!-- Interactive Controls -->
+                <div class="sim-controls-bar">
+                    <div class="sim-control-group">
+                        <span class="sim-control-label">1. SELECIONE O PERFIL DE PROVA PARA SIMULAR:</span>
+                        <div class="sim-profile-btns">
+                            <button type="button" class="sim-profile-btn active" data-profile="fiscal">FISCAL & CONTROLE // CEBRASPE</button>
+                            <button type="button" class="sim-profile-btn" data-profile="tribunais">TRIBUNAIS & MP // FGV</button>
+                            <button type="button" class="sim-profile-btn" data-profile="policial">POLICIAL & ADM // VUNESP</button>
+                            <button type="button" class="sim-profile-btn" data-profile="oab">EXAME OAB & ENEM</button>
+                        </div>
+                    </div>
+
+                    <div class="sim-slider-wrap">
+                        <div class="sim-slider-top">
+                            <span class="sim-control-label">2. SUA DISPONIBILIDADE DIÁRIA:</span>
+                            <span class="sim-hours-val" id="sim-hours-label">4H / DIA (24H/SEM)</span>
+                        </div>
+                        <input type="range" min="2" max="8" value="4" step="1" class="brutal-slider" id="sim-hours-slider" aria-label="Horas de estudo por dia">
+                    </div>
+                </div>
+
+                <!-- Dynamic Output Grid -->
+                <div class="sim-showcase-grid">
+                    <div class="raiox-card">
+                        <div class="raiox-card-head">
+                            <span id="sim-table-title">RAIO-X DE DISTRIBUIÇÃO // CARREIRAS FISCAIS (CEBRASPE)</span>
+                            <span>HORAS ALOCADAS / SEMANA</span>
+                        </div>
+                        <div class="raiox-table-wrap">
+                            <table class="raiox-table">
+                                <thead>
+                                    <tr>
+                                        <th>Disciplina Auditada</th>
+                                        <th>Peso na Prova</th>
+                                        <th>Carga / Sem</th>
+                                        <th>Prioridade</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="sim-table-body">
+                                    <!-- Populated dynamically via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="sim-telemetry-box">
+                        <div>
+                            <div class="mono-tag dark" style="margin-bottom: 1rem;">DIAGNÓSTICO DE EFICIÊNCIA</div>
+                            <div class="telemetry-kpis">
+                                <div class="telemetry-kpi">
+                                    <span class="telemetry-kpi-num red" id="sim-kpi-coverage">86%</span>
+                                    <span class="telemetry-kpi-desc">Dos pontos da prova cobertos no ciclo nuclear</span>
+                                </div>
+                                <div class="telemetry-kpi">
+                                    <span class="telemetry-kpi-num blue" id="sim-kpi-weeks">12 SEM</span>
+                                    <span class="telemetry-kpi-desc">Tempo estimado p/ fechar a base de alto impacto</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pareto-visual">
+                            <div class="pareto-visual-title">
+                                <span>ECONOMIA DE TEMPO VS. ESTUDO LINEAR</span>
+                                <span id="sim-saved-hours" style="color: var(--accent-red);">-142H INÚTEIS CORTADAS</span>
+                            </div>
+                            <div class="pareto-bars">
+                                <div class="pareto-bar-row">
+                                    <div style="display:flex; justify-content:space-between; gap: 0.5rem;">
+                                        <span>ESTUDO LINEAR (LER O EDITAL DO ZERO AO FIM)</span>
+                                        <span id="sim-linear-weeks">26 SEMANAS</span>
+                                    </div>
+                                    <div class="pareto-bar-track">
+                                        <div class="pareto-bar-fill" style="width: 100%; background: var(--text-muted);"></div>
+                                    </div>
+                                </div>
+                                <div class="pareto-bar-row">
+                                    <div style="display:flex; justify-content:space-between; gap: 0.5rem; font-weight:800;">
+                                        <span>CRONOGRAMA CALIBRADO CRIVOS (CORTE PARETO)</span>
+                                        <span id="sim-crivos-weeks" style="color: var(--accent-blue);">12 SEMANAS</span>
+                                    </div>
+                                    <div class="pareto-bar-track">
+                                        <div class="pareto-bar-fill" id="sim-crivos-bar" style="width: 46%; background: var(--accent-red);"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; padding-top: 0.5rem; border-top: 1px solid var(--border-color);">
+                            <span style="font-family: var(--font-mono); font-size: 0.74rem; color: var(--text-secondary);">
+                                Quer explorar a interface completa?
+                            </span>
+                            <a href="https://crivos-demo.pages.dev" target="_blank" rel="noopener" class="btn btn-secondary" style="padding: 0.65rem 1.1rem; font-size: 0.75rem;">
+                                Abrir Painel de Demonstração ↗
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. ARQUITETURA DE ESTUDO (#anatomia) -->
+        <section id="anatomia" class="section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-header-top">
+                        <span class="mono-tag">02 // ARQUITETURA DE ESTUDO</span>
+                        <span class="section-coord">4 PILARES DE EXECUÇÃO PÓS-EDITAL</span>
+                    </div>
+                    <h2 class="section-title">POR QUE PLANILHAS ESTÁTICAS FALHAM NO PRIMEIRO IMPREVISTO.</h2>
+                    <p class="section-subtitle">
+                        Com a data da prova marcada, você não pode se dar ao luxo de perder horas reorganizando tabelas. Seu sistema precisa absorver imprevistos e conduzir sua retenção exatamente até o domingo do exame.
+                    </p>
+                </div>
+
+                <div class="anatomy-grid">
+                    <article class="anatomy-card reveal-card">
+                        <div>
+                            <div class="anatomy-card-top">
+                                <span class="anatomy-index">PILAR // 01</span>
+                                <span class="anatomy-badge">ROTA ADAPTATIVA</span>
+                            </div>
+                            <h3>Cronograma Diário Elástico</h3>
+                            <p>
+                                Surgiu um plantão no trabalho ou imprevisto familiar e você não conseguiu estudar na quarta-feira? Com um clique, o painel redistribui a pendência nos blocos seguintes respeitando o peso de cada disciplina — sem efeito bola de neve.
+                            </p>
+                        </div>
+                        <div class="anatomy-spec">
+                            [ IMPACTO ] Zero culpa e zero tempo perdido refazendo planilhas manualmente no domingo.
+                        </div>
+                    </article>
+
+                    <article class="anatomy-card reveal-card">
+                        <div>
+                            <div class="anatomy-card-top">
+                                <span class="anatomy-index">PILAR // 02</span>
+                                <span class="anatomy-badge">MATRIZ DE PESOS</span>
+                            </div>
+                            <h3>Engenharia Reversa até o Dia da Prova</h3>
+                            <p>
+                                Calculamos os dias exatos que separam você da aplicação da prova e cruzamos com as horas líquidas da sua semana. Isolamos os assuntos de alta incidência da banca e cortamos o excesso improdutivo que não cabe no seu calendário.
+                            </p>
+                        </div>
+                        <div class="anatomy-spec">
+                            [ IMPACTO ] Seu tempo escasso vai primeiro para onde estão 80% dos pontos da sua prova.
+                        </div>
+                    </article>
+
+                    <article class="anatomy-card reveal-card">
+                        <div>
+                            <div class="anatomy-card-top">
+                                <span class="anatomy-index">PILAR // 03</span>
+                                <span class="anatomy-badge">MEMÓRIA BLINDADA</span>
+                            </div>
+                            <h3>Pico de Retenção SM-2 na Véspera</h3>
+                            <p>
+                                Nos níveis Arsenal e Elite, seu painel inclui flashcards táticos regidos pelo algoritmo SM-2. Os intervalos de repetição espaçada convergem para que todas as matérias críticas atinjam o ápice de consolidação na semana final antes da prova.
+                            </p>
+                        </div>
+                        <div class="anatomy-spec">
+                            [ IMPACTO ] O que você estudou na primeira semana chega blindado na sua memória no dia do exame.
+                        </div>
+                    </article>
+
+                    <article class="anatomy-card reveal-card">
+                        <div>
+                            <div class="anatomy-card-top">
+                                <span class="anatomy-index">PILAR // 04</span>
+                                <span class="anatomy-badge">PRONTO EM ATÉ 24H</span>
+                            </div>
+                            <h3>Entrega Pronta & Ciclo Fechado D+1</h3>
+                            <p>
+                                Nossa equipe entrega seu painel configurado em até 24h (ou em até 6h no Nível Elite). Seu acesso é calibrado sob medida até 24 horas após a última prova do concurso (D+1) para auditoria de gabarito, recursos e fechamento de ciclo.
+                            </p>
+                        </div>
+                        <div class="anatomy-spec">
+                            [ IMPACTO ] + Guia Tático completo em PDF A4 de alta definição que fica com você para sempre.
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- 8. COMPARATIVO DIRETO (#comparativo) -->
+        <section id="comparativo" class="section section-alt">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-header-top">
+                        <span class="mono-tag blue">03 // COMPARATIVO DIRETO</span>
+                        <span class="section-coord">ANÁLISE DE EFICIÊNCIA</span>
+                    </div>
+                    <h2 class="section-title">A DIFERENÇA ENTRE ACUMULAR MATERIAL E EXECUTAR COM PRAZO REAL.</h2>
+                </div>
+
+                <div class="compare-table-wrap reveal-card">
+                    <table class="compare-table">
+                        <thead>
+                            <tr>
+                                <th>Critério</th>
+                                <th>Assinaturas / Planilhas Genéricas</th>
+                                <th class="col-crivos">Sistema Individual CRIVOS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="col-metric">Personalização</td>
+                                <td class="col-old">PDF estático igual para milhares de alunos com rotinas diferentes.</td>
+                                <td class="col-crivos">Calibrado sob medida para as horas reais de cada dia da sua semana.</td>
+                            </tr>
+                            <tr>
+                                <td class="col-metric">Imprevistos e Atrasos</td>
+                                <td class="col-old">Acumula matérias atrasadas até você abandonar a planilha.</td>
+                                <td class="col-crivos">Recálculo elástico da rota mantendo os tópicos de maior peso no topo.</td>
+                            </tr>
+                            <tr>
+                                <td class="col-metric">Priorização de Edital</td>
+                                <td class="col-old">Trata tópicos que caem em toda prova igual a tópicos raros.</td>
+                                <td class="col-crivos">Matriz de incidência com Corte de Pareto (foco nos 80% decisivos).</td>
+                            </tr>
+                            <tr>
+                                <td class="col-metric">Horizonte de Execução</td>
+                                <td class="col-old">Estudo solto e sem urgência que se arrasta indefinidamente.</td>
+                                <td class="col-crivos">Contagem regressiva cirúrgica até a prova + protocolo de revisão de véspera e D+1.</td>
+                            </tr>
+                            <tr>
+                                <td class="col-metric">Modelo de Cobrança</td>
+                                <td class="col-old">Assinaturas recorrentes que prendem o limite do seu cartão por 12 meses.</td>
+                                <td class="col-crivos">Pagamento único por edital (a partir de R$ 67), sem renovação automática.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 9. COMO FUNCIONA EM 3 PASSOS (#como-funciona) -->
+        <section id="como-funciona" class="section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-header-top">
+                        <span class="mono-tag">04 // COMO FUNCIONA</span>
+                        <span class="section-coord">DO DIAGNÓSTICO À EXECUÇÃO</span>
+                    </div>
+                    <h2 class="section-title">SEU PLANO PRONTO EM 3 ETAPAS SIMPLES.</h2>
+                    <p class="section-subtitle">
+                        Eliminamos toda a burocracia. Você preenche um diagnóstico rápido pós-compra e recebe tudo configurado para o seu edital.
+                    </p>
+                </div>
+
+                <div class="steps-grid">
+                    <div class="step-col reveal-card">
+                        <div>
+                            <div class="step-num-row">
+                                <span class="step-num">01</span>
+                                <span class="step-time-tag">LEVA 5 MINUTOS</span>
+                            </div>
+                            <h3>Diagnóstico de Rotina e Edital</h3>
+                            <p>
+                                Após escolher seu nível de acesso, você informa seu concurso/cargo com edital aberto (ou data de prova definida), indica quantas horas líquidas tem de segunda a domingo e aponta sua bagagem atual em cada disciplina.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="step-col reveal-card">
+                        <div>
+                            <div class="step-num-row">
+                                <span class="step-num">02</span>
+                                <span class="step-time-tag">EM ATÉ 24H (6H ELITE)</span>
+                            </div>
+                            <h3>Engenharia Reversa e Calibração</h3>
+                            <p>
+                                Auditamos os pesos da banca examinadora, cruzamos com os dias restantes até a prova e montamos seu cronograma diário, metas de questões, ciclo de revisão espaçada SM-2 e guia tático em PDF A4.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="step-col reveal-card">
+                        <div>
+                            <div class="step-num-row">
+                                <span class="step-num">03</span>
+                                <span class="step-time-tag">7 DIAS DE AJUSTE FINO</span>
+                            </div>
+                            <h3>Entrega + Calibração Assistida</h3>
+                            <p>
+                                Você recebe seu link exclusivo por e-mail e WhatsApp. Durante os primeiros 7 dias de execução prática, se sentir que o ritmo das metas precisa de ajuste fino, recalibramos sua carga horária gratuitamente.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 10. PLANOS E INVESTIMENTO (#precos) -->
+        <section id="precos" class="section section-alt">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-header-top">
+                        <span class="mono-tag red">05 // PLANOS E ACESSO</span>
+                        <span class="section-coord">PAGAMENTO ÚNICO // SEM MENSALIDADES</span>
+                    </div>
+                    <h2 class="section-title">ESCOLHA A PROFUNDIDADE DO SEU SISTEMA DE ESTUDO.</h2>
+                    <p class="section-subtitle">
+                        Sem assinatura recorrente. Você investe uma única vez pelo mapeamento completo do seu edital até o fechamento da sua prova (D+1), além de receber o Guia Tático em PDF A4 definitivo.
+                    </p>
+                </div>
+
+                <div class="pricing-grid">
+                    <!-- NÍVEL 1: TÁTICO -->
+                    <div class="price-card reveal-card">
+                        <div>
+                            <div class="price-tier-label">NÍVEL 01 // ESSENCIAL</div>
+                            <h3 class="price-tier-title">CRIVOS TÁTICO</h3>
+                            <div class="price-value-box">
+                                <div class="price-amount"><small>R$</small> 67</div>
+                                <div class="price-payment-note">PAGAMENTO ÚNICO // ENTREGA EM ATÉ 24H</div>
+                            </div>
+                            <ul class="price-features">
+                                <li><span class="check-sq">[✓]</span> <span><strong>Raio-X Estatístico do Edital</strong> com matriz de pesos e prioridades</span></li>
+                                <li><span class="check-sq">[✓]</span> <span><strong>Cronograma Diário Elástico</strong> calculado até o dia da sua prova</span></li>
+                                <li><span class="check-sq">[✓]</span> <span><strong>Guia de Estudos em PDF A4</strong> definitivo para leitura e impressão</span></li>
+                                <li><span class="check-sq">[✓]</span> <span><strong>Timer Pomodoro Integrado</strong> e rastreador de progresso por tópico</span></li>
+                                <li><span class="check-sq">[✓]</span> <span><strong>Garantia de 7 Dias Grátis</strong> de calibração e ajuste de carga</span></li>
+                            </ul>
+                        </div>
+                        <a href="/payment.html?produto=tatico" class="btn btn-secondary" style="width: 100%;">Escolher Nível Tático →</a>
+                    </div>
+
+                    <!-- NÍVEL 2: ARSENAL (DESTAQUE) -->
+                    <div class="price-card featured reveal-card">
+                        <div class="featured-ribbon">MAIS ESCOLHIDO</div>
+                        <div>
+                            <div class="price-tier-label">NÍVEL 02 // RETENÇÃO ATIVA</div>
+                            <h3 class="price-tier-title">CRIVOS ARSENAL</h3>
+                            <div class="price-value-box">
+                                <div class="price-amount"><small>R$</small> 124</div>
+                                <div class="price-payment-note">BASE TÁTICO + R$ 57 // ENTREGA EM ATÉ 24H</div>
+                            </div>
+                            <ul class="price-features">
+                                <li><span class="check-sq">[✓]</span> <span><strong>Tudo do Nível Tático</strong> (Cronograma + Raio-X + Guia PDF)</span></li>
+                                <li><span class="check-sq">[+]</span> <span><strong>Decks de Flashcards SM-2</strong> pré-carregados com pico de retenção na véspera</span></li>
+                                <li><span class="check-sq">[+]</span> <span><strong>Resumos Direcionados de Alta Incidência</strong> integrados ao painel</span></li>
+                                <li><span class="check-sq">[+]</span> <span><strong>Caderno de Erros Inteligente</strong> para auditoria de pontos cegos</span></li>
+                                <li><span class="check-sq">[+]</span> <span><strong>Simulados Diagnósticos</strong> calibrados no padrão da sua banca</span></li>
+                            </ul>
+                        </div>
+                        <a href="/payment.html?produto=arsenal" class="btn btn-primary" style="width: 100%;">Escolher Nível Arsenal →</a>
+                    </div>
+
+                    <!-- NÍVEL 3: ELITE -->
+                    <div class="price-card reveal-card">
+                        <div>
+                            <div class="price-tier-label">NÍVEL 03 // PREPARAÇÃO TOTAL</div>
+                            <h3 class="price-tier-title">CRIVOS ELITE</h3>
+                            <div class="price-value-box">
+                                <div class="price-amount"><small>R$</small> 221</div>
+                                <div class="price-payment-note">ARSENAL + R$ 97 // ENTREGA EXPRESSA EM ATÉ 6H</div>
+                            </div>
+                            <ul class="price-features">
+                                <li><span class="check-sq">[✓]</span> <span><strong>Tudo dos Níveis Tático e Arsenal</strong></span></li>
+                                <li><span class="check-sq">[+]</span> <span><strong>Fila de Prioridade Máxima:</strong> entrega expressa em até 6 horas</span></li>
+                                <li><span class="check-sq">[+]</span> <span><strong>Módulo de Discursivas e Redação</strong> com repertório e esqueletos de resposta</span></li>
+                                <li><span class="check-sq">[+]</span> <span><strong>1 Recalibração Extra de Rota</strong> gratuita a qualquer momento até a prova</span></li>
+                                <li><span class="check-sq">[+]</span> <span><strong>Mapeamento de Tópicos Polêmicos</strong> e jurisprudência da banca</span></li>
+                            </ul>
+                        </div>
+                        <a href="/payment.html?produto=elite" class="btn btn-dark" style="width: 100%;">Escolher Nível Elite →</a>
+                    </div>
+                </div>
+
+                <!-- Guarantee Strip (Foco em Calibração e Ajuste Gratuito) -->
+                <div class="guarantee-strip reveal-card">
+                    <div class="guarantee-left">
+                        <div class="guarantee-badge">7 DIAS</div>
+                        <div>
+                            <h4 style="font-size: 1.12rem; margin-bottom: 0.3rem;">GARANTIA DE 7 DIAS GRÁTIS DE CALIBRAÇÃO E AJUSTE FINO</h4>
+                            <p style="font-size: 0.9rem; color: var(--text-secondary);">
+                                Nenhum planejamento sobrevive ao campo de batalha sem ajuste. Teste seu cronograma na sua semana real por 7 dias: se perceber que a carga diária ficou pesada demais, leve demais ou se seus horários mudaram, nossa equipe recalibra toda a sua rota gratuitamente.
+                            </p>
+                        </div>
+                    </div>
+                    <a href="https://crivos-demo.pages.dev" target="_blank" rel="noopener" class="btn btn-secondary">Ver Exemplo de Entrega ↗</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 11. PERGUNTAS FREQUENTES (#faq) -->
+        <section id="faq" class="section">
+            <div class="container">
+                <div class="section-header" style="text-align: center; align-items: center;">
+                    <span class="mono-tag">06 // DÚVIDAS FREQUENTES</span>
+                    <h2 class="section-title">PERGUNTAS E RESPOSTAS DIRETAS.</h2>
+                </div>
+
+                <div class="faq-list">
+                    <div class="faq-item open">
+                        <button class="faq-trigger" type="button">
+                            <span>01. Por que a CRIVOS trabalha exclusivamente no pós-edital e com acesso até um dia após a prova (D+1)?</span>
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-content">
+                            Porque nós não vendemos assinaturas infinitas que lucram com a sua procrastinação — nós entregamos <strong>Engenharia de Ciclo Fechado</strong>. Como o seu investimento é único, toda a matemática do sistema (o corte estatístico de Pareto, a velocidade de avanço nas metas e a curva de repetição espaçada SM-2) é calculada em contagem regressiva exata até a data do seu exame, garantindo que você atinja o pico de retenção na revisão de véspera. Seu painel interativo permanece ativo até <strong>24 horas após a aplicação da última prova do certame (protocolo D+1)</strong>: o tempo cirúrgico para você realizar o <em>debriefing</em> pós-prova, cruzar o gabarito preliminar com o seu caderno de erros, mapear fundamentações para eventuais recursos e encerrar a missão. Além disso, o seu <strong>Guia Tático completo em PDF A4</strong> fica salvo com você de forma definitiva.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-trigger" type="button">
+                            <span>02. Qual é o prazo de entrega do meu painel e do Guia em PDF?</span>
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-content">
+                            Após preencher o diagnóstico pós-compra (leva cerca de 5 minutos), nossa equipe processa o seu edital e entrega o seu ambiente individual completo em <strong>até 24 horas</strong> nos planos Tático e Arsenal. Caso você opte pelo <strong>Nível Elite</strong>, seu pedido entra na fila de prioridade máxima com <strong>entrega expressa em até 6 horas</strong>.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-trigger" type="button">
+                            <span>03. Como funciona a Garantia de 7 Dias de Calibração e Ajuste?</span>
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-content">
+                            Uma coisa é imaginar que você consegue estudar 4 horas por dia; outra é colocar isso em prática na rotina real. Por isso, a partir da entrega do seu painel, você conta com <strong>7 dias grátis de calibração assistida</strong>: se sentir que os blocos diários ficaram intensos demais, leves demais ou se algum compromisso da sua semana mudou, basta solicitar o ajuste e recalibramos toda a distribuição até a prova sem nenhum custo adicional.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-trigger" type="button">
+                            <span>04. A CRIVOS substitui as videoaulas ou PDFs extensos do meu cursinho?</span>
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-content">
+                            A CRIVOS é o seu sistema de inteligência, direção estratégica e retenção de memória. Nos níveis Arsenal e Elite você já recebe resumos táticos direcionados para os tópicos de maior peso, flashcards SM-2 e questões diagnósticas no perfil da banca, usando materiais extensos apenas para consulta pontual quando estritamente necessário.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-trigger" type="button">
+                            <span>05. Preciso instalar algum aplicativo ou pagar mensalidade?</span>
+                            <span class="faq-icon">+</span>
+                        </button>
+                        <div class="faq-content">
+                            Não precisa instalar nada e não há nenhuma cobrança mensal. O pagamento é 100% único para o seu edital e o painel funciona direto no navegador do computador, tablet ou celular, acompanhado do Guia de Estudos em PDF A4 pronto para impressão.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 12. FINAL CONVERSION BANNER -->
+        <section class="cta-banner">
+            <div class="container">
+                <span class="mono-tag red">ENTREGA EM ATÉ 24H // 6H NO ELITE</span>
+                <h2>PARE DE ESTUDAR NO ESCURO. COMECE A EXECUTAR COM DADOS.</h2>
+                <p>
+                    Transforme seu edital publicado em uma rota diária exata até o domingo da prova, priorizada por peso estatístico e blindada contra o esquecimento.
+                </p>
+                <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                    <a href="#precos" class="btn btn-primary">Escolher Meu Plano Agora →</a>
+                    <a href="https://crivos-demo.pages.dev" target="_blank" rel="noopener" class="btn btn-secondary">Explorar Demonstração Ao Vivo ↗</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 13. INSTITUTIONAL FOOTER (CRIVOS EM INTER) -->
+        <footer class="footer">
+            <div class="container">
+                <div class="footer-grid">
+                    <div>
+                        <a href="#" class="brand" style="margin-bottom: 0.8rem;">
+                            <span class="brand-sq"></span>
+                            <span class="brand-name">CRIVOS</span>
+                        </a>
+                        <p style="color: var(--text-muted); max-width: 360px;">
+                            Inteligência tática pós-edital, mapeamento estatístico de bancas e sistemas individuais de retenção para concursos e exames de alta concorrência.
+                        </p>
+                    </div>
+
+                    <div class="footer-links">
+                        <a href="#demonstracao">Simulador</a>
+                        <a href="#anatomia">O Sistema</a>
+                        <a href="#como-funciona">Como Funciona</a>
+                        <a href="#precos">Planos</a>
+                        <a href="https://crivos-demo.pages.dev" target="_blank" rel="noopener">Demo Ao Vivo ↗</a>
+                        <a href="/login.html">Área do Candidato ↗</a>
+                    </div>
+                </div>
+
+                <div class="footer-bottom">
+                    <span>© 2026 CRIVOS (CRIVOS.ME) — TODOS OS DIREITOS RESERVADOS.</span>
+                    <span>ENGENHARIA TÁTICA PARA CONCURSOS E EXAMES</span>
+                </div>
+            </div>
+        </footer>
+
     </div>
 
-    <div class="nav-actions">
-      <a href="/login.html" class="btn btn-outline" style="font-size:12px;padding:8px 14px;border-color:var(--border-color);font-weight:700;">Área do Candidato ↗</a>
-      <a href="#precos" class="btn btn-primary">Montar Meu Plano →</a>
-      <button type="button" id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Menu de Navegação">☰ MENU</button>
-    </div>
-  </nav>
-
-  <!-- DRAWER MOBILE DE NAVEGAÇÃO -->
-  <div id="mobile-nav-drawer" class="mobile-nav-drawer">
-    <a href="#como-funciona" class="mobile-nav-link">01. Como Funciona</a>
-    <a href="#anatomia" class="mobile-nav-link">02. Anatomia do Plano</a>
-    <a href="#demonstracao" class="mobile-nav-link">03. Demonstração Ao Vivo</a>
-    <a href="#precos" class="mobile-nav-link">04. Tabela de Preços</a>
-    <a href="#faq" class="mobile-nav-link">05. Perguntas Frequentes (FAQ)</a>
-    <a href="/login.html" class="btn btn-outline" style="width:100%;margin-top:10px;text-align:center;font-weight:700;">ÁREA DO CANDIDATO ↗</a>
-    <a href="#precos" class="btn btn-primary" style="width:100%;margin-top:8px;">Montar Meu Plano →</a>
-  </div>
-
-  <!-- ======================================================== -->
-  <!-- B. HERO SECTION (A GRANDE PROMESSA)                      -->
-  <!-- ======================================================== -->
-  <section class="hero-section">
-    <div class="container">
-      <div class="hero-badge">
-        <span class="pulse-dot"></span>
-        <span>[ ENTREGA EM ATÉ 48H • FEITO SOB DEMANDA • PRIVACIDADE LOCAL ]</span>
-      </div>
-
-      <div class="hero-grid">
-        <div>
-          <h1 class="hero-headline">
-            VOCÊ NOS ENTREGA SEU EDITAL E SUA ROTINA. NÓS DEVOLVEMOS SEU PLANO DE APROVAÇÃO MASTIGADO, DIA A DIA.
-          </h1>
-
-          <p class="hero-subhead">
-            Engenharia de estudos e planejamento tático pós-edital sob demanda ("Done-For-You"). Não é um aplicativo vazio nem template de Notion; é um Sistema Operacional de Estudos individual, acessível por qualquer dispositivo com internet, fechado e calibrado para a sua rotina exata.
-          </p>
-
-          <div class="hero-cta-group">
-            <a href="#precos" class="btn btn-primary btn-lg">
-              [ MONTAR MEU PLANO DE APROVAÇÃO ]
-            </a>
-            <a href="https://crivos-demo.pages.dev" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-lg">
-              [ ACESSAR DEMONSTRAÇÃO AO VIVO ] ↗
-            </a>
-          </div>
-
-          <div class="hero-guarantees">
-            <div class="hero-guarantee-item">
-              <span>✓</span> Entrega em até 48h
-            </div>
-            <span>·</span>
-            <div class="hero-guarantee-item">
-              <span>✓</span> 100% Calibrado para sua rotina
-            </div>
-            <span>·</span>
-            <div class="hero-guarantee-item">
-              <span>✓</span> Privacidade local absoluta
-            </div>
-          </div>
-        </div>
-
-        <!-- Asset Visual: Print / Mockup Interativo do Painel com Animação Flutuante -->
-        <div class="hero-mockup-wrapper">
-          <div class="hero-mockup-frame">
-            <div class="mockup-window-header">
-              <div class="mockup-window-dots">
-                <span class="mockup-dot"></span>
-                <span class="mockup-dot"></span>
-                <span class="mockup-dot"></span>
-              </div>
-              <div class="mockup-window-url">crivos-demo.pages.dev</div>
-              <div class="mockup-live-tag">AO VIVO</div>
-            </div>
-
-            <div class="mockup-header-strip">
-              <div class="mockup-user-info">
-                <div class="mockup-avatar">CR</div>
-                <div>
-                  <div class="mockup-cand-label">CANDIDATO: <b>AUDITOR // SEFAZ</b></div>
-                  <div class="mockup-plan-name">EDITAL ALVO: AUDITOR FISCAL 2026</div>
-                </div>
-              </div>
-              <div class="mockup-countdown-pill">
-                <span class="mockup-cd-txt">PROVA EM</span>
-                <span class="mockup-cd-num">86 DIAS</span>
-              </div>
-            </div>
-
-            <div class="mockup-body-grid">
-              <div class="mockup-body-left">
-                <div class="mockup-widget-title">HOJE • CICLO ELÁSTICO (3.5H)</div>
-                <div class="mockup-task-item done">
-                  <span class="mockup-check">✓</span>
-                  <div class="mockup-task-text">
-                    <b>TI &amp; BANCO DE DADOS</b>
-                    <span>Modelagem + 20 Questões Cebraspe</span>
-                  </div>
-                </div>
-                <div class="mockup-task-item current">
-                  <span class="mockup-play">►</span>
-                  <div class="mockup-task-text">
-                    <b>DIR. TRIBUTÁRIO (EM CURSO)</b>
-                    <span>Impostos Estaduais (ICMS) • 45m</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="mockup-body-right">
-                <div class="mockup-widget-title">RETENÇÃO SM-2</div>
-                <div class="mockup-stat-box">
-                  <span class="mockup-stat-val">94.8%</span>
-                  <span class="mockup-stat-lbl">ÍNDICE DE ACERTO</span>
-                </div>
-                <div class="mockup-pomo-box">
-                  <span>POMODORO // ATIVO</span>
-                  <b>25:00</b>
-                </div>
-              </div>
-            </div>
-
-            <div class="mockup-footer-strip">
-              <span>SISTEMA OPERACIONAL CRIVOS • ROTINA CALIBRADA</span>
-              <a href="https://crivos-demo.pages.dev" target="_blank" rel="noopener noreferrer" class="mockup-open-btn">[TESTAR AO VIVO ↗]</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- LIVE TICKER TÉCNICO -->
-  <div class="ticker-banner">
-    <div class="ticker-track">
-      <div class="ticker-item"><span class="sq-red">■</span> ENGENHARIA DE EDITAIS SOB DEMANDA</div>
-      <div class="ticker-item">MÉDIA DE ENTREGA: 34H20M</div>
-      <div class="ticker-item">TAXA DE ADERÊNCIA DE CRONOGRAMA: 93.4%</div>
-      <div class="ticker-item">BANCO SM-2 INTEGRADO</div>
-      <div class="ticker-item">SEM APLICATIVOS PESADOS</div>
-      <div class="ticker-item">RODA EM QUALQUER CELULAR OU PC</div>
-      <div class="ticker-item"><span class="sq-red">■</span> PRIVACIDADE LOCAL ABSOLUTA</div>
-      <div class="ticker-item">CALIBRAÇÃO ATIVA: CEBRASPE // FGV // FCC // VUNESP // VESTIBULARES // PÓS-GRADUAÇÃO</div>
-      <!-- Repetição contínua para o loop linear do ticker -->
-      <div class="ticker-item"><span class="sq-red">■</span> ENGENHARIA DE EDITAIS SOB DEMANDA</div>
-      <div class="ticker-item">MÉDIA DE ENTREGA: 34H20M</div>
-      <div class="ticker-item">TAXA DE ADERÊNCIA DE CRONOGRAMA: 93.4%</div>
-      <div class="ticker-item">BANCO SM-2 INTEGRADO</div>
-      <div class="ticker-item">SEM APLICATIVOS PESADOS</div>
-      <div class="ticker-item">RODA EM QUALQUER CELULAR OU PC</div>
-    </div>
-  </div>
-
-  <!-- ======================================================== -->
-  <!-- DEMONSTRAÇÃO DO ENTREGÁVEL INTERATIVO                    -->
-  <!-- ======================================================== -->
-  <section class="section section-alt" id="demonstracao">
-    <div class="container">
-      <div class="section-meta">[SYS.01 // DEMONSTRAÇÃO DO ENTREGÁVEL]</div>
-      <h2 class="section-title">PAINEL DE AUDITORIA &amp; EXECUÇÃO SOB DEMANDA</h2>
-      <p class="section-desc">
-        Abaixo, você visualiza a arquitetura real do painel que entregamos. Sem planilhas vazias: cada matéria mapeada por relevância estatística na banca, com distribuição dia a dia e reagendamento elástico.
-      </p>
-
-      <div class="demo-canvas">
-        <div class="demo-topbar">
-          <div class="demo-title-group">
-            <span class="demo-badge">PAINEL ATIVO</span>
-            <span class="demo-target">EXEMPLAR: AUDITOR TÉCNICO // CEBRASPE</span>
-          </div>
-
-          <div class="demo-metrics">
-            <div class="demo-metric-item">
-              <span>HORAS DECLARADAS:</span> <strong>24H / SEMANA</strong>
-            </div>
-            <div class="demo-metric-item">
-              <span>PROVA EM:</span> <strong style="color:var(--crivos-red);">86 DIAS</strong>
-            </div>
-            <div class="demo-metric-item">
-              <span>COBERTURA TEÓRICA:</span> <strong style="color:var(--crivos-blue);">94.8%</strong>
-            </div>
-          </div>
-        </div>
-
-        <div class="demo-columns">
-          <!-- Coluna 1: Raio-X por Peso -->
-          <div class="demo-col">
-            <div class="demo-col-header">
-              <span class="demo-col-title">[01] RAIO-X // PESO NA BANCA</span>
-              <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--crivos-blue);">PESQUISA ATIVA</span>
-            </div>
-            <p style="font-size:12px;margin-bottom:12px;">Disciplinas ordenadas por relevância e incidência na prova.</p>
-
-            <div class="demo-table-wrapper"><table class="demo-table">
-              <thead>
-                <tr>
-                  <th>Disciplina</th>
-                  <th style="text-align:right;">Peso</th>
-                  <th style="text-align:center;">Pri.</th>
-                  <th style="text-align:right;">Carga</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><b>TI &amp; Bancos de Dados</b></td>
-                  <td style="text-align:right;color:var(--crivos-red);font-weight:700;">22.0%</td>
-                  <td style="text-align:center;"><span class="tag-p0">P0</span></td>
-                  <td style="text-align:right;">5.5h/sem</td>
-                </tr>
-                <tr>
-                  <td><b>Dir. Administrativo</b></td>
-                  <td style="text-align:right;font-weight:600;">18.5%</td>
-                  <td style="text-align:center;"><span class="tag-p1">P1</span></td>
-                  <td style="text-align:right;">4.5h/sem</td>
-                </tr>
-                <tr>
-                  <td><b>Controle Externo</b></td>
-                  <td style="text-align:right;color:var(--crivos-red);font-weight:700;">17.0%</td>
-                  <td style="text-align:center;"><span class="tag-p0">P0</span></td>
-                  <td style="text-align:right;">4.0h/sem</td>
-                </tr>
-                <tr>
-                  <td><b>Língua Portuguesa</b></td>
-                  <td style="text-align:right;">13.5%</td>
-                  <td style="text-align:center;"><span class="tag-p2">P2</span></td>
-                  <td style="text-align:right;">3.0h/sem</td>
-                </tr>
-                <tr>
-                  <td><b>Dir. Constitucional</b></td>
-                  <td style="text-align:right;">11.0%</td>
-                  <td style="text-align:center;"><span class="tag-p2">P2</span></td>
-                  <td style="text-align:right;">2.5h/sem</td>
-                </tr>
-              </tbody>
-            </table></div>
-
-            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-muted);">
-              *Regra de Pareto: 60% do seu tempo dedicado nos 80% das chances de aprovação.
-            </div>
-          </div>
-
-          <!-- Coluna 2: Cronograma Diário -->
-          <div class="demo-col">
-            <div class="demo-col-header">
-              <span class="demo-col-title">[02] MATRIZ DIÁRIA // CRONOGRAMA</span>
-              <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--crivos-red);font-weight:700;">ELÁSTICO</span>
-            </div>
-
-            <!-- Dia 1 -->
-            <div class="demo-day-card">
-              <div class="demo-day-head">
-                <span>SEGUNDA-FEIRA • 3.5H LÍQUIDAS</span>
-                <span style="color:var(--crivos-blue);">CONCLUÍDO</span>
-              </div>
-              <div class="demo-task-row">
-                <div class="demo-task-box done">✓</div>
-                <div>
-                  <strong>TI: Modelagem Dimensional &amp; SQL</strong>
-                  <div style="color:var(--ink-muted);font-size:11px;">Teoria resumida + 25 questões recentes Cebraspe</div>
-                </div>
-              </div>
-              <div class="demo-task-row">
-                <div class="demo-task-box done">✓</div>
-                <div>
-                  <strong>Dir. Administrativo: Licitações (Lei 14.133/21)</strong>
-                  <div style="color:var(--ink-muted);font-size:11px;">Modalidades de Contratação + 15 questões</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Dia 2 (Ativo) -->
-            <div class="demo-day-card active">
-              <div class="demo-day-head">
-                <span style="color:var(--crivos-red);">HOJE • EM ANDAMENTO (3.5H)</span>
-                <span style="background:var(--crivos-red);color:#FFF;padding:1px 6px;font-size:10px;">AO VIVO</span>
-              </div>
-              <div class="demo-task-row">
-                <div class="demo-task-box done">✓</div>
-                <div>
-                  <strong>Controle Externo: Regimento e Súmulas</strong>
-                  <div style="color:var(--ink-muted);font-size:11px;">Concluído em 1h45m • Acerto: 90%</div>
-                </div>
-              </div>
-              <div class="demo-task-row">
-                <div class="demo-task-box" style="border-color:var(--crivos-red);color:var(--crivos-red);">►</div>
-                <div>
-                  <strong style="color:var(--crivos-red);">TI: Governança COBIT e ITIL v4</strong>
-                  <div style="color:var(--ink-primary);font-size:11px;font-weight:600;">Meta: 45 min de fichamento + Flashcards SM-2</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Coluna 3: Retenção e Algoritmo SM-2 -->
-          <div class="demo-col">
-            <div class="demo-col-header">
-              <span class="demo-col-title">[03] RETENÇÃO SM-2</span>
-              <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--crivos-red);font-weight:700;">ALGORITMO</span>
-            </div>
-
-            <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px;">
-              <div style="border:1px solid var(--border-color);padding:10px;background:var(--bg-subtle);">
-                <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;margin-bottom:4px;">
-                  <span>REVISÃO D+1 (IMEDIATA)</span>
-                  <span style="color:var(--crivos-blue);">3 PENDENTES</span>
-                </div>
-                <div class="demo-progress-track">
-                  <div style="width:75%;height:100%;background:var(--crivos-blue);"></div>
-                </div>
-              </div>
-
-              <div style="border:1px solid var(--border-color);padding:10px;background:var(--bg-subtle);">
-                <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;margin-bottom:4px;">
-                  <span>REVISÃO D+7 (LATENTE)</span>
-                  <span style="color:var(--crivos-red);">5 PENDENTES</span>
-                </div>
-                <div class="demo-progress-track">
-                  <div style="width:50%;height:100%;background:var(--crivos-red);"></div>
-                </div>
-              </div>
-            </div>
-
-            <div style="border:1px solid var(--border-color);padding:12px;background:var(--bg-card);box-shadow:var(--shadow-hard);">
-              <div style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:var(--ink-muted);margin-bottom:4px;">ÚLTIMO SIMULADO AUDITADO</div>
-              <div style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:800;color:var(--crivos-red);line-height:1;">79.2%</div>
-              <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-muted);margin-top:4px;">CORTE ESTIMADO DA BANCA: 73.5%</div>
-            </div>
-          </div>
-        </div>
-
-        <div style="background:var(--bg-dark);color:var(--ink-inverted);padding:10px 20px;font-family:'JetBrains Mono',monospace;font-size:11px;display:flex;justify-content:space-between;align-items:center;">
-          <span>LINK EXCLUSIVO INDIVIDUAL • ARQUITETURA FECHADA PARA SUA ROTINA</span>
-          <a href="https://crivos-demo.pages.dev" target="_blank" rel="noopener noreferrer" style="color:#FFF;text-decoration:underline;">ABRIR DEMONSTRAÇÃO COMPLETA NO NAVEGADOR ↗</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ======================================================== -->
-  <!-- C. SEÇÃO: "A ANATOMIA DE UM PLANO CRIVOS" (4 CARDS)        -->
-  <!-- ======================================================== -->
-  <section class="section" id="anatomia">
-    <div class="container">
-      <div class="section-meta">[SYS.02 // ARQUITETURA DE ENGENHARIA]</div>
-      <h2 class="section-title">A ANATOMIA DE UM PLANO CRIVOS</h2>
-      <p class="section-desc">
-        Tratamos a sua preparação como um problema de engenharia de tempo e alocação de recursos finitos. Cada elemento do seu Sistema Operacional foi calibrado para eliminar o atrito e garantir execução fria.
-      </p>
-
-      <div class="anatomy-grid">
-        <!-- Card 1 -->
-        <div class="anatomy-card">
-          <div>
-            <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-color);padding-bottom:8px;">
-              <span class="card-num">[01]</span>
-              <span class="card-tag">ROTINA &amp; TEMPO</span>
-            </div>
-            <h3 class="card-title">CRONOGRAMA DIÁRIO ELÁSTICO</h3>
-            <p class="card-desc">
-              Distribuição exata das horas livres da semana com reagendamento automático de atrasos. Imprevistos acontecem: o sistema redistribui os tópicos pendentes sem acúmulo e sem peso na consciência.
-            </p>
-          </div>
-          <div class="card-badge-bottom">ZERO CULPA DE ATRASO</div>
-        </div>
-
-        <!-- Card 2 -->
-        <div class="anatomy-card">
-          <div>
-            <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-color);padding-bottom:8px;">
-              <span class="card-num">[02]</span>
-              <span class="card-tag">ALFAJATARIA PURA</span>
-            </div>
-            <h3 class="card-title">CÁLCULO DE DISPONIBILIDADE</h3>
-            <p class="card-desc">
-              O sistema se molda à sua carga horária real (seja 3h/dia ou 8h/dia). Nada de cronogramas irreais de cursinho: desenhamos a malha de estudos para o tempo exato que você de fato consegue cumprir.
-            </p>
-          </div>
-          <div class="card-badge-bottom">ADERÊNCIA MATEMÁTICA REAL</div>
-        </div>
-
-        <!-- Card 3 -->
-        <div class="anatomy-card">
-          <div>
-            <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-color);padding-bottom:8px;">
-              <span class="card-num">[03]</span>
-              <span class="card-tag">CIÊNCIA COGNITIVA</span>
-            </div>
-            <h3 class="card-title">MÓDULO DE RETENÇÃO (SM-2)</h3>
-            <p class="card-desc">
-              Banco de flashcards integrados e mapeamento dos tópicos essenciais do edital. Com a repetição espaçada calculada pelo algoritmo SuperMemo-2, os temas mais difíceis são fixados até o dia do exame.
-            </p>
-          </div>
-          <div class="card-badge-bottom">MEMÓRIA DE LONGO PRAZO</div>
-        </div>
-
-        <!-- Card 4 -->
-        <div class="anatomy-card">
-          <div>
-            <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-color);padding-bottom:8px;">
-              <span class="card-num">[04]</span>
-              <span class="card-tag">PRONTO PARA USAR</span>
-            </div>
-            <h3 class="card-title">ENTREGA PRONTA PARA EXECUÇÃO</h3>
-            <p class="card-desc">
-              Painel individual fechado via link exclusivo, sem precisar configurar nada. Não perde tempo montando tabelas ou ajustando aplicativos: você abre o link e sua tarefa do dia já está na tela.
-            </p>
-          </div>
-          <div class="card-badge-bottom">BASTA ABRIR E EXECUTAR</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ======================================================== -->
-  <!-- D. SEÇÃO: "COMO FUNCIONA EM 3 ETAPAS EXATAS"              -->
-  <!-- ======================================================== -->
-  <section class="section section-alt" id="como-funciona">
-    <div class="container">
-      <div class="section-meta">[SYS.03 // FLUXO OPERACIONAL]</div>
-      <h2 class="section-title">COMO FUNCIONA EM 3 ETAPAS EXATAS</h2>
-      <p class="section-desc">
-        Você gasta apenas 5 minutos preenchendo o diagnóstico inicial. Todo o trabalho analítico, de peso de matérias e cronometria é executado pela nossa engenharia.
-      </p>
-
-      <div class="steps-grid">
-        <!-- Passo 1 -->
-        <div class="step-card">
-          <div>
-            <div class="step-num-badge">01</div>
-            <span class="step-subtag">ENTRADA // 5 MINUTOS</span>
-            <h3 class="step-title">DIAGNÓSTICO E ENVIO</h3>
-            <p class="step-desc">
-              Você envia o PDF do edital da sua banca (ou informa o concurso e cargo pretendido) e a sua disponibilidade de estudos na semana (dias, turnos e horas disponíveis por dia).
-            </p>
-          </div>
-          <div class="step-footer-meta">FORMULÁRIO SEGURO E OBJETIVO</div>
-        </div>
-
-        <!-- Passo 2 -->
-        <div class="step-card highlight">
-          <div style="position:absolute;top:0;right:0;background:var(--crivos-red);color:#FFF;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;padding:2px 8px;text-transform:uppercase;">
-            ETAPA TÉCNICA
-          </div>
-          <div>
-            <div class="step-num-badge">02</div>
-            <span class="step-subtag">ENGENHARIA // EM ATÉ 48H</span>
-            <h3 class="step-title">PERSONALIZAÇÃO DE CARGA E EDITAL</h3>
-            <p class="step-desc">
-              Nossa engenharia processa os conteúdos, pesos e prazos, transformando em metas diárias executáveis. Cruzamos a incidência estatística da banca para alocar o tempo onde os pontos realmente estão.
-            </p>
-          </div>
-          <div class="step-footer-meta" style="color:var(--crivos-red);font-weight:700;">AUDITORIA HUMANA + MODELAGEM TÉCNICA</div>
-        </div>
-
-        <!-- Passo 3 -->
-        <div class="step-card">
-          <div>
-            <div class="step-num-badge">03</div>
-            <span class="step-subtag">REMESSA // LINK DIRETO</span>
-            <h3 class="step-title">ENTREGA E CALIBRAÇÃO</h3>
-            <p class="step-desc">
-              Em até 48 horas, você recebe seu link exclusivo de acesso ao seu Sistema Operacional de Estudos pronto para rodar no celular, tablet ou computador, com 7 dias de garantia para ajustes finos.
-            </p>
-          </div>
-          <div class="step-footer-meta">GARANTIA DE ADAPTAÇÃO TOTAL</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ======================================================== -->
-  <!-- E. TABELA DE PREÇOS E CHECKOUT (ESCADA DE VALOR)          -->
-  <!-- ======================================================== -->
-  <section class="section" id="precos">
-    <div class="container">
-      <div class="section-meta">[SYS.04 // ESTRUTURA DE PLANOS &amp; ORDER BUMPS]</div>
-      <h2 class="section-title">TABELA DE PREÇOS // PLANOS SOB DEMANDA</h2>
-      <p class="section-desc">
-        Investimento único e transparente. Sem mensalidades recorrentes ou renovações surpresa: você paga uma única vez e o painel é seu até o dia da prova.
-      </p>
-
-      <div class="pricing-grid">
-        <!-- NÍVEL 1: TÁTICO -->
-        <div class="price-card">
-          <div>
-            
-            <h3 class="price-title">NÍVEL 1: TÁTICO</h3>
-            <div class="price-focus">FOCO EM EXECUÇÃO</div>
-
-            <div class="price-box">
-              <span class="price-currency">R$</span>
-              <span class="price-amount">67</span>
-              <span class="price-terms">/ PAGAMENTO ÚNICO</span>
-            </div>
-
-            <ul class="price-features">
-              <li class="price-feature-item">
-                <span class="price-check">■</span>
-                <span>Cabeçalho personalizado com nome e concurso</span>
-              </li>
-              <li class="price-feature-item">
-                <span class="price-check">■</span>
-                <span>Contadores Regressivos oficiais da prova</span>
-              </li>
-              <li class="price-feature-item">
-                <span class="price-check">■</span>
-                <span>Cronograma Diário Inteligente com Reagendamento Elástico</span>
-              </li>
-              <li class="price-feature-item">
-                <span class="price-check">■</span>
-                <span>Pomodoro com registro de horas e Checklist de prova</span>
-              </li>
-              <li class="price-feature-item">
-                <span class="price-check">■</span>
-                <span>Acesso imediato no celular e computador via link seguro</span>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <a href="/payment.html?produto=tatico" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="width:100%;">
-              ADQUIRIR NÍVEL TÁTICO
-            </a>
-          </div>
-        </div>
-
-        <!-- NÍVEL 2: ARSENAL (ORDER BUMP 1 - DESTACADO) -->
-        <div class="price-card featured">
-          <div class="price-card-tag">MAIS ESCOLHIDO • ALTA RETENÇÃO</div>
-          <div>
-            
-            <h3 class="price-title">NÍVEL 2: ARSENAL</h3>
-            <div class="price-focus">FOCO EM RETENÇÃO &amp; MEMÓRIA</div>
-
-            <div class="bump-badge">+R$ 57 no checkout ou individual</div>
-
-            <div class="price-box">
-              <span class="price-currency">R$</span>
-              <span class="price-amount">124</span>
-              <span class="price-terms">/ PAGAMENTO ÚNICO</span>
-            </div>
-
-            <ul class="price-features">
-              <li class="price-feature-item highlight">
-                <span class="price-check">■</span>
-                <span>Tudo do Nível Tático incluído</span>
-              </li>
-              <li class="price-feature-item highlight">
-                <span class="price-check">■</span>
-                <span>Mapeamento dos Top Tópicos por prioridade (Essencial, Importante, Secundário)</span>
-              </li>
-              <li class="price-feature-item highlight">
-                <span class="price-check">■</span>
-                <span>Banco de Flashcards prontos com algoritmo SuperMemo-2 (SM-2)</span>
-              </li>
-              <li class="price-feature-item highlight">
-                <span class="price-check">■</span>
-                <span>Mapa / Grafo de Conexões conceituais interativo</span>
-              </li>
-              <li class="price-feature-item">
-                <span class="price-check">■</span>
-                <span>Ciclos automáticos de revisão espaçada (D+1, D+7, D+14, D+28)</span>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <a href="/payment.html?produto=arsenal" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="width:100%;">
-              ADQUIRIR PACOTE ARSENAL →
-            </a>
-          </div>
-        </div>
-
-        <!-- NÍVEL 3: ELITE (ORDER BUMP 2) -->
-        <div class="price-card">
-          <div>
-            
-            <h3 class="price-title">NÍVEL 3: ELITE</h3>
-            <div class="price-focus">FOCO EM BANCA E PRESSÃO</div>
-
-            <div class="bump-badge">+R$ 97 no checkout ou pacote integral</div>
-
-            <div class="price-box">
-              <span class="price-currency">R$</span>
-              <span class="price-amount">221</span>
-              <span class="price-terms">/ PAGAMENTO ÚNICO</span>
-            </div>
-
-            <ul class="price-features">
-              <li class="price-feature-item highlight">
-                <span class="price-check">■</span>
-                <span>Tudo do Nível Arsenal incluído</span>
-              </li>
-              <li class="price-feature-item highlight">
-                <span class="price-check">■</span>
-                <span>Questões e Simulador de Discursivas/Redação cronometrado</span>
-              </li>
-              <li class="price-feature-item highlight">
-                <span class="price-check">■</span>
-                <span>Grade técnica de autocorreção espelhada nos critérios da banca</span>
-              </li>
-              <li class="price-feature-item highlight">
-                <span class="price-check">■</span>
-                <span>Módulo de Treino de Prova Oral / Defesa de Projeto</span>
-              </li>
-              <li class="price-feature-item">
-                <span class="price-check">■</span>
-                <span>Temporizador de resposta em voz alta com feedback estrutural</span>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <a href="/payment.html?produto=elite" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="width:100%;">
-              PACOTE COMPLETO ELITE
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ======================================================== -->
-  <!-- F. SEÇÃO FAQ (PERGUNTAS FREQUENTES)                      -->
-  <!-- ======================================================== -->
-  <section class="section section-alt" id="faq">
-    <div class="container">
-      <div class="section-meta">[SYS.05 // DÚVIDAS RECORRENTES]</div>
-      <h2 class="section-title">PERGUNTAS FREQUENTES (FAQ)</h2>
-      <p class="section-desc">
-        Respostas diretas e transparentes sobre a metodologia, entrega e tecnologia do CRIVOS.
-      </p>
-
-      <div class="faq-list">
-        <!-- FAQ 1 -->
-        <details class="faq-item">
-          <summary class="faq-question">
-            <span>01. O EDITAL DO MEU CONCURSO OU EXAME É ATENDIDO?</span>
-            <span class="faq-icon">+</span>
-          </summary>
-          <div class="faq-answer">
-            Sim. Cobrimos concursos públicos de todas as esferas (federais, estaduais e municipais), exames de conselhos de classe profissionais (OAB, CFC, CRM), ENEM, vestibulares de alta densidade (Medicina, ITA, IME), exames ANPEC e ANPAD, além de seleções acadêmicas de pós-graduação (Mestrado e Doutorado em universidades públicas). Nossa equipe de engenharia analisa a ementa de qualquer edital publicado ou histórico recente.
-          </div>
-        </details>
-
-        <!-- FAQ 2 -->
-        <details class="faq-item">
-          <summary class="faq-question">
-            <span>02. COMO RECEBO MEU ACESSO APÓS A COMPRA?</span>
-            <span class="faq-icon">+</span>
-          </summary>
-          <div class="faq-answer">
-            Em até 48 horas após você enviar o PDF do edital e sua disponibilidade semanal de horários através do nosso formulário seguro, você receberá no seu e-mail e WhatsApp o link individual exclusivo de acesso ao seu Sistema Operacional de Estudos CRIVOS, completamente configurado e pronto para rodar.
-          </div>
-        </details>
-
-        <!-- FAQ 3 -->
-        <details class="faq-item">
-          <summary class="faq-question">
-            <span>03. ONDE MEUS DADOS DE ESTUDO E PROGRESSO FICAM SALVOS?</span>
-            <span class="faq-icon">+</span>
-          </summary>
-          <div class="faq-answer">
-            No seu próprio aparelho via armazenamento local seguro (Local Storage nativo com criptografia de sessão), garantindo privacidade absoluta e velocidade instantânea de carregamento, mesmo em conexões lentas ou instáveis. Você também pode exportar e sincronizar seu histórico sempre que desejar.
-          </div>
-        </details>
-
-        <!-- FAQ 4 -->
-        <details class="faq-item" open="">
-          <summary class="faq-question">
-            <span>04. O QUE PRECISO INSTALAR NO MEU COMPUTADOR OU CELULAR?</span>
-            <span class="faq-icon">+</span>
-          </summary>
-          <div class="faq-answer">
-            Absolutamente nada. O CRIVOS roda 100% no navegador (Chrome, Safari, Edge, Firefox), de forma ultraleve e responsiva. Sem aplicativos pesados para baixar, sem travar seu telefone e sem assinaturas de softwares de terceiros.
-          </div>
-        </details>
-      </div>
-    </div>
-  </section>
-
-  <!-- ======================================================== -->
-  <!-- BANNER FINAL DE CONVERSÃO TÉCNICA                        -->
-  <!-- ======================================================== -->
-  <section class="final-cta-section">
-    <div class="container">
-      <div style="display:inline-flex;align-items:center;gap:8px;background:#222;border:1px solid #444;padding:4px 10px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--crivos-red);margin-bottom:20px;">
-        <span class="sq-red">■</span> SLOTS DE CALIBRAÇÃO ABERTOS ESTA SEMANA
-      </div>
-      <h2>
-        PARE DE PERDER SEMANAS MONTANDO CRONOGRAMAS. SEU PAPEL É SENTAR E ESTUDAR. O NOSSO É GARANTIR QUE VOCÊ ESTUDE O QUE CAI.
-      </h2>
-      <p>
-        Receba em até 48 horas seu plano cirúrgico, estruturado por especialistas com os pesos estatísticos da sua banca examinadora e calibrado para as suas horas reais.
-      </p>
-
-      <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;">
-        <a href="#precos" class="btn btn-primary btn-lg">
-          [ MONTAR MEU SISTEMA EM 48H ]
-        </a>
-        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#888;">
-          ✓ GARANTIA DE REVISÃO E AJUSTE DE 7 DIAS
-        </span>
-      </div>
-    </div>
-  </section>
-
-  <!-- ======================================================== -->
-  <!-- G. RODAPÉ INSTITUCIONAL                                  -->
-  <!-- ======================================================== -->
-  <footer class="site-footer">
-    <div class="container">
-      <div class="footer-grid">
-        <div class="footer-brand">
-          <div style="display:flex;align-items:center;gap:10px;">
-            <div class="nav-brand-logo"></div>
-            <span style="font-family:'Inter',sans-serif;font-weight:800;font-size:16px;">CRIVOS // SISTEMAS SOB DEMANDA</span>
-          </div>
-          <p style="font-size:13px;line-height:1.6;margin-top:4px;">
-            Sistemas operacionais de estudos pós-edital individuais e sob demanda. Metodologia orientada a dados, relevância estatística de banca e calibração de rotina humana.
-          </p>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-muted);margin-top:6px;">
-            FEITO POR E PARA CONCURSADOS.
-          </div>
-        </div>
-
-        <div>
-          <div class="footer-heading">[01] NAVEGAÇÃO</div>
-          <ul class="footer-links">
-            <li><a href="#como-funciona" class="footer-link">// Como Funciona</a></li>
-            <li><a href="#anatomia" class="footer-link">// Anatomia do Sistema</a></li>
-            <li><a href="#demonstracao" class="footer-link">// Painel Demonstrativo</a></li>
-            <li><a href="#precos" class="footer-link">// Tabela de Preços</a></li>
-            <li><a href="#faq" class="footer-link">// Perguntas Frequentes</a></li>
-            <li><a href="/login.html" class="footer-link" style="color:var(--crivos-red);font-weight:700;">// Área do Candidato (Login) ↗</a></li>
-          </ul>
-        </div>
-
-        <div>
-          <div class="footer-heading">[02] CONFORMIDADE</div>
-          <ul class="footer-links">
-            <li><span class="footer-link">Remessa: Até 48h úteis</span></li>
-            <li><span class="footer-link">Garantia: 7 dias corridos</span></li>
-            <li><span class="footer-link">Recalibração: Sem burocracia</span></li>
-            <li><span class="footer-link">Privacidade: Armazenamento Local</span></li>
-          </ul>
-        </div>
-
-        <div>
-          <div class="footer-heading">[03] DEMONSTRAÇÃO</div>
-          <p style="font-size:12px;margin-bottom:12px;color:var(--ink-muted);">
-            Acesse o protótipo funcional ao vivo em produção para testar a dinâmica:
-          </p>
-          <a href="https://crivos-demo.pages.dev" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="font-size:11px;padding:6px 12px;width:100%;text-align:center;">
-            crivos-demo.pages.dev ↗
-          </a>
-        </div>
-      </div>
-
-      <div class="footer-bottom">
-        <div>
-          © 2026 CRIVOS INTELIGÊNCIA E SISTEMAS DE ESTUDO LTDA. TODOS OS DIREITOS RESERVADOS.
-        </div>
-        <div style="display:flex;gap:16px;">
-          <span>TERMOS DE SERVIÇO</span>
-          <span>•</span>
-          <span>POLÍTICA DE PRIVACIDADE</span>
-          <span>•</span>
-          <span>SUPORTE DIRETO</span>
-        </div>
-      </div>
-    </div>
-  </footer>
-
-  <!-- Script leve de interatividade -->
-  <script src="script.js"></script>
-
-
+    <!-- BOTÃO FLUTUANTE DE MODO CLARO / ESCURO (DIRETO NO BODY, SEMPRE VISÍVEL NA TELA) -->
+    <button class="theme-floating-btn" id="theme-toggle" type="button" title="Alternar Modo Claro / Escuro" aria-label="Alternar Tema">
+        <span class="theme-icon-wrap" id="theme-icon">◐</span>
+    </button>
+
+    <!-- ==========================================================================
+         MODULAR INTERACTIVE JAVASCRIPT (RESPONSIVE CANVAS + GSAP + SIMULATOR)
+         ========================================================================== -->
+    <script>
+        (function () {
+            'use strict';
+
+            /* ------------------------------------------------------------------
+               1. CINEMATIC BOOT SEQUENCE (FAST, RESPONSIVE & SKIPPABLE)
+               ------------------------------------------------------------------ */
+            const bootOverlay = document.getElementById('boot-overlay');
+            const bootCounter = document.getElementById('boot-counter');
+            const bootBarFill = document.getElementById('boot-bar-fill');
+            const bootSkipBtn = document.getElementById('boot-skip');
+            const bootLines = document.querySelectorAll('.boot-line');
+            const bootShutters = document.querySelectorAll('.boot-shutter');
+            const pageWrapper = document.getElementById('page-wrapper');
+
+            let bootFinished = false;
+            let bootInterval = null;
+
+            function unlockInterface() {
+                if (bootFinished) return;
+                bootFinished = true;
+                if (bootInterval) clearInterval(bootInterval);
+
+                bootCounter.textContent = '100%';
+                bootBarFill.style.width = '100%';
+                pageWrapper.classList.add('glitch-slice');
+                setTimeout(() => {
+                    pageWrapper.classList.remove('glitch-slice');
+                }, 300);
+
+                if (window.gsap) {
+                    gsap.to(['.boot-top', '.boot-terminal', '.boot-bottom'], {
+                        opacity: 0,
+                        y: -12,
+                        duration: 0.2,
+                        ease: 'power2.in'
+                    });
+                    gsap.to(bootShutters, {
+                        scaleY: 0,
+                        duration: 0.5,
+                        stagger: 0.04,
+                        ease: 'power4.inOut',
+                        delay: 0.12,
+                        onComplete: () => {
+                            bootOverlay.style.display = 'none';
+                            if (window.ScrollTrigger) {
+                                ScrollTrigger.refresh();
+                            }
+                        }
+                    });
+                } else {
+                    bootOverlay.style.display = 'none';
+                }
+            }
+
+            bootSkipBtn.addEventListener('click', unlockInterface);
+
+            let progress = 0;
+            bootLines.forEach((line, idx) => {
+                setTimeout(() => {
+                    line.style.transition = 'opacity 0.18s ease, transform 0.18s ease';
+                    line.style.opacity = '1';
+                    line.style.transform = 'translateY(0)';
+                }, idx * 190);
+            });
+
+            bootInterval = setInterval(() => {
+                progress += Math.floor(Math.random() * 10) + 6;
+                if (progress >= 100) {
+                    progress = 100;
+                    bootCounter.textContent = '100%';
+                    bootBarFill.style.width = '100%';
+                    clearInterval(bootInterval);
+                    setTimeout(unlockInterface, 160);
+                } else {
+                    bootCounter.textContent = String(progress).padStart(2, '0') + '%';
+                    bootBarFill.style.width = progress + '%';
+                }
+            }, 60);
+
+            /* ------------------------------------------------------------------
+               2. DARK / LIGHT THEME TOGGLE (COM ANIMAÇÃO DE BOX E ÍCONE)
+               ------------------------------------------------------------------ */
+            const themeBtn = document.getElementById('theme-toggle');
+            const themeIcon = document.getElementById('theme-icon');
+            const savedTheme = localStorage.getItem('crivos_theme');
+
+            function updateThemeIcon(isDark) {
+                if (themeIcon) {
+                    themeIcon.textContent = isDark ? '◑' : '◐';
+                }
+            }
+
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                updateThemeIcon(true);
+            }
+
+            if (themeBtn) {
+                themeBtn.addEventListener('click', () => {
+                    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                    const nextIsDark = !isDark;
+
+                    if (nextIsDark) {
+                        document.documentElement.setAttribute('data-theme', 'dark');
+                        localStorage.setItem('crivos_theme', 'dark');
+                    } else {
+                        document.documentElement.removeAttribute('data-theme');
+                        localStorage.setItem('crivos_theme', 'light');
+                    }
+
+                    updateThemeIcon(nextIsDark);
+
+                    // Animação da box (bounce/recoil elástico)
+                    themeBtn.classList.remove('theme-box-bounce');
+                    void themeBtn.offsetWidth; // Força reflow do navegador
+                    themeBtn.classList.add('theme-box-bounce');
+
+                    // Animação do ícone (rotação de 360° com pulso de escala)
+                    if (themeIcon) {
+                        themeIcon.classList.remove('theme-icon-spin');
+                        void themeIcon.offsetWidth; // Força reflow do navegador
+                        themeIcon.classList.add('theme-icon-spin');
+                    }
+                });
+            }
+
+            /* ------------------------------------------------------------------
+               3. RESPONSIVE COORDINATE GRID CANVAS (RETINA + TOUCH + AUTO-PULSE)
+               ------------------------------------------------------------------ */
+            const canvas = document.getElementById('coord-canvas');
+            const ctx = canvas.getContext('2d');
+            let width = window.innerWidth;
+            let height = window.innerHeight;
+            let dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+            const pointer = { x: -9999, y: -9999, active: false };
+            let pulseAngle = 0;
+
+            function setCanvasSize() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                dpr = Math.min(window.devicePixelRatio || 1, 2);
+                canvas.width = width * dpr;
+                canvas.height = height * dpr;
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            }
+
+            let nodes = [];
+            function initNodes() {
+                setCanvasSize();
+                nodes = [];
+                const isMobile = width < 768;
+                const densityDivisor = isMobile ? 22000 : 30000;
+                const count = Math.max(18, Math.min(48, Math.floor((width * height) / densityDivisor)));
+                const speed = isMobile ? 0.28 : 0.38;
+
+                for (let i = 0; i < count; i++) {
+                    nodes.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        vx: (Math.random() - 0.5) * speed,
+                        vy: (Math.random() - 0.5) * speed,
+                        size: Math.random() > 0.75 ? 3 : 2
+                    });
+                }
+            }
+
+            initNodes();
+
+            let resizeTimer = null;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => {
+                    initNodes();
+                    if (window.ScrollTrigger) ScrollTrigger.refresh();
+                }, 120);
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                pointer.x = e.clientX;
+                pointer.y = e.clientY;
+                pointer.active = true;
+            }, { passive: true });
+
+            window.addEventListener('mouseleave', () => {
+                pointer.active = false;
+            }, { passive: true });
+
+            window.addEventListener('touchstart', (e) => {
+                if (e.touches && e.touches[0]) {
+                    pointer.x = e.touches[0].clientX;
+                    pointer.y = e.touches[0].clientY;
+                    pointer.active = true;
+                }
+            }, { passive: true });
+
+            window.addEventListener('touchmove', (e) => {
+                if (e.touches && e.touches[0]) {
+                    pointer.x = e.touches[0].clientX;
+                    pointer.y = e.touches[0].clientY;
+                    pointer.active = true;
+                }
+            }, { passive: true });
+
+            window.addEventListener('touchend', () => {
+                pointer.active = false;
+            }, { passive: true });
+
+            function renderCanvas() {
+                ctx.clearRect(0, 0, width, height);
+                const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                const isMobile = width < 768;
+
+                const gridStroke = isDark ? 'rgba(242, 242, 238, 0.03)' : 'rgba(17, 17, 17, 0.045)';
+                const nodeFill = isDark ? 'rgba(242, 242, 238, 0.22)' : 'rgba(17, 17, 17, 0.2)';
+
+                // Responsive static architectural grid
+                const step = isMobile ? 44 : 64;
+                ctx.strokeStyle = gridStroke;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                for (let x = 0; x <= width; x += step) {
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, height);
+                }
+                for (let y = 0; y <= height; y += step) {
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(width, y);
+                }
+                ctx.stroke();
+
+                // Autonomous telemetry focal point on mobile / idle so animation is always alive
+                pulseAngle += 0.012;
+                const focalX = pointer.active ? pointer.x : width * 0.5 + Math.cos(pulseAngle) * (width * 0.28);
+                const focalY = pointer.active ? pointer.y : height * 0.45 + Math.sin(pulseAngle * 0.8) * (height * 0.25);
+                const connectDist = isMobile ? 110 : 140;
+                const focalDist = isMobile ? 135 : 175;
+
+                for (let i = 0; i < nodes.length; i++) {
+                    const n = nodes[i];
+                    n.x += n.vx;
+                    n.y += n.vy;
+
+                    if (n.x < 0 || n.x > width) n.vx *= -1;
+                    if (n.y < 0 || n.y > height) n.vy *= -1;
+
+                    ctx.fillStyle = nodeFill;
+                    ctx.fillRect(n.x - n.size / 2, n.y - n.size / 2, n.size, n.size);
+
+                    // Connect nearby nodes
+                    for (let j = i + 1; j < nodes.length; j++) {
+                        const n2 = nodes[j];
+                        const dx = n.x - n2.x;
+                        const dy = n.y - n2.y;
+                        const dist = Math.hypot(dx, dy);
+                        if (dist < connectDist) {
+                            const alpha = (1 - dist / connectDist) * (isDark ? 0.14 : 0.12);
+                            ctx.strokeStyle = isDark
+                                ? `rgba(242, 242, 238, ${alpha})`
+                                : `rgba(17, 17, 17, ${alpha})`;
+                            ctx.beginPath();
+                            ctx.moveTo(n.x, n.y);
+                            ctx.lineTo(n2.x, n2.y);
+                            ctx.stroke();
+                        }
+                    }
+
+                    // Connect to active pointer or autonomous scanner wave (Red CRIVOS telemetry)
+                    const fdx = n.x - focalX;
+                    const fdy = n.y - focalY;
+                    const fdist = Math.hypot(fdx, fdy);
+                    if (fdist < focalDist) {
+                        const fAlpha = (1 - fdist / focalDist) * (pointer.active ? 0.45 : 0.24);
+                        ctx.strokeStyle = `rgba(217, 43, 43, ${fAlpha})`;
+                        ctx.beginPath();
+                        ctx.moveTo(n.x, n.y);
+                        ctx.lineTo(focalX, focalY);
+                        ctx.stroke();
+                    }
+                }
+
+                requestAnimationFrame(renderCanvas);
+            }
+            requestAnimationFrame(renderCanvas);
+
+            /* ------------------------------------------------------------------
+               4. HERO LIVE PANEL INTERACTIVITY (CHECKLIST, POMODORO, FLASHCARD)
+               ------------------------------------------------------------------ */
+            const tabBtns = document.querySelectorAll('.panel-tab-btn');
+            const tabViews = document.querySelectorAll('.panel-view');
+            tabBtns.forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    tabBtns.forEach((b) => b.classList.remove('active'));
+                    tabViews.forEach((v) => v.classList.remove('active'));
+                    btn.classList.add('active');
+                    const target = document.getElementById(btn.getAttribute('data-tab'));
+                    if (target) target.classList.add('active');
+                });
+            });
+
+            const heroTasks = document.querySelectorAll('.interactive-task');
+            const heroPct = document.getElementById('hero-progress-pct');
+            const heroFill = document.getElementById('hero-progress-fill');
+
+            function updateHeroProgress() {
+                let doneCount = 0;
+                heroTasks.forEach((t) => {
+                    if (t.classList.contains('done')) doneCount++;
+                });
+                const pct = Math.round((doneCount / heroTasks.length) * 100);
+                heroPct.textContent = pct === 100 ? '100% META BATIDA ✓' : `${pct}% CONCLUÍDO`;
+                heroFill.style.width = `${pct}%`;
+                heroFill.style.backgroundColor = pct === 100 ? 'var(--accent-green)' : 'var(--accent-blue)';
+            }
+
+            heroTasks.forEach((task) => {
+                task.addEventListener('click', () => {
+                    task.classList.toggle('done');
+                    const box = task.querySelector('.task-checkbox');
+                    box.textContent = task.classList.contains('done') ? '✓' : '';
+                    updateHeroProgress();
+                });
+            });
+
+            const pomoTimerEl = document.getElementById('hero-pomo-timer');
+            const pomoBtn = document.getElementById('hero-pomo-btn');
+            let pomoSeconds = 25 * 60;
+            let pomoRunning = false;
+            let pomoTimerId = null;
+
+            pomoBtn.addEventListener('click', () => {
+                pomoRunning = !pomoRunning;
+                if (pomoRunning) {
+                    pomoBtn.textContent = '[ ⏸ PAUSAR BLOCO ]';
+                    pomoBtn.classList.add('running');
+                    pomoTimerId = setInterval(() => {
+                        pomoSeconds = Math.max(0, pomoSeconds - 1);
+                        const m = String(Math.floor(pomoSeconds / 60)).padStart(2, '0');
+                        const s = String(pomoSeconds % 60).padStart(2, '0');
+                        pomoTimerEl.textContent = `${m}:${s}`;
+                    }, 1000);
+                } else {
+                    pomoBtn.textContent = '[ ▶ RETOMAR BLOCO ]';
+                    pomoBtn.classList.remove('running');
+                    clearInterval(pomoTimerId);
+                }
+            });
+
+            const heroFlashcard = document.getElementById('hero-flashcard');
+            heroFlashcard.addEventListener('click', () => {
+                heroFlashcard.classList.toggle('flipped');
+            });
+
+            document.querySelectorAll('.fc-rate-btn').forEach((btn) => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    heroFlashcard.classList.remove('flipped');
+                    const orig = btn.textContent;
+                    btn.textContent = 'AGENDADO ✓';
+                    setTimeout(() => {
+                        btn.textContent = orig;
+                    }, 1100);
+                });
+            });
+
+            /* ------------------------------------------------------------------
+               5. INTERACTIVE EDITAL & ROUTINE SIMULATOR (#demonstracao)
+               ------------------------------------------------------------------ */
+            const profilesData = {
+                fiscal: {
+                    title: 'RAIO-X DE DISTRIBUIÇÃO // CARREIRAS FISCAIS (CEBRASPE)',
+                    coverage: '86%',
+                    baseWeeksAt4h: 12,
+                    linearWeeksAt4h: 26,
+                    subjects: [
+                        { name: 'Direito Tributário & Legislação', weight: '26.5%', share: 0.30, prio: 'crit', label: 'CRÍTICA (P1)' },
+                        { name: 'Auditoria Fiscal & Contabilidade', weight: '24.0%', share: 0.28, prio: 'crit', label: 'CRÍTICA (P1)' },
+                        { name: 'Direito Constitucional & Adm.', weight: '18.5%', share: 0.20, prio: 'high', label: 'ALTA (P2)' },
+                        { name: 'Tecnologia da Informação / Dados', weight: '17.0%', share: 0.15, prio: 'high', label: 'ALTA (P2)' },
+                        { name: 'Estatística & Raciocínio Lógico', weight: '14.0%', share: 0.07, prio: 'opt', label: 'MANUTENÇÃO' }
+                    ]
+                },
+                tribunais: {
+                    title: 'RAIO-X DE DISTRIBUIÇÃO // TRIBUNAIS & MP (FGV)',
+                    coverage: '84%',
+                    baseWeeksAt4h: 10,
+                    linearWeeksAt4h: 22,
+                    subjects: [
+                        { name: 'Língua Portuguesa (Padrão FGV)', weight: '25.0%', share: 0.28, prio: 'crit', label: 'CRÍTICA (P1)' },
+                        { name: 'Direito Constitucional & Administrativo', weight: '27.5%', share: 0.30, prio: 'crit', label: 'CRÍTICA (P1)' },
+                        { name: 'Direito Processual Civil / Penal', weight: '23.0%', share: 0.24, prio: 'high', label: 'ALTA (P2)' },
+                        { name: 'Legislação Interna / Regimento', weight: '14.5%', share: 0.12, prio: 'high', label: 'ALTA (P2)' },
+                        { name: 'Raciocínio Lógico-Matemático', weight: '10.0%', share: 0.06, prio: 'opt', label: 'MANUTENÇÃO' }
+                    ]
+                },
+                policial: {
+                    title: 'RAIO-X DE DISTRIBUIÇÃO // CARREIRAS POLICIAIS & ADM',
+                    coverage: '88%',
+                    baseWeeksAt4h: 9,
+                    linearWeeksAt4h: 20,
+                    subjects: [
+                        { name: 'Direito Penal & Processual Penal', weight: '28.0%', share: 0.32, prio: 'crit', label: 'CRÍTICA (P1)' },
+                        { name: 'Legislação Penal Especial', weight: '22.0%', share: 0.24, prio: 'crit', label: 'CRÍTICA (P1)' },
+                        { name: 'Língua Portuguesa & Redação', weight: '20.0%', share: 0.20, prio: 'high', label: 'ALTA (P2)' },
+                        { name: 'Direito Constitucional & Adm.', weight: '18.0%', share: 0.16, prio: 'high', label: 'ALTA (P2)' },
+                        { name: 'Informática & Raciocínio Lógico', weight: '12.0%', share: 0.08, prio: 'opt', label: 'MANUTENÇÃO' }
+                    ]
+                },
+                oab: {
+                    title: 'RAIO-X DE DISTRIBUIÇÃO // EXAME DE ORDEM (OAB) & ENEM',
+                    coverage: '82%',
+                    baseWeeksAt4h: 8,
+                    linearWeeksAt4h: 18,
+                    subjects: [
+                        { name: 'Ética Profissional (8 Questões)', weight: '20.0%', share: 0.25, prio: 'crit', label: 'CRÍTICA (P1)' },
+                        { name: 'Direito Constitucional & Administrativo', weight: '22.5%', share: 0.27, prio: 'crit', label: 'CRÍTICA (P1)' },
+                        { name: 'Direito Civil & Processo Civil', weight: '22.5%', share: 0.24, prio: 'high', label: 'ALTA (P2)' },
+                        { name: 'Direito Penal & Trabalho', weight: '20.0%', share: 0.16, prio: 'high', label: 'ALTA (P2)' },
+                        { name: 'Demais Disciplinas Complementares', weight: '15.0%', share: 0.08, prio: 'opt', label: 'MANUTENÇÃO' }
+                    ]
+                }
+            };
+
+            let currentProfile = 'fiscal';
+            let currentHoursPerDay = 4;
+
+            const simProfileBtns = document.querySelectorAll('.sim-profile-btn');
+            const simHoursSlider = document.getElementById('sim-hours-slider');
+            const simHoursLabel = document.getElementById('sim-hours-label');
+            const simTableTitle = document.getElementById('sim-table-title');
+            const simTableBody = document.getElementById('sim-table-body');
+            const simKpiCoverage = document.getElementById('sim-kpi-coverage');
+            const simKpiWeeks = document.getElementById('sim-kpi-weeks');
+            const simSavedHours = document.getElementById('sim-saved-hours');
+            const simLinearWeeks = document.getElementById('sim-linear-weeks');
+            const simCrivosWeeks = document.getElementById('sim-crivos-weeks');
+            const simCrivosBar = document.getElementById('sim-crivos-bar');
+
+            function renderSimulator() {
+                const data = profilesData[currentProfile];
+                const weeklyHours = currentHoursPerDay * 6;
+                simHoursLabel.textContent = `${currentHoursPerDay}H / DIA (${weeklyHours}H/SEM)`;
+                simTableTitle.textContent = data.title;
+                simKpiCoverage.textContent = data.coverage;
+
+                const scaleFactor = 4 / currentHoursPerDay;
+                const crivosW = Math.max(4, Math.round(data.baseWeeksAt4h * scaleFactor));
+                const linearW = Math.max(9, Math.round(data.linearWeeksAt4h * scaleFactor));
+                const savedH = Math.round((linearW - crivosW) * weeklyHours * 0.75);
+
+                simKpiWeeks.textContent = `${crivosW} SEM`;
+                simLinearWeeks.textContent = `${linearW} SEMANAS`;
+                simCrivosWeeks.textContent = `${crivosW} SEMANAS`;
+                simSavedHours.textContent = `-${savedH}H IMPRODUTIVAS CORTADAS`;
+                simCrivosBar.style.width = `${Math.round((crivosW / linearW) * 100)}%`;
+
+                simTableBody.innerHTML = data.subjects
+                    .map((s) => {
+                        const allocated = (weeklyHours * s.share).toFixed(1).replace('.0', '');
+                        const rowClass = s.prio === 'crit' ? 'class="priority-max"' : '';
+                        return `
+                            <tr ${rowClass}>
+                                <td>${s.name}</td>
+                                <td><strong>${s.weight}</strong></td>
+                                <td><strong>${allocated}h / sem</strong></td>
+                                <td><span class="badge-prio ${s.prio}">${s.label}</span></td>
+                            </tr>
+                        `;
+                    })
+                    .join('');
+            }
+
+            simProfileBtns.forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    simProfileBtns.forEach((b) => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentProfile = btn.getAttribute('data-profile');
+                    renderSimulator();
+                });
+            });
+
+            simHoursSlider.addEventListener('input', (e) => {
+                currentHoursPerDay = parseInt(e.target.value, 10);
+                renderSimulator();
+            });
+
+            renderSimulator();
+
+            /* ------------------------------------------------------------------
+               6. FAQ ACCORDION
+               ------------------------------------------------------------------ */
+            document.querySelectorAll('.faq-trigger').forEach((trigger) => {
+                trigger.addEventListener('click', () => {
+                    const item = trigger.parentElement;
+                    const wasOpen = item.classList.contains('open');
+                    document.querySelectorAll('.faq-item').forEach((el) => el.classList.remove('open'));
+                    if (!wasOpen) item.classList.add('open');
+                });
+            });
+
+            /* ------------------------------------------------------------------
+               7. SCROLL PROGRESS BAR & RESPONSIVE GSAP SCROLLTRIGGER
+               ------------------------------------------------------------------ */
+            const scrollBar = document.getElementById('scroll-progress-bar');
+            window.addEventListener('scroll', () => {
+                const scrollTop = window.scrollY;
+                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+                scrollBar.style.width = `${pct}%`;
+            }, { passive: true });
+
+            window.addEventListener('load', () => {
+                if (window.gsap && window.ScrollTrigger) {
+                    gsap.registerPlugin(ScrollTrigger);
+
+                    ScrollTrigger.matchMedia({
+                        // Desktop & Tablet
+                        '(min-width: 769px)': function () {
+                            gsap.utils.toArray('.reveal-card').forEach((card, i) => {
+                                gsap.fromTo(card,
+                                    { y: 26, opacity: 0 },
+                                    {
+                                        scrollTrigger: {
+                                            trigger: card,
+                                            start: 'top 90%',
+                                            toggleActions: 'play none none none'
+                                        },
+                                        y: 0,
+                                        opacity: 1,
+                                        duration: 0.45,
+                                        delay: (i % 3) * 0.05,
+                                        ease: 'power3.out'
+                                    }
+                                );
+                            });
+                        },
+                        // Mobile (snappy, lightweight vertical reveal)
+                        '(max-width: 768px)': function () {
+                            gsap.utils.toArray('.reveal-card').forEach((card) => {
+                                gsap.fromTo(card,
+                                    { y: 16, opacity: 0 },
+                                    {
+                                        scrollTrigger: {
+                                            trigger: card,
+                                            start: 'top 94%',
+                                            toggleActions: 'play none none none'
+                                        },
+                                        y: 0,
+                                        opacity: 1,
+                                        duration: 0.35,
+                                        ease: 'power2.out'
+                                    }
+                                );
+                            });
+                        }
+                    });
+                }
+            });
+
+            /* ------------------------------------------------------------------
+               8. MOBILE MENU DRAWER CONTROLLER (COM ANIMAÇÃO DE PULSO & TRANSIÇÃO)
+               ------------------------------------------------------------------ */
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileDrawer = document.getElementById('mobile-drawer');
+
+            function toggleMobileDrawer(open) {
+                if (!mobileDrawer) return;
+
+                if (open) {
+                    mobileDrawer.classList.add('open');
+                    mobileDrawer.setAttribute('aria-hidden', 'false');
+                    if (mobileMenuBtn) {
+                        mobileMenuBtn.classList.add('active');
+                        const labelSpan = mobileMenuBtn.querySelector('span:last-child');
+                        if (labelSpan) labelSpan.textContent = 'FECHAR';
+                        const iconSpan = mobileMenuBtn.querySelector('.menu-icon');
+                        if (iconSpan) iconSpan.textContent = '✕';
+                    }
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    mobileDrawer.classList.remove('open');
+                    mobileDrawer.setAttribute('aria-hidden', 'true');
+                    if (mobileMenuBtn) {
+                        mobileMenuBtn.classList.remove('active');
+                        const labelSpan = mobileMenuBtn.querySelector('span:last-child');
+                        if (labelSpan) labelSpan.textContent = 'MENU';
+                        const iconSpan = mobileMenuBtn.querySelector('.menu-icon');
+                        if (iconSpan) iconSpan.textContent = '☰';
+                    }
+                    document.body.style.overflow = '';
+                }
+            }
+
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    // Micro-animação de recoil tátil na caixa do botão menu
+                    mobileMenuBtn.classList.remove('btn-pulse');
+                    void mobileMenuBtn.offsetWidth; // Força reflow
+                    mobileMenuBtn.classList.add('btn-pulse');
+
+                    const isOpen = mobileDrawer && mobileDrawer.classList.contains('open');
+                    toggleMobileDrawer(!isOpen);
+                });
+            }
+
+            /* ------------------------------------------------------------------
+               9. CLEAN SMOOTH SCROLL (SEM HASH NA URL: #precos, #faq etc)
+               ------------------------------------------------------------------ */
+            document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+                anchor.addEventListener('click', function (e) {
+                    const href = this.getAttribute('href');
+                    if (!href || href === '#') return;
+
+                    const targetElement = document.querySelector(href);
+                    if (targetElement) {
+                        e.preventDefault();
+
+                        // Fecha o menu mobile caso esteja aberto
+                        toggleMobileDrawer(false);
+
+                        // Calcula rolagem suave com compensação da topbar fixa (70px)
+                        const topbarOffset = 70;
+                        const elementPos = targetElement.getBoundingClientRect().top;
+                        const targetY = elementPos + window.pageYOffset - topbarOffset;
+
+                        window.scrollTo({
+                            top: targetY,
+                            behavior: 'smooth'
+                        });
+
+                        // Garante que o #hash nunca apareça na URL da barra de endereços
+                        if (window.history && window.history.replaceState) {
+                            window.history.replaceState(null, null, window.location.pathname + window.location.search);
+                        }
+                    }
+                });
+            });
+        })();
+    </script>
 </body>
 </html>
