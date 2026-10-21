@@ -1521,6 +1521,12 @@
 
         startPixPolling(data.id);
 
+        // Agendamento preventivo de recuperação de Pix:
+        // Caso a aba continue aberta e passem 5 minutos sem pagamento, aciona a verificação
+        setTimeout(() => {
+          fetch('/api/cron-recovery').catch(() => {});
+        }, 5 * 60 * 1000);
+
       } catch (err) {
         showError(err.message, false);
         btn.disabled = false;
@@ -2042,6 +2048,13 @@
   // Inicializa o valor compilado
   updateCompiledRoutine();
 })();
+
+// Aciona rotina preventiva e silenciosa de recuperação em background
+setTimeout(() => {
+  try {
+    fetch('/api/cron-recovery').catch(() => {});
+  } catch (e) {}
+}, 2500);
 
 </script>
 </body>

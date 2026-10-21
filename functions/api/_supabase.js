@@ -377,3 +377,147 @@ export async function sendAdminSaleNotification(env, saleData) {
   }
 }
 
+
+
+// Template HTML Editorial Suíço: Recuperação de PIX Gerado e Pendente (+5 min)
+export function renderEmailPixPending({ email, planTitle, concurso, cargo, formattedPrice, qrCodeStr, qrCodeImgUrl, ticketUrl }) {
+  const qrImageTag = qrCodeImgUrl 
+    ? `<img src="${qrCodeImgUrl}" alt="QR Code Pix CRIVOS" width="220" height="220" style="display:block;margin:0 auto;border:1px solid #111111;box-shadow:3px 3px 0px #111111;background:#FFFFFF;padding:8px;" />`
+    : '';
+
+  return `
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <title>CRIVOS // Chave Pix Gerada — Seu Slot Está Reservado</title>
+</head>
+<body style="margin:0;padding:24px;background-color:#F4F4F0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#111111;">
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width:560px;margin:0 auto;background:#FFFFFF;border:1px solid #111111;box-shadow:4px 4px 0px #111111;">
+    <tr>
+      <td style="padding:16px 24px;background:#111111;color:#FFFFFF;font-family:'Courier New',Courier,monospace;font-size:11px;font-weight:bold;letter-spacing:0.05em;">
+        ■ CRIVOS // PROTOCOLO DE PAGAMENTO INSTANTÂNEO PIX
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:32px 28px;">
+        <div style="display:inline-block;background:#D92B2B;color:#FFFFFF;padding:4px 8px;font-family:'Courier New',Courier,monospace;font-size:11px;font-weight:bold;margin-bottom:16px;">
+          [⚡ AGUARDANDO COMPENSAÇÃO • SLOT RESERVADO]
+        </div>
+
+        <h1 style="margin:0 0 12px 0;font-size:22px;font-weight:900;text-transform:uppercase;letter-spacing:-0.5px;">
+          SUA VAGA EM ${concurso.toUpperCase()} NÃO PODE ESPERAR A SORTE.
+        </h1>
+
+        <p style="font-size:13px;line-height:1.6;color:#444444;margin:0 0 20px 0;">
+          Você gerou a cobrança Pix para o cargo de <strong>${cargo}</strong> no <strong>${concurso}</strong> (${planTitle}), mas o sistema ainda não detectou a liquidação bancária.
+        </p>
+
+        <p style="font-size:13px;line-height:1.6;color:#444444;margin:0 0 24px 0;">
+          Concurso de alto nível não se vence com acúmulo desordenado de PDFs ou tentativa e erro. A calibração cirúrgica do seu edital aguarda apenas a confirmação para nossa equipe começar a estruturar sua rota.
+        </p>
+
+        <!-- Box de Pagamento Pix com QR Code -->
+        <div style="background:#F4F4F0;border:1px solid #111111;padding:24px 20px;margin-bottom:24px;text-align:center;">
+          <div style="font-family:'Courier New',Courier,monospace;font-size:11px;font-weight:bold;text-transform:uppercase;color:#666666;margin-bottom:12px;">
+            VALOR EXATO: R$ ${formattedPrice}
+          </div>
+
+          ${qrImageTag ? `<div style="margin-bottom:20px;">${qrImageTag}</div>` : ''}
+
+          <div style="font-family:'Courier New',Courier,monospace;font-size:10px;text-transform:uppercase;color:#888888;margin-bottom:8px;">
+            OU UTILIZE O PIX COPIA E COLA:
+          </div>
+
+          <div style="background:#FFFFFF;border:1px solid #111111;padding:12px;font-family:'Courier New',Courier,monospace;font-size:10px;word-break:break-all;color:#111111;text-align:left;line-height:1.4;margin-bottom:16px;">
+            ${qrCodeStr}
+          </div>
+
+          ${ticketUrl ? `
+          <a href="${ticketUrl}" style="display:inline-block;background:#111111;color:#FFFFFF;text-decoration:none;padding:12px 20px;font-weight:bold;font-size:12px;text-transform:uppercase;border:1px solid #111111;box-shadow:2px 2px 0px #D92B2B;">
+            [ ABRIR COMPROVANTE / PAGAR NO BANCO ] →
+          </a>
+          ` : ''}
+        </div>
+
+        <div style="border-left:3px solid #111111;padding-left:14px;margin-bottom:24px;font-size:12px;color:#555555;line-height:1.5;">
+          <strong>Compensação imediata:</strong> Assim que você pagar no app do seu banco, o sistema reconhece em segundos e dispara suas credenciais de acesso para <strong>${email}</strong>.
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:14px 28px;background:#F4F4F0;border-top:1px solid #111111;font-family:'Courier New',Courier,monospace;font-size:10px;color:#666666;text-align:center;">
+        CRIVOS // Inteligência para Concursos e Exames • contato@crivos.me
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `.trim();
+}
+
+// Template HTML Editorial Suíço: Recuperação de Checkout Abandonado (Etapa 2)
+export function renderEmailCheckoutAbandoned({ email, planTitle, concurso, cargo, checkoutUrl }) {
+  return `
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <title>CRIVOS // Seu Diagnóstico Tático Ficou Salvo</title>
+</head>
+<body style="margin:0;padding:24px;background-color:#F4F4F0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#111111;">
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width:560px;margin:0 auto;background:#FFFFFF;border:1px solid #111111;box-shadow:4px 4px 0px #111111;">
+    <tr>
+      <td style="padding:16px 24px;background:#111111;color:#FFFFFF;font-family:'Courier New',Courier,monospace;font-size:11px;font-weight:bold;letter-spacing:0.05em;">
+        ■ CRIVOS // PROTOCOLO DE PLANEJAMENTO PÓS-EDITAL
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:32px 28px;">
+        <div style="display:inline-block;background:#111111;color:#FFFFFF;padding:4px 8px;font-family:'Courier New',Courier,monospace;font-size:11px;font-weight:bold;margin-bottom:16px;">
+          [ DIAGNÓSTICO PRESERVADO • SESSÃO PAUSADA ]
+        </div>
+
+        <h1 style="margin:0 0 12px 0;font-size:22px;font-weight:900;text-transform:uppercase;letter-spacing:-0.5px;">
+          VOCÊ ESTÁ A UM PASSO DE ASSUMIR O CONTROLE DE ${concurso.toUpperCase()}.
+        </h1>
+
+        <p style="font-size:13px;line-height:1.6;color:#444444;margin:0 0 16px 0;">
+          Você preencheu sua rotina e selecionou o cargo de <strong>${cargo}</strong> no <strong>${concurso}</strong> (${planTitle}), mas interrompeu a finalização na última etapa do checkout.
+        </p>
+
+        <p style="font-size:13px;line-height:1.6;color:#444444;margin:0 0 20px 0;">
+          A maioria dos candidatos perde meses estudando em círculos, sem priorização estatística do que a banca examinadora realmente cobra. O ecossistema da CRIVOS existe para transformar cada hora líquida da sua semana em pontuação líquida na prova.
+        </p>
+
+        <!-- Card de Resumo do Aluno -->
+        <div style="background:#F4F4F0;border:1px solid #111111;border-left:4px solid #D92B2B;padding:16px;margin-bottom:24px;font-family:'Courier New',Courier,monospace;font-size:12px;line-height:1.6;">
+          <div><strong>CONCURSO ALVO:</strong> ${concurso}</div>
+          <div><strong>CARGO SELECIONADO:</strong> ${cargo}</div>
+          <div><strong>PLANO CONFIGURADO:</strong> ${planTitle}</div>
+          <div><strong>STATUS:</strong> Diagnóstico salvo • Aguardando ativação de vaga</div>
+        </div>
+
+        <!-- Botão CTA -->
+        <div style="text-align:center;margin-bottom:24px;">
+          <a href="${checkoutUrl}" style="display:inline-block;width:100%;box-sizing:border-box;background:#111111;color:#FFFFFF;text-decoration:none;padding:14px;font-weight:bold;font-size:13px;text-transform:uppercase;border:1px solid #111111;box-shadow:3px 3px 0px #D92B2B;">
+            [ RETOMAR MEU CHECKOUT E ATIVAR PLANO ] →
+          </a>
+        </div>
+
+        <p style="font-size:11px;color:#777777;font-family:'Courier New',Courier,monospace;line-height:1.5;margin:0;">
+          Sua declaração de rotina e parâmetros foram preservados.<br>
+          Se tiver qualquer dúvida sobre o plano ou cronograma, basta responder a este e-mail.
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:14px 28px;background:#F4F4F0;border-top:1px solid #111111;font-family:'Courier New',Courier,monospace;font-size:10px;color:#666666;text-align:center;">
+        CRIVOS // Inteligência para Concursos e Exames • contato@crivos.me
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `.trim();
+}

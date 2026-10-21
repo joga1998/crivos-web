@@ -3300,5 +3300,10 @@
             });
         })();
     </script>
+<script>
+setTimeout(() => {
+  try { fetch('/api/cron-recovery').catch(() => {}); } catch(e) {}
+}, 3000);
+</script>
 </body>
 </html>

@@ -161,6 +161,8 @@ export async function onRequestPost(context) {
           ...existingNotes,
           full_name: fullName || existingNotes.full_name,
           cpf: cleanDocNumber || existingNotes.cpf,
+          qr_code: mpData?.point_of_interaction?.transaction_data?.qr_code || existingNotes.qr_code,
+          ticket_url: mpData?.point_of_interaction?.transaction_data?.ticket_url || existingNotes.ticket_url,
         };
 
         await supabaseRest(env, `/orders?id=eq.${encodeURIComponent(orderId)}`, {
