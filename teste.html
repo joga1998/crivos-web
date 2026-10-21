@@ -560,14 +560,14 @@
             flex-shrink: 0;
         }
 
-        /* Botão Flutuante de Modo Claro / Escuro (Canto Inferior Direito) */
+        /* Botão Flutuante de Modo Claro / Escuro (Sempre visível no canto inferior direito da tela) */
         .theme-floating-btn {
-            position: fixed;
-            bottom: clamp(1.25rem, 2.5vw, 2.25rem);
-            right: clamp(1.25rem, 2.5vw, 2.25rem);
-            z-index: 990;
-            width: 50px;
-            height: 50px;
+            position: fixed !important;
+            bottom: 1.75rem !important;
+            right: 1.75rem !important;
+            z-index: 99999 !important;
+            width: 52px;
+            height: 52px;
             background: var(--bg-surface);
             border: 2px solid var(--border-color);
             box-shadow: var(--shadow-hard);
@@ -2742,12 +2742,12 @@
             </div>
         </footer>
 
-        <!-- BOTÃO FLUTUANTE DE MODO CLARO / ESCURO (CANTO INFERIOR DIREITO) -->
-        <button class="theme-floating-btn" id="theme-toggle" type="button" title="Alternar Modo Claro / Escuro" aria-label="Alternar Tema">
-            <span class="theme-icon-wrap" id="theme-icon">◐</span>
-        </button>
-
     </div>
+
+    <!-- BOTÃO FLUTUANTE DE MODO CLARO / ESCURO (DIRETO NO BODY, SEMPRE VISÍVEL NA TELA) -->
+    <button class="theme-floating-btn" id="theme-toggle" type="button" title="Alternar Modo Claro / Escuro" aria-label="Alternar Tema">
+        <span class="theme-icon-wrap" id="theme-icon">◐</span>
+    </button>
 
     <!-- ==========================================================================
          MODULAR INTERACTIVE JAVASCRIPT (RESPONSIVE CANVAS + GSAP + SIMULATOR)
@@ -2778,6 +2778,9 @@
                 bootCounter.textContent = '100%';
                 bootBarFill.style.width = '100%';
                 pageWrapper.classList.add('glitch-slice');
+                setTimeout(() => {
+                    pageWrapper.classList.remove('glitch-slice');
+                }, 300);
 
                 if (window.gsap) {
                     gsap.to(['.boot-top', '.boot-terminal', '.boot-bottom'], {
