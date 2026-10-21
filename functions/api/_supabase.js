@@ -33,7 +33,7 @@ export function getCorsHeaders(request) {
 export function getSupabaseConfig(env) {
   const url = (env?.SUPABASE_URL || 'https://dmmtmfjlieqeqwlhtgrr.supabase.co').replace(/\/$/, '');
   const serviceKey = env?.SUPABASE_SERVICE_ROLE_KEY || '';
-  const anonKey = env?.SUPABASE_ANON_KEY || 'sb_publishable_pRdJFHU4VWrjVOOSUcNB5Q_9ZnJw7g';
+  const anonKey = env?.SUPABASE_ANON_KEY || 'sb_publishable_pRdjFhU4VWrjVOOSUcNB5Q_9ZnJwFNw';
 
   return { url, serviceKey, anonKey };
 }
