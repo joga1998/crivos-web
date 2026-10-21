@@ -214,6 +214,7 @@ export async function onRequestPost(context) {
     }
 
     // Se temos orderId, vincula payment_id na tabela orders preservando notes anteriores
+    // e já marca a ordem como aprovada para evitar corrida concorrente com o webhook assíncrono
     if (orderId && mpData?.id) {
       try {
         let existingNotes = {};
@@ -229,11 +230,14 @@ export async function onRequestPost(context) {
           cpf: cleanDocNumber || existingNotes.cpf,
         };
 
+        const isApproved = (mpData.status === 'approved' || mpData.status === 'in_process');
+
         await supabaseRest(env, `/orders?id=eq.${encodeURIComponent(orderId)}`, {
           method: 'PATCH',
           body: {
             payment_id: String(mpData.id),
             payment_method: 'credit_card',
+            status: isApproved ? 'approved' : 'pending',
             notes: JSON.stringify(mergedNotes),
             updated_at: new Date().toISOString(),
           },
@@ -243,7 +247,7 @@ export async function onRequestPost(context) {
       }
     }
 
-    // Se aprovado ou em processamento (contingência/análise do gateway), provisiona o usuário e envia o E-mail #1
+    // Provisiona diretamente o usuário para entrega imediata sem esperar o webhook
     if (mpData.status === 'approved' || mpData.status === 'in_process') {
       try {
         await provisionUserOrder(env, {
@@ -252,7 +256,7 @@ export async function onRequestPost(context) {
           paymentMethod: 'credit_card',
         });
       } catch (provErr) {
-        console.warn('[process-card] Falha no provisionamento imediato (o webhook cuidará):', provErr.message);
+        console.warn('[process-card] Falha no provisionamento imediato:', provErr.message);
       }
     }
 

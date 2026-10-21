@@ -73,6 +73,8 @@ export async function onRequestPost(context) {
     console.log(`[Webhook MP] Pagamento ${paymentId}: status=${status}, orderId=${orderId}`);
 
     if (status === 'approved' || status === 'in_process') {
+      // Para pagamentos com cartão, o provisionamento já é executado sincronamente em process-card.js
+      // O webhook atua como contingência (caso a ordem ainda não esteja aprovada) ou para pagamentos assíncronos (PIX)
       const provisionResult = await provisionUserOrder(env, {
         orderId: orderId || null,
         mpPaymentId: String(paymentId),
