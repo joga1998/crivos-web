@@ -29,6 +29,8 @@
 
   <!-- Biblioteca de Conexão com Servidor -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Google Identity Services (GIS) Oficial -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 
   <style>
     :root {
@@ -532,15 +534,17 @@
         </div>
       </div>
 
-      <button type="button" id="btn-google-login" class="btn-google">
-        <svg width="18" height="18" viewBox="0 0 24 24" style="flex-shrink:0;">
-          <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
-          <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.28v3.15C3.27 21.36 7.36 24 12 24z"/>
-          <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.28C.46 8.2 0 10.04 0 12s.46 3.8 1.28 5.42l4-3.15z"/>
-          <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.36 0 3.27 2.64 1.28 6.58l4 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
-        </svg>
-        <span>ENTRAR COM O GOOGLE</span>
-      </button>
+      <div id="google-btn-container" style="display:flex;justify-content:center;margin-bottom:1rem;min-height:44px;width:100%;">
+        <button type="button" id="btn-google-login" class="btn-google" style="width:100%;">
+          <svg width="18" height="18" viewBox="0 0 24 24" style="flex-shrink:0;">
+            <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+            <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.28v3.15C3.27 21.36 7.36 24 12 24z"/>
+            <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.28C.46 8.2 0 10.04 0 12s.46 3.8 1.28 5.42l4-3.15z"/>
+            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.36 0 3.27 2.64 1.28 6.58l4 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+          </svg>
+          <span>ENTRAR COM O GOOGLE</span>
+        </button>
+      </div>
 
       <div class="auth-divider">
         <span>OU COM CHAVE DE ACESSO</span>
@@ -680,6 +684,81 @@
       }
     });
 
+    // Google Identity Services (GIS) — Login Nativo com Título CRIVOS
+    const GOOGLE_CLIENT_ID = '703299914594-j5v53bdkg9hbh862otm9klsgburdidqo.apps.googleusercontent.com';
+
+    async function handleGoogleCredentialResponse(response) {
+      if (!response || !response.credential) {
+        showFeedback('Nenhuma credencial recebida do Google.');
+        return;
+      }
+
+      if (!sbClient) {
+        showFeedback('Falha na conexão com o servidor. Tente novamente em instantes.');
+        return;
+      }
+
+      showFeedback('Autenticando credencial com o ecossistema CRIVOS...', false);
+
+      try {
+        const { data, error } = await sbClient.auth.signInWithIdToken({
+          provider: 'google',
+          token: response.credential,
+        });
+
+        if (error) throw error;
+
+        if (data && data.session) {
+          showFeedback('Autenticação com o Google autorizada! Carregando...', false);
+          if (data.session.user && data.session.user.email) {
+            try { localStorage.setItem('crivos_user_email', data.session.user.email); } catch(e) {}
+          }
+          setTimeout(() => {
+            const redirectUrl = `https://app.crivos.me/#access_token=${encodeURIComponent(data.session.access_token)}&refresh_token=${encodeURIComponent(data.session.refresh_token)}&type=recovery`;
+            window.location.href = redirectUrl;
+          }, 400);
+        }
+      } catch (err) {
+        console.error('[Google GIS Error]', err);
+        showFeedback('Erro na validação do Google: ' + (err.message || 'Falha ao autenticar.'));
+      }
+    }
+
+    function initGoogleIdentity() {
+      if (window.google && window.google.accounts && window.google.accounts.id) {
+        try {
+          window.google.accounts.id.initialize({
+            client_id: GOOGLE_CLIENT_ID,
+            callback: handleGoogleCredentialResponse,
+            auto_select: false,
+            cancel_on_tap_outside: true,
+          });
+
+          const container = document.getElementById('google-btn-container');
+          if (container) {
+            // Renderiza o botão oficial do Google perfeitamente integrado
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            container.innerHTML = '';
+            window.google.accounts.id.renderButton(container, {
+              type: 'standard',
+              theme: isDark ? 'filled_black' : 'outline',
+              size: 'large',
+              text: 'signin_with',
+              shape: 'rectangular',
+              logo_alignment: 'left',
+              width: container.offsetWidth || 340,
+            });
+          }
+        } catch (e) {
+          console.warn('[Google GIS init warning]', e);
+        }
+      } else {
+        setTimeout(initGoogleIdentity, 150);
+      }
+    }
+
+    window.addEventListener('load', initGoogleIdentity);
+
     const googleBtn = document.getElementById('btn-google-login');
     if (googleBtn) {
       googleBtn.addEventListener('click', async () => {
@@ -701,15 +780,6 @@
           console.error('[OAuth Google]', err);
           showFeedback('Falha ao conectar com o Google: ' + (err.message || 'Erro inesperado.'));
           googleBtn.disabled = false;
-          googleBtn.innerHTML = `
-            <svg width="18" height="18" viewBox="0 0 24 24" style="flex-shrink:0;">
-              <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
-              <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.28v3.15C3.27 21.36 7.36 24 12 24z"/>
-              <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.28C.46 8.2 0 10.04 0 12s.46 3.8 1.28 5.42l4-3.15z"/>
-              <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.36 0 3.27 2.64 1.28 6.58l4 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
-            </svg>
-            <span>ENTRAR COM O GOOGLE</span>
-          `;
         }
       });
     }
