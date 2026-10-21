@@ -1,40 +1,70 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="light">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CRIVOS // Pagamento Confirmado</title>
+  <title>CRIVOS // Pagamento Confirmado — Calibração Iniciada</title>
+  
+  <!-- Favicon oficial: Quadrado Vermelho Brutalista -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%23D92B2B'/></svg>">
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-  
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%23D92B2B' stroke='%23111111' stroke-width='1'/></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    (function() {
+      try {
+        var t = localStorage.getItem('crivos_theme') || localStorage.getItem('crivos_web_theme');
+        if (t === 'dark' || (!t && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      } catch(e) {}
+    })();
+  </script>
 
   <style>
     :root {
-      --bg-color: #F4F4F0;
-      --card-bg: #FFFFFF;
-      --text-color: #111111;
+      --bg-primary: #F4F4F0;
+      --bg-surface: #FFFFFF;
+      --bg-elevated: #EAEAE4;
+      --bg-dark-block: #111111;
+      --text-primary: #111111;
+      --text-secondary: #383838;
       --text-muted: #666666;
+      --text-on-dark: #F4F4F0;
+      --accent-red: #D92B2B;
+      --accent-red-hover: #B91C1C;
+      --accent-blue: #1D4ED8;
+      --accent-green: #15803D;
       --border-color: #111111;
-      --accent-color: #D92B2B;
-      --box-shadow: 4px 4px 0px #111111;
-      --btn-shadow: 2px 2px 0px #D92B2B;
-      --input-bg: #F4F4F0;
-      --success-color: #15803d;
+      --border-subtle: rgba(17, 17, 17, 0.15);
+      --shadow-sm: 2px 2px 0px #111111;
+      --shadow-hard: 4px 4px 0px #111111;
+      --shadow-lg: 8px 8px 0px #111111;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
     }
 
     [data-theme="dark"] {
-      --bg-color: #0A0A0A;
-      --card-bg: #141414;
-      --text-color: #F4F4F0;
-      --text-muted: #A0A0A0;
-      --border-color: #333333;
-      --accent-color: #EF4444;
-      --box-shadow: 4px 4px 0px #333333;
-      --btn-shadow: 2px 2px 0px #EF4444;
-      --input-bg: #1A1A1A;
-      --success-color: #22c55e;
+      --bg-primary: #0B0C0E;
+      --bg-surface: #131519;
+      --bg-elevated: #1B1E24;
+      --bg-dark-block: #070809;
+      --text-primary: #F2F2EE;
+      --text-secondary: #B0B6C3;
+      --text-muted: #767E8F;
+      --text-on-dark: #F2F2EE;
+      --accent-red: #E53935;
+      --accent-red-hover: #D32F2F;
+      --accent-blue: #3B82F6;
+      --accent-green: #22C55E;
+      --border-color: #2C313C;
+      --border-subtle: rgba(242, 242, 238, 0.1);
+      --shadow-sm: 2px 2px 0px #000000;
+      --shadow-hard: 4px 4px 0px #000000;
+      --shadow-lg: 8px 8px 0px #000000;
     }
 
     * {
@@ -45,209 +75,462 @@
     }
 
     body {
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      font-family: 'Inter', sans-serif;
-      padding: 20px 20px 60px 20px;
-    }
-
-    .top-bar {
-      max-width: 600px;
-      margin: 0 auto 24px auto;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      line-height: 1.5;
+      min-height: 100vh;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      padding: 12px 16px;
-      box-shadow: 2px 2px 0px var(--border-color);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
     }
 
-    .container {
-      max-width: 600px;
+    /* TOPBAR INSTITUCIONAL */
+    .topbar {
+      border-bottom: 2px solid var(--border-color);
+      background: var(--bg-surface);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .topbar-container {
+      max-width: 1200px;
       margin: 0 auto;
-      background: var(--card-bg);
+      padding: 0 1.25rem;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      text-decoration: none;
+      color: var(--text-primary);
+    }
+
+    .brand-sq {
+      width: 14px;
+      height: 14px;
+      background: var(--accent-red);
       border: 1px solid var(--border-color);
-      box-shadow: var(--box-shadow);
-      padding: 36px 32px;
+      display: inline-block;
+      flex-shrink: 0;
+      aspect-ratio: 1/1;
+    }
+
+    .brand-name {
+      font-family: var(--font-sans);
+      font-weight: 900;
+      font-size: 1.25rem;
+      letter-spacing: -0.04em;
+    }
+
+    .brand-tag {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      border-left: 1px solid var(--border-subtle);
+      padding-left: 0.6rem;
+      margin-left: 0.2rem;
+    }
+
+    .nav-link-btn {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-decoration: none;
+      color: var(--text-primary);
+      padding: 0.5rem 0.85rem;
+      border: 1px solid var(--border-color);
+      background: var(--bg-surface);
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+    }
+
+    .nav-link-btn:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: var(--shadow-hard);
+    }
+
+    /* CONTAINER SUCESSO */
+    .sucesso-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1.25rem;
+    }
+
+    .sucesso-card {
+      background: var(--bg-surface);
+      border: 2px solid var(--border-color);
+      box-shadow: var(--shadow-lg);
+      width: 100%;
+      max-width: 620px;
+      padding: 2.5rem 2.25rem;
     }
 
     .status-badge {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      font-weight: 700;
-      background: var(--success-color);
-      color: #FFFFFF;
-      padding: 4px 8px;
-      display: inline-block;
-      margin-bottom: 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 800;
+      background: rgba(21, 128, 61, 0.1);
+      border: 1px solid var(--accent-green);
+      color: var(--accent-green);
+      padding: 0.35rem 0.65rem;
+      margin-bottom: 1.25rem;
+      letter-spacing: 0.04em;
     }
 
     h1 {
-      font-size: 26px;
+      font-family: var(--font-sans);
+      font-size: 1.85rem;
       font-weight: 900;
-      text-transform: uppercase;
-      margin-bottom: 12px;
-      letter-spacing: -0.5px;
+      letter-spacing: -0.04em;
+      line-height: 1.15;
+      margin-bottom: 0.75rem;
     }
 
     .lead-text {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
+      font-size: 0.95rem;
       color: var(--text-muted);
-      margin-bottom: 24px;
-      line-height: 1.5;
+      line-height: 1.55;
+      margin-bottom: 1.5rem;
     }
 
+    /* RESUMO DO PEDIDO */
     .order-summary {
-      background: var(--input-bg);
+      background: var(--bg-elevated);
       border: 1px solid var(--border-color);
-      border-left: 4px solid var(--accent-color);
-      padding: 16px;
-      margin-bottom: 24px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      line-height: 1.6;
+      padding: 1.25rem 1.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 1.75rem;
     }
 
+    .order-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    /* PASSOS DE ATIVAÇÃO */
     .steps-box {
       border: 1px solid var(--border-color);
-      padding: 20px;
-      margin-bottom: 28px;
+      margin-bottom: 2rem;
     }
 
     .steps-title {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      font-weight: 700;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      padding: 0.65rem 1rem;
+      background: var(--bg-elevated);
+      border-bottom: 1px solid var(--border-color);
       text-transform: uppercase;
-      margin-bottom: 14px;
-      color: var(--accent-color);
     }
 
     .step-item {
+      padding: 1rem 1.25rem;
       display: flex;
-      gap: 12px;
-      margin-bottom: 12px;
-      font-size: 13px;
-      line-height: 1.5;
+      gap: 1rem;
+      align-items: flex-start;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .step-item:last-child {
+      border-bottom: none;
     }
 
     .step-num {
-      font-family: 'JetBrains Mono', monospace;
-      font-weight: 700;
-      color: var(--accent-color);
-    }
-
-    .cta-button {
-      display: block;
-      width: 100%;
-      text-align: center;
-      background: var(--accent-color);
-      color: #FFFFFF;
-      text-decoration: none;
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-mono);
       font-weight: 800;
-      font-size: 14px;
-      padding: 16px;
-      box-shadow: 2px 2px 0px var(--border-color);
-      margin-bottom: 12px;
-      text-transform: uppercase;
+      font-size: 1rem;
+      color: var(--accent-red);
+      flex-shrink: 0;
+      line-height: 1.2;
     }
 
-    .cta-button:hover {
-      background: var(--text-color);
+    .step-desc {
+      font-size: 0.85rem;
+      line-height: 1.5;
+      color: var(--text-primary);
+    }
+
+    .step-desc strong {
+      color: var(--text-primary);
+    }
+
+    /* AÇÕES */
+    .cta-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .btn-main {
+      background: var(--accent-red);
+      color: #FFFFFF;
+      border: 2px solid var(--border-color);
+      padding: 1rem 1.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .btn-main:hover {
+      background: var(--accent-red-hover);
+      transform: translate(-1px, -1px);
+      box-shadow: var(--shadow-hard);
     }
 
     .btn-secondary {
-      background: var(--card-bg);
-      color: var(--text-color);
-      border: 1px solid var(--border-color);
-      box-shadow: 2px 2px 0px var(--border-color);
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      border: 2px solid var(--border-color);
+      padding: 0.85rem 1.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .btn-secondary:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: var(--shadow-hard);
     }
 
     .footer-note {
-      text-align: center;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
       color: var(--text-muted);
-      margin-top: 20px;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    /* BOTAO FLUTUANTE DE TEMA */
+    .theme-floating-btn {
+      position: fixed !important;
+      bottom: 1.75rem !important;
+      right: 1.75rem !important;
+      z-index: 99999 !important;
+      width: 52px;
+      height: 52px;
+      background: var(--bg-surface);
+      border: 2px solid var(--border-color);
+      box-shadow: var(--shadow-hard);
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s ease;
+      user-select: none;
+    }
+
+    .theme-floating-btn:hover {
+      transform: translate(-3px, -3px) scale(1.06);
+      box-shadow: 6px 6px 0px var(--border-color);
+    }
+
+    .theme-floating-btn:active {
+      transform: translate(2px, 2px) scale(0.96);
+      box-shadow: 2px 2px 0px var(--border-color);
+    }
+
+    .theme-icon-wrap {
+      font-size: 1.25rem;
+      line-height: 1;
+      display: inline-block;
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* FOOTER */
+    .footer {
+      border-top: 1px solid var(--border-color);
+      background: var(--bg-surface);
+      padding: 1.25rem 1.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-align: center;
     }
   </style>
 </head>
 <body>
 
-  <header class="top-bar">
-    <a href="/" style="color:var(--text-color);text-decoration:none;">[← INÍCIO DA CRIVOS]</a>
-    <span>// CONFIRMAÇÃO DE PEDIDO</span>
+  <!-- TOPBAR INSTITUCIONAL -->
+  <header class="topbar">
+    <div class="topbar-container">
+      <a href="/" class="brand">
+        <span class="brand-sq"></span>
+        <span class="brand-name">CRIVOS</span>
+        <span class="brand-tag">// PEDIDO CONFIRMADO</span>
+      </a>
+
+      <div class="nav-actions">
+        <a href="/" class="nav-link-btn">← Início da CRIVOS</a>
+      </div>
+    </div>
   </header>
 
-  <div class="container">
-    <div class="status-badge">[✓ PAGAMENTO IDENTIFICADO COM SUCESSO]</div>
-    <h1>BEM-VINDO AO CRIVOS</h1>
-    <p class="lead-text">
-      Sua transação foi processada de forma segura e seu slot de calibração tática já está garantido na nossa fila de engenharia.
-    </p>
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="sucesso-container">
+    <div class="sucesso-card">
+      <div class="status-badge">[✓ PAGAMENTO IDENTIFICADO COM SUCESSO]</div>
+      <h1>BEM-VINDO AO CRIVOS</h1>
+      <p class="lead-text">
+        Sua transação foi processada de forma segura e seu slot de calibração tática já está garantido na nossa fila de engenharia sob demanda.
+      </p>
 
-    <div class="order-summary" id="order-info">
-      <div><strong>TRANSAÇÃO:</strong> <span id="tx-id">Carregando...</span></div>
-      <div><strong>STATUS:</strong> <span id="tx-status" style="color:var(--success-color);">APROVADO</span></div>
-      <div><strong>PRAZO DE CALIBRAÇÃO:</strong> ATÉ 48 HORAS ÚTEIS</div>
-    </div>
-
-    <div class="steps-box">
-      <div class="steps-title">[ PRÓXIMOS PASSOS // ACESSO AO SISTEMA ]</div>
-      <div class="step-item">
-        <span class="step-num">01.</span>
-        <div>
-          <strong>Credenciais Enviadas:</strong> Enviamos sua senha provisória de acesso para o e-mail cadastrado. Confira também sua caixa de spam.
+      <div class="order-summary" id="order-info">
+        <div class="order-row">
+          <span>TRANSAÇÃO:</span>
+          <strong id="tx-id">#CARREGANDO...</strong>
+        </div>
+        <div class="order-row">
+          <span>STATUS:</span>
+          <strong style="color:var(--accent-green);">APROVADO E VINCULADO</strong>
+        </div>
+        <div class="order-row">
+          <span>PRAZO DE CALIBRAÇÃO:</span>
+          <strong>ATÉ 48 HORAS ÚTEIS</strong>
         </div>
       </div>
-      <div class="step-item">
-        <span class="step-num">02.</span>
-        <div>
-          <strong>Acesso ao Painel:</strong> Você já pode acessar o sistema agora em <a href="https://crivos-painel.pages.dev" style="color:var(--accent-color);font-weight:bold;">crivos-painel.pages.dev</a> para acompanhar a fila de calibração tática (prazo de até 48h úteis).
+
+      <div class="steps-box">
+        <div class="steps-title">[ PRÓXIMOS PASSOS // FLUXO DE ATIVAÇÃO ]</div>
+        
+        <div class="step-item">
+          <span class="step-num">01.</span>
+          <div class="step-desc">
+            <strong>Credenciais de Acesso:</strong> Enviamos sua chave de acesso tática para o e-mail cadastrado. Lembre-se de conferir também sua caixa de spam ou lixo eletrônico.
+          </div>
+        </div>
+
+        <div class="step-item">
+          <span class="step-num">02.</span>
+          <div class="step-desc">
+            <strong>Acompanhamento em Tempo Real:</strong> Você já pode acessar seu ambiente em <a href="https://crivos-painel.pages.dev" target="_blank" rel="noopener noreferrer" style="color:var(--accent-red);font-weight:700;text-decoration:underline;">crivos-painel.pages.dev</a> para configurar sua foto de candidato e acompanhar a montagem da matriz de Pareto.
+          </div>
+        </div>
+
+        <div class="step-item">
+          <span class="step-num">03.</span>
+          <div class="step-desc">
+            <strong>Desbloqueio Automático:</strong> Assim que a equipe de pedagogia e IA concluir a análise do edital e gerar o cronograma com SM-2, todos os módulos serão destravados automaticamente na sua conta.
+          </div>
         </div>
       </div>
-      <div class="step-item">
-        <span class="step-num">03.</span>
-        <div>
-          <strong>Liberação Automática:</strong> Assim que a engenharia do seu edital for concluída, você receberá um segundo e-mail de notificação e seu painel estará 100% carregado para execução diária.
-        </div>
+
+      <div class="cta-group">
+        <a href="https://crivos-painel.pages.dev" class="btn-main">
+          <span>[ ACESSAR MEU PAINEL CRIVOS AGORA ]</span>
+          <span>→</span>
+        </a>
+
+        <a href="https://wa.me/5521970821736?text=Ol%C3%A1!%20Acabei%20de%20adquirir%20meu%20plano%20CRIVOS%20e%20gostaria%20de%20confirmar%20o%20recebimento." target="_blank" rel="noopener noreferrer" class="btn-secondary">
+          <span>[ CANAL OFICIAL DE ATENDIMENTO WHATSAPP ]</span>
+          <span>↗</span>
+        </a>
+      </div>
+
+      <div class="footer-note">
+        Dúvidas ou canal prioritário da coordenação: contato@crivos.me<br>
+        WhatsApp: +55 21 97082-1736 · Atendimento Seg à Sex (09h às 19h)
       </div>
     </div>
+  </main>
 
-    <a href="https://crivos-painel.pages.dev" class="cta-button">
-      [ ACESSAR MEU PAINEL CRIVOS AGORA ] →
-    </a>
+  <!-- BOTAO FLUTUANTE DE TEMA -->
+  <button class="theme-floating-btn" id="theme-toggle" type="button" title="Alternar Modo Claro / Escuro" aria-label="Alternar Tema">
+    <span class="theme-icon-wrap" id="theme-icon">◐</span>
+  </button>
 
-    <a href="https://wa.me/5500000000000?text=Ol%C3%A1!%20Acabei%20de%20adquirir%20meu%20plano%20CRIVOS." target="_blank" rel="noopener noreferrer" class="cta-button btn-secondary">
-      [ SUPORTE PRIORITÁRIO WHATSAPP ]
-    </a>
-
-    <div class="footer-note">
-      Dúvidas ou suporte prioritário: contato@crivos.me<br>
-      CRIVOS // Inteligência para Concursos e Exames
-    </div>
-  </div>
+  <footer class="footer">
+    CRIVOS // ENGENHARIA TÁTICA PARA CONCURSOS E EXAMES · SEGURANÇA E PROTOCOLO
+  </footer>
 
   <script>
     (function() {
-      // Sincroniza tema
-      const savedTheme = localStorage.getItem('crivos_web_theme') || localStorage.getItem('crivos_theme') || 'light';
-      document.documentElement.setAttribute('data-theme', savedTheme);
-
-      // Lê o ID da transação da URL
+      // Sincronização do ID da transação
       const urlParams = new URLSearchParams(window.location.search);
       const id = urlParams.get('id') || urlParams.get('payment_id') || 'CRV-' + Math.floor(100000 + Math.random() * 900000);
-      document.getElementById('tx-id').textContent = '#' + id;
+      const txEl = document.getElementById('tx-id');
+      if (txEl) txEl.textContent = '#' + id;
 
-      // Disparo de garantia: consulta a API para assegurar que a ordem foi provisionada e o e-mail disparado
+      // Disparo de garantia: consulta a API para assegurar que a ordem foi provisionada
       if (id && /^\d+$/.test(id)) {
         fetch(`/api/check-payment/${id}`).catch(function(e) {
           console.warn('Garantia check-payment:', e);
+        });
+      }
+
+      // Theme toggle sincronizado
+      const themeBtn = document.getElementById('theme-toggle');
+      const themeIcon = document.getElementById('theme-icon');
+
+      function updateThemeIcon(isDark) {
+        if (themeIcon) {
+          themeIcon.textContent = isDark ? '◑' : '◐';
+        }
+      }
+
+      const savedTheme = localStorage.getItem('crivos_theme') || localStorage.getItem('crivos_web_theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        updateThemeIcon(true);
+      }
+
+      if (themeBtn) {
+        themeBtn.addEventListener('click', () => {
+          const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+          const next = isDark ? 'light' : 'dark';
+          if (next === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+          } else {
+            document.documentElement.removeAttribute('data-theme');
+          }
+          localStorage.setItem('crivos_theme', next);
+          localStorage.setItem('crivos_web_theme', next);
+          updateThemeIcon(next === 'dark');
+
+          if (themeIcon) {
+            themeIcon.style.transform = 'rotate(180deg)';
+            setTimeout(() => { themeIcon.style.transform = 'none'; }, 350);
+          }
         });
       }
     })();

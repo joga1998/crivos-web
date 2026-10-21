@@ -6,18 +6,18 @@
   <title>CRIVOS // Área do Candidato — Acesso ao Painel</title>
   <meta name="description" content="Acesse seu Sistema Operacional de Estudos CRIVOS com seu e-mail e chave de acesso tática.">
   
-  <!-- Favicon -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23D92B2B'/></svg>">
+  <!-- Favicon oficial: Quadrado Vermelho Brutalista -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%23D92B2B'/></svg>">
 
   <!-- Google Fonts: Inter & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <script>
     (function() {
       try {
-        var t = localStorage.getItem('crivos_web_theme') || localStorage.getItem('crivos_theme');
+        var t = localStorage.getItem('crivos_theme') || localStorage.getItem('crivos_web_theme');
         if (t === 'dark' || (!t && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
           document.documentElement.setAttribute('data-theme', 'dark');
         }
@@ -27,191 +27,469 @@
 
   <!-- SDK Oficial Supabase JS v2 -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link rel="stylesheet" href="style.css">
 
   <style>
+    :root {
+      --bg-primary: #F4F4F0;
+      --bg-surface: #FFFFFF;
+      --bg-elevated: #EAEAE4;
+      --bg-dark-block: #111111;
+      --text-primary: #111111;
+      --text-secondary: #383838;
+      --text-muted: #666666;
+      --text-on-dark: #F4F4F0;
+      --accent-red: #D92B2B;
+      --accent-red-hover: #B91C1C;
+      --accent-blue: #1D4ED8;
+      --accent-green: #15803D;
+      --border-color: #111111;
+      --border-subtle: rgba(17, 17, 17, 0.15);
+      --shadow-sm: 2px 2px 0px #111111;
+      --shadow-hard: 4px 4px 0px #111111;
+      --shadow-lg: 8px 8px 0px #111111;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    [data-theme="dark"] {
+      --bg-primary: #0B0C0E;
+      --bg-surface: #131519;
+      --bg-elevated: #1B1E24;
+      --bg-dark-block: #070809;
+      --text-primary: #F2F2EE;
+      --text-secondary: #B0B6C3;
+      --text-muted: #767E8F;
+      --text-on-dark: #F2F2EE;
+      --accent-red: #E53935;
+      --accent-red-hover: #D32F2F;
+      --accent-blue: #3B82F6;
+      --accent-green: #22C55E;
+      --border-color: #2C313C;
+      --border-subtle: rgba(242, 242, 238, 0.1);
+      --shadow-sm: 2px 2px 0px #000000;
+      --shadow-hard: 4px 4px 0px #000000;
+      --shadow-lg: 8px 8px 0px #000000;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      border-radius: 0px !important;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* TOPBAR INSTITUCIONAL */
+    .topbar {
+      border-bottom: 2px solid var(--border-color);
+      background: var(--bg-surface);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .topbar-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.25rem;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      text-decoration: none;
+      color: var(--text-primary);
+    }
+
+    .brand-sq {
+      width: 14px;
+      height: 14px;
+      background: var(--accent-red);
+      border: 1px solid var(--border-color);
+      display: inline-block;
+      flex-shrink: 0;
+      aspect-ratio: 1/1;
+    }
+
+    .brand-name {
+      font-family: var(--font-sans);
+      font-weight: 900;
+      font-size: 1.25rem;
+      letter-spacing: -0.04em;
+    }
+
+    .brand-tag {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      border-left: 1px solid var(--border-subtle);
+      padding-left: 0.6rem;
+      margin-left: 0.2rem;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .nav-link-btn {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-decoration: none;
+      color: var(--text-primary);
+      padding: 0.5rem 0.85rem;
+      border: 1px solid var(--border-color);
+      background: var(--bg-surface);
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .nav-link-btn:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: var(--shadow-hard);
+    }
+
+    /* CONTAINER PRINCIPAL */
     .login-container {
-      min-height: calc(100vh - 120px);
+      flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 40px 20px;
+      padding: 3rem 1.25rem;
     }
+
     .login-card {
-      background: var(--bg-card);
+      background: var(--bg-surface);
       border: 2px solid var(--border-color);
-      box-shadow: var(--shadow-hard-lg);
+      box-shadow: var(--shadow-lg);
       width: 100%;
       max-width: 460px;
-      padding: 36px 28px;
+      padding: 2.25rem 2rem;
+      position: relative;
     }
+
     .login-brand-header {
       display: flex;
       align-items: center;
       gap: 12px;
-      margin-bottom: 24px;
-      padding-bottom: 18px;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.25rem;
       border-bottom: 1px solid var(--border-subtle);
     }
+
     .login-brand-sq {
-      width: 24px;
-      height: 24px;
-      background: var(--crivos-red);
+      width: 22px;
+      height: 22px;
+      background: var(--accent-red);
+      border: 1px solid var(--border-color);
       flex-shrink: 0;
+      aspect-ratio: 1/1;
     }
+
     .login-brand-title {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: var(--font-mono);
       font-weight: 800;
-      font-size: 15px;
-      letter-spacing: 0.05em;
+      font-size: 0.95rem;
+      letter-spacing: 0.04em;
       line-height: 1.2;
     }
+
     .login-brand-subtitle {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      color: var(--ink-muted);
-      letter-spacing: 0.03em;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      letter-spacing: 0.02em;
     }
-    .login-form-group {
-      margin-bottom: 20px;
+
+    .login-intro {
+      font-size: 0.85rem;
+      line-height: 1.55;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
     }
-    .login-label {
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-label {
       display: block;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
       font-weight: 700;
       letter-spacing: 0.05em;
       text-transform: uppercase;
-      margin-bottom: 8px;
-      color: var(--ink-primary);
+      margin-bottom: 0.45rem;
+      color: var(--text-primary);
     }
-    .login-input {
+
+    .form-input {
       width: 100%;
-      background: var(--bg-card);
-      color: var(--ink-primary);
+      background: var(--bg-surface);
+      color: var(--text-primary);
       border: 1px solid var(--border-color);
-      padding: 12px 14px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-      transition: border-color 0.15s ease;
+      padding: 0.75rem 0.85rem;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
-    .login-input:focus {
+
+    .form-input:focus {
       outline: none;
-      border-color: var(--crivos-red);
+      border-color: var(--accent-red);
+      box-shadow: 2px 2px 0px var(--accent-red);
     }
+
     .login-feedback {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      margin-bottom: 16px;
-      line-height: 1.4;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      margin-bottom: 1.25rem;
+      line-height: 1.45;
+      display: none;
     }
+
     .login-feedback.error {
+      display: block;
       background: rgba(217, 43, 43, 0.08);
-      border-left: 3px solid var(--crivos-red);
-      color: var(--crivos-red);
-      padding: 10px 12px;
+      border: 1px solid var(--accent-red);
+      border-left: 4px solid var(--accent-red);
+      color: var(--accent-red);
+      padding: 0.65rem 0.85rem;
     }
+
     .login-feedback.success {
+      display: block;
       background: rgba(21, 128, 61, 0.08);
-      border-left: 3px solid #15803D;
-      color: #15803D;
-      padding: 10px 12px;
+      border: 1px solid var(--accent-green);
+      border-left: 4px solid var(--accent-green);
+      color: var(--accent-green);
+      padding: 0.65rem 0.85rem;
     }
+
+    .btn-submit {
+      width: 100%;
+      background: var(--accent-red);
+      color: #FFFFFF;
+      border: 2px solid var(--border-color);
+      padding: 0.85rem 1.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .btn-submit:hover:not(:disabled) {
+      background: var(--accent-red-hover);
+      transform: translate(-1px, -1px);
+      box-shadow: var(--shadow-hard);
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
     .login-footer-actions {
-      margin-top: 24px;
-      padding-top: 20px;
+      margin-top: 1.5rem;
+      padding-top: 1.25rem;
       border-top: 1px solid var(--border-subtle);
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 0.75rem;
     }
+
+    .login-footer-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
     .login-link-secondary {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      color: var(--ink-muted);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
       text-decoration: underline;
       cursor: pointer;
-      display: inline-block;
     }
+
     .login-link-secondary:hover {
-      color: var(--crivos-red);
+      color: var(--accent-red);
+    }
+
+    .demo-callout-btn {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      text-decoration: none;
+      background: var(--bg-elevated);
+      padding: 0.65rem 0.85rem;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      text-align: center;
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+    }
+
+    .demo-callout-btn:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: var(--shadow-hard);
+    }
+
+    /* BOTAO FLUTUANTE DE TEMA */
+    .theme-floating-btn {
+      position: fixed !important;
+      bottom: 1.75rem !important;
+      right: 1.75rem !important;
+      z-index: 99999 !important;
+      width: 52px;
+      height: 52px;
+      background: var(--bg-surface);
+      border: 2px solid var(--border-color);
+      box-shadow: var(--shadow-hard);
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s ease;
+      user-select: none;
+    }
+
+    .theme-floating-btn:hover {
+      transform: translate(-3px, -3px) scale(1.06);
+      box-shadow: 6px 6px 0px var(--border-color);
+    }
+
+    .theme-floating-btn:active {
+      transform: translate(2px, 2px) scale(0.96);
+      box-shadow: 2px 2px 0px var(--border-color);
+    }
+
+    .theme-icon-wrap {
+      font-size: 1.25rem;
+      line-height: 1;
+      display: inline-block;
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* FOOTER */
+    .footer {
+      border-top: 1px solid var(--border-color);
+      background: var(--bg-surface);
+      padding: 1.25rem 1.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-align: center;
     }
   </style>
 </head>
 <body>
 
   <!-- TOPBAR INSTITUCIONAL -->
-  <header class="crivos-topbar">
-    <div class="crivos-topbar-left">
-      <span class="sq-red">■</span> CRIVOS // PORTAL DE ACESSO DO CANDIDATO
-    </div>
-    <div class="crivos-topbar-right">
-      <a href="/" style="color:#FFF;text-decoration:none;font-weight:700;margin-right:12px;">← VOLTAR À HOME</a>
-      <button type="button" id="theme-toggle-btn" class="theme-toggle-btn" title="Alternar Modo Escuro">[ ◐ DIA ]</button>
+  <header class="topbar">
+    <div class="topbar-container">
+      <a href="/" class="brand">
+        <span class="brand-sq"></span>
+        <span class="brand-name">CRIVOS</span>
+        <span class="brand-tag">// ACESSO</span>
+      </a>
+
+      <div class="nav-actions">
+        <a href="/" class="nav-link-btn">← Início</a>
+        <a href="https://crivos-demo.pages.dev" target="_blank" rel="noopener noreferrer" class="nav-link-btn" style="background:var(--bg-elevated)">Demo Ao Vivo ↗</a>
+      </div>
     </div>
   </header>
 
-  <!-- ÁREA DE LOGIN -->
+  <!-- FORMULÁRIO DE LOGIN -->
   <main class="login-container">
     <div class="login-card">
       <div class="login-brand-header">
-        <div class="login-brand-sq"></div>
+        <div class="login-brand-sq" aria-hidden="true"></div>
         <div>
-          <div class="login-brand-title">CRIVOS // ÁREA DO CANDIDATO</div>
-          <div class="login-brand-subtitle">SISTEMA OPERACIONAL DE ESTUDOS</div>
+          <div class="login-brand-title">PORTAL DO CANDIDATO</div>
+          <div class="login-brand-subtitle">AUTENTICAÇÃO TÁTICA SUPABASE</div>
         </div>
       </div>
 
-      <p style="font-size: 13px; color: var(--ink-muted); line-height: 1.5; margin-bottom: 22px;">
-        Informe o e-mail cadastrado na contratação e a sua chave de acesso enviada automaticamente após a confirmação do pagamento.
+      <p class="login-intro">
+        Informe o e-mail cadastrado na contratação e sua chave de acesso enviada por e-mail após a confirmação do pagamento.
       </p>
 
-      <div id="login-feedback" class="login-feedback" style="display:none;"></div>
-
       <form id="login-form">
-        <div class="login-form-group">
-          <label for="login-email" class="login-label">E-mail do Candidato</label>
-          <input type="email" id="login-email" class="login-input" placeholder="seu-email@exemplo.com" required autocomplete="email">
+        <div class="form-group">
+          <label for="login-email" class="form-label">E-MAIL DO CANDIDATO</label>
+          <input type="email" id="login-email" class="form-input" required placeholder="candidato@exemplo.com" autocomplete="username">
         </div>
 
-        <div class="login-form-group">
-          <label for="login-password" class="login-label">Chave de Acesso (Senha Tática)</label>
-          <input type="password" id="login-password" class="login-input" placeholder="••••••••••••" required autocomplete="current-password">
+        <div class="form-group">
+          <label for="login-password" class="form-label">CHAVE DE ACESSO (SENHA TÁTICA)</label>
+          <input type="password" id="login-password" class="form-input" required placeholder="••••••••••••" autocomplete="current-password">
         </div>
 
-        <button type="submit" id="btn-submit-login" class="btn btn-primary" style="width:100%;padding:14px;font-size:13px;font-weight:700;letter-spacing:0.04em;">
-          [ ENTRAR NO PAINEL ] →
+        <div id="login-feedback" class="login-feedback"></div>
+
+        <button type="submit" id="btn-submit-login" class="btn-submit">
+          <span>[ ENTRAR NO PAINEL ]</span>
+          <span>→</span>
         </button>
       </form>
 
       <div class="login-footer-actions">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-          <a href="#" id="link-forgot" class="login-link-secondary">
-            Esqueceu sua chave de acesso?
-          </a>
-          <a href="/" class="login-link-secondary">
-            Ainda não tem um plano?
-          </a>
+        <div class="login-footer-row">
+          <a href="#" id="link-forgot" class="login-link-secondary">Esqueceu sua chave de acesso?</a>
+          <a href="/" class="login-link-secondary">← Voltar à Vitrine</a>
         </div>
-
-        <div style="margin-top:8px;padding-top:14px;border-top:1px dashed var(--border-subtle);text-align:center;">
-          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink-muted);display:block;margin-bottom:8px">
-            ACESSO DE DEMONSTRAÇÃO PÚBLICA
-          </span>
-          <a href="https://crivos-demo.pages.dev" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="width:100%;padding:10px;font-size:11px;">
-            ⚡ TESTAR DEMO AO VIVO (PPGHS) ↗
-          </a>
-        </div>
+        
+        <a href="https://crivos-demo.pages.dev" target="_blank" rel="noopener noreferrer" class="demo-callout-btn">
+          ⚡ TESTAR DEMONSTRAÇÃO AO VIVO (PPGHS) ↗
+        </a>
       </div>
     </div>
   </main>
 
-  <footer style="padding:24px 20px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-muted);border-top:1px solid var(--border-color);background:var(--bg-dark);">
-    CRIVOS // SISTEMA OPERACIONAL DE ESTUDOS · SEGURANÇA E PRIVACIDADE LOCAL
+  <!-- BOTAO FLUTUANTE DE TEMA (DIRETRIZ OFICIAL CRIVOS-WEB) -->
+  <button class="theme-floating-btn" id="theme-toggle" type="button" title="Alternar Modo Claro / Escuro" aria-label="Alternar Tema">
+    <span class="theme-icon-wrap" id="theme-icon">◐</span>
+  </button>
+
+  <footer class="footer">
+    CRIVOS // SISTEMA OPERACIONAL DE ESTUDOS · INFRAESTRUTURA SUPABASE
   </footer>
 
   <script>
-    // Inicialização do Supabase
+    // Inicialização do Supabase Client
     const SUPABASE_URL = 'https://dmmtmfjlieqeqwlhtgrr.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_pRdjFhU4VWrjVOOSUcNB5Q_9ZnJwFNw';
     
@@ -248,7 +526,7 @@
       }
 
       if (!sbClient) {
-        showFeedback('Falha na inicialização da conexão com o servidor. Tente novamente em instantes.');
+        showFeedback('Falha na conexão com o servidor. Tente novamente em instantes.');
         return;
       }
 
@@ -262,31 +540,28 @@
           password: password,
         });
 
-        if (error) {
-          throw error;
-        }
+        if (error) throw error;
 
         if (data && data.session) {
-          showFeedback('Autenticação bem-sucedida! Carregando seu painel...', false);
+          showFeedback('Autenticação autorizada! Carregando seu ecossistema...', false);
           
-          // Armazena credenciais para facilitar transição local se necessário
           try {
             localStorage.setItem('crivos_user_email', email);
           } catch(e) {}
 
-          // Redireciona diretamente para o painel com token de acesso para auto-login imediato
+          // Redireciona diretamente para o painel com token de acesso para auto-login cross-domain
           setTimeout(() => {
             const redirectUrl = `https://crivos-painel.pages.dev/#access_token=${encodeURIComponent(data.session.access_token)}&refresh_token=${encodeURIComponent(data.session.refresh_token)}&type=recovery`;
             window.location.href = redirectUrl;
-          }, 600);
+          }, 500);
         }
       } catch (err) {
         console.error(err);
         showFeedback(err.message === 'Invalid login credentials' 
-          ? 'Chave de acesso ou e-mail incorretos. Verifique os dados recebidos por e-mail.' 
+          ? 'Chave de acesso ou e-mail incorretos. Verifique suas credenciais.' 
           : (err.message || 'Falha na autenticação. Verifique suas credenciais.'));
         submitBtn.disabled = false;
-        submitBtn.textContent = '[ ENTRAR NO PAINEL ] →';
+        submitBtn.innerHTML = '<span>[ ENTRAR NO PAINEL ]</span><span>→</span>';
       }
     });
 
@@ -309,25 +584,40 @@
       }
     });
 
-    // Theme toggle
-    const themeBtn = document.getElementById('theme-toggle-btn');
-    function updateThemeUI() {
-      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-      if (themeBtn) themeBtn.textContent = isDark ? '[ ◑ NOITE ]' : '[ ◐ DIA ]';
+    // Theme toggle sincronizado
+    const themeBtn = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+
+    function updateThemeIcon(isDark) {
+      if (themeIcon) {
+        themeIcon.textContent = isDark ? '◑' : '◐';
+      }
     }
+
+    const savedTheme = localStorage.getItem('crivos_theme') || localStorage.getItem('crivos_web_theme');
+    if (savedTheme === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      updateThemeIcon(true);
+    }
+
     if (themeBtn) {
-      themeBtn.onclick = function() {
-        const cur = document.documentElement.getAttribute('data-theme');
-        const next = cur === 'dark' ? 'light' : 'dark';
-        if (next === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
-        else document.documentElement.removeAttribute('data-theme');
-        try {
-          localStorage.setItem('crivos_web_theme', next);
-          localStorage.setItem('crivos_theme', next);
-        } catch(e) {}
-        updateThemeUI();
-      };
-      updateThemeUI();
+      themeBtn.addEventListener('click', () => {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const next = isDark ? 'light' : 'dark';
+        if (next === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+          document.documentElement.removeAttribute('data-theme');
+        }
+        localStorage.setItem('crivos_theme', next);
+        localStorage.setItem('crivos_web_theme', next);
+        updateThemeIcon(next === 'dark');
+
+        if (themeIcon) {
+          themeIcon.style.transform = 'rotate(180deg)';
+          setTimeout(() => { themeIcon.style.transform = 'none'; }, 350);
+        }
+      });
     }
   </script>
 </body>

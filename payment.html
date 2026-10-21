@@ -1,47 +1,94 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="light">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CRIVOS // Configuração do Sistema & Checkout</title>
+  <title>CRIVOS // Configuração do Sistema &amp; Checkout</title>
+  
+  <!-- Favicon oficial: Quadrado Vermelho Brutalista -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%23D92B2B'/></svg>">
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-  
-  <!-- Favicon com o quadrado vermelho oficial da marca -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%23D92B2B' stroke='%23111111' stroke-width='1'/></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    (function() {
+      try {
+        var t = localStorage.getItem('crivos_theme') || localStorage.getItem('crivos_web_theme');
+        if (t === 'dark' || (!t && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      } catch(e) {}
+    })();
+  </script>
 
   <!-- SDK Oficial do Mercado Pago V2 -->
   <script src="https://sdk.mercadopago.com/js/v2"></script>
 
   <style>
     :root {
-      --bg-color: #F4F4F0;
-      --card-bg: #FFFFFF;
-      --text-color: #111111;
+      --bg-primary: #F4F4F0;
+      --bg-surface: #FFFFFF;
+      --bg-elevated: #EAEAE4;
+      --bg-dark-block: #111111;
+      --text-primary: #111111;
+      --text-secondary: #383838;
       --text-muted: #666666;
+      --text-on-dark: #F4F4F0;
+      --accent-red: #D92B2B;
+      --accent-red-hover: #B91C1C;
+      --accent-blue: #1D4ED8;
+      --accent-green: #15803D;
       --border-color: #111111;
-      --border-subtle: #DDDDDD;
-      --accent-color: #D92B2B;
-      --box-shadow: 4px 4px 0px #111111;
-      --btn-shadow: 2px 2px 0px #111111;
-      --input-bg: #F4F4F0;
-      --urgency-bg: #FFF5F5;
+      --border-subtle: rgba(17, 17, 17, 0.15);
+      --shadow-sm: 2px 2px 0px #111111;
+      --shadow-hard: 4px 4px 0px #111111;
+      --shadow-lg: 8px 8px 0px #111111;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      /* Aliases para compatibilidade total com os elementos existentes */
+      --bg-color: var(--bg-primary);
+      --card-bg: var(--bg-surface);
+      --text-color: var(--text-primary);
+      --accent-color: var(--accent-red);
+      --box-shadow: var(--shadow-hard);
+      --btn-shadow: var(--shadow-sm);
+      --input-bg: var(--bg-surface);
+      --urgency-bg: rgba(217, 43, 43, 0.08);
       --pix-green: #0d9488;
     }
 
     [data-theme="dark"] {
-      --bg-color: #0A0A0A;
-      --card-bg: #141414;
-      --text-color: #F4F4F0;
-      --text-muted: #A0A0A0;
-      --border-color: #333333;
-      --border-subtle: #262626;
-      --accent-color: #EF4444;
-      --box-shadow: 4px 4px 0px #333333;
-      --btn-shadow: 2px 2px 0px #EF4444;
-      --input-bg: #1A1A1A;
-      --urgency-bg: #1F1212;
+      --bg-primary: #0B0C0E;
+      --bg-surface: #131519;
+      --bg-elevated: #1B1E24;
+      --bg-dark-block: #070809;
+      --text-primary: #F2F2EE;
+      --text-secondary: #B0B6C3;
+      --text-muted: #767E8F;
+      --text-on-dark: #F2F2EE;
+      --accent-red: #E53935;
+      --accent-red-hover: #D32F2F;
+      --accent-blue: #3B82F6;
+      --accent-green: #22C55E;
+      --border-color: #2C313C;
+      --border-subtle: rgba(242, 242, 238, 0.1);
+      --shadow-sm: 2px 2px 0px #000000;
+      --shadow-hard: 4px 4px 0px #000000;
+      --shadow-lg: 8px 8px 0px #000000;
+
+      /* Aliases dark */
+      --bg-color: var(--bg-primary);
+      --card-bg: var(--bg-surface);
+      --text-color: var(--text-primary);
+      --accent-color: var(--accent-red);
+      --box-shadow: var(--shadow-hard);
+      --btn-shadow: var(--shadow-sm);
+      --input-bg: var(--bg-surface);
+      --urgency-bg: rgba(229, 57, 53, 0.14);
       --pix-green: #14b8a6;
     }
 
@@ -53,626 +100,692 @@
     }
 
     body {
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      font-family: 'Inter', sans-serif;
-      padding: 20px 20px 60px 20px;
-    }
-
-    .top-bar {
-      max-width: 640px;
-      margin: 0 auto 20px auto;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      line-height: 1.5;
+      min-height: 100vh;
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* TOPBAR INSTITUCIONAL PADRONIZADA */
+    .topbar {
+      border-bottom: 2px solid var(--border-color);
+      background: var(--bg-surface);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .topbar-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.25rem;
+      height: 64px;
+      display: flex;
       align-items: center;
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      padding: 10px 16px;
-      box-shadow: 2px 2px 0px var(--border-color);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
+      justify-content: space-between;
     }
 
-    .back-link {
-      color: var(--text-color);
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
       text-decoration: none;
-      font-weight: 700;
-      border-bottom: 1px dashed var(--text-color);
+      color: var(--text-primary);
     }
 
-    .theme-toggle {
-      background: var(--input-bg);
-      color: var(--text-color);
+    .brand-sq {
+      width: 14px;
+      height: 14px;
+      background: var(--accent-red);
       border: 1px solid var(--border-color);
-      padding: 4px 8px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
-      cursor: pointer;
+      display: inline-block;
+      flex-shrink: 0;
+      aspect-ratio: 1/1;
+    }
+
+    .brand-name {
+      font-family: var(--font-sans);
+      font-weight: 900;
+      font-size: 1.25rem;
+      letter-spacing: -0.04em;
+    }
+
+    .brand-tag {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
       font-weight: 700;
+      color: var(--text-muted);
+      border-left: 1px solid var(--border-subtle);
+      padding-left: 0.6rem;
+      margin-left: 0.2rem;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .nav-link-btn {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-decoration: none;
+      color: var(--text-primary);
+      padding: 0.5rem 0.85rem;
+      border: 1px solid var(--border-color);
+      background: var(--bg-surface);
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .nav-link-btn:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: var(--shadow-hard);
+    }
+
+    /* CHECKOUT LAYOUT */
+    .checkout-wrapper {
+      flex: 1;
+      padding: 2.5rem 1.25rem 4rem;
+      display: flex;
+      justify-content: center;
     }
 
     .checkout-container {
+      width: 100%;
       max-width: 640px;
-      margin: 0 auto;
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      box-shadow: var(--box-shadow);
-      padding: 32px 28px;
     }
 
-    /* Indicador Visual de Etapas */
+    /* Barra de Passos / Steps */
     .steps-nav {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 24px;
+      display: flex;
+      margin-bottom: 2rem;
+      border: 2px solid var(--border-color);
+      background: var(--bg-surface);
+      box-shadow: var(--shadow-sm);
     }
 
     .step-indicator {
-      border: 1px solid var(--border-color);
-      background: var(--input-bg);
-      padding: 12px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      flex: 1;
+      text-align: center;
+      padding: 0.85rem 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 800;
       color: var(--text-muted);
+      letter-spacing: 0.04em;
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    .step-indicator span {
+      display: inline-block;
+      margin-right: 0.25rem;
     }
 
     .step-indicator.active {
-      background: var(--text-color);
-      color: var(--bg-color);
-      border-color: var(--text-color);
-      box-shadow: 2px 2px 0px var(--accent-color);
+      background: var(--border-color);
+      color: var(--bg-surface);
     }
 
-    .step-indicator.done {
-      background: var(--card-bg);
-      color: var(--text-color);
-      border-color: var(--border-color);
+    /* Cards e Formulário */
+    .checkout-card {
+      background: var(--bg-surface);
+      border: 2px solid var(--border-color);
+      padding: 2.25rem 2rem;
+      box-shadow: var(--shadow-lg);
+      margin-bottom: 1.5rem;
     }
 
     .header-tag {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
-      text-transform: uppercase;
-      background: var(--accent-color);
-      color: #FFFFFF;
-      padding: 4px 8px;
-      display: inline-block;
-      margin-bottom: 12px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--accent-red);
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.05em;
     }
 
     h1 {
-      font-size: 24px;
+      font-family: var(--font-sans);
+      font-size: 1.65rem;
       font-weight: 900;
-      text-transform: uppercase;
-      margin-bottom: 8px;
-      letter-spacing: -0.5px;
+      letter-spacing: -0.04em;
+      margin-bottom: 0.5rem;
+      line-height: 1.2;
     }
 
     .step-desc {
-      font-size: 13px;
-      line-height: 1.5;
+      font-size: 0.85rem;
       color: var(--text-muted);
-      margin-bottom: 20px;
+      margin-bottom: 1.75rem;
+      line-height: 1.55;
     }
 
     .form-group {
-      margin-bottom: 18px;
+      margin-bottom: 1.35rem;
     }
 
     label {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      font-weight: 700;
       display: block;
-      margin-bottom: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.45rem;
       text-transform: uppercase;
-      color: var(--text-color);
     }
 
-    label .req {
-      color: var(--accent-color);
+    .req {
+      color: var(--accent-red);
     }
 
-    select, input, textarea {
-      width: 100%;
-      background: var(--input-bg);
-      border: 1px solid var(--border-color);
-      padding: 12px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
-      color: var(--text-color);
-    }
-
+    input[type="text"],
+    input[type="email"],
+    select,
     textarea {
-      resize: vertical;
-      min-height: 80px;
-      line-height: 1.4;
+      width: 100%;
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      padding: 0.75rem 0.85rem;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
 
-    select:focus, input:focus, textarea:focus {
+    input:focus,
+    select:focus,
+    textarea:focus {
       outline: none;
-      border-color: var(--accent-color);
-    }
-
-    .plan-description {
-      background: var(--input-bg);
-      border: 1px solid var(--border-color);
-      border-left: 4px solid var(--accent-color);
-      padding: 12px 14px;
-      margin-bottom: 22px;
-      font-size: 12px;
-      line-height: 1.5;
-      font-family: 'JetBrains Mono', monospace;
-      color: var(--text-color);
-    }
-
-    /* Alternador Edital: Upload vs Texto */
-    .edital-mode-switch {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-
-    .edital-mode-btn {
-      background: var(--input-bg);
-      border: 1px solid var(--border-color);
-      color: var(--text-color);
-      padding: 8px 10px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      font-weight: 700;
-      cursor: pointer;
-      text-align: center;
-    }
-
-    .edital-mode-btn.active {
-      background: var(--card-bg);
-      border-left: 3px solid var(--accent-color);
-      font-weight: 700;
-    }
-
-    .upload-zone {
-      border: 2px dashed var(--border-color);
-      background: var(--input-bg);
-      padding: 18px;
-      text-align: center;
-      cursor: pointer;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      margin-bottom: 6px;
-    }
-
-    .upload-zone:hover {
-      border-color: var(--accent-color);
-    }
-
-    .file-selected-name {
-      display: block;
-      margin-top: 8px;
-      font-weight: 700;
-      color: var(--accent-color);
-      word-break: break-all;
+      border-color: var(--accent-red);
+      box-shadow: 2px 2px 0px var(--accent-red);
     }
 
     .grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      gap: 1rem;
     }
 
+    @media (max-width: 600px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+      .checkout-card {
+        padding: 1.75rem 1.25rem;
+      }
+    }
+
+    /* Descrição do Plano */
+    .plan-description {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-color);
+      padding: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      margin-bottom: 1.5rem;
+    }
+
+    .plan-description strong {
+      color: var(--accent-red);
+    }
+
+    /* Upload Zone */
+    .upload-zone {
+      border: 2px dashed var(--border-color);
+      padding: 1.5rem 1rem;
+      text-align: center;
+      background: var(--bg-elevated);
+      cursor: pointer;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      transition: background 0.15s;
+    }
+
+    .upload-zone:hover {
+      background: var(--bg-surface);
+      border-color: var(--accent-red);
+    }
+
+    .file-selected-name {
+      display: block;
+      font-weight: 800;
+      color: var(--accent-green);
+      margin-top: 0.5rem;
+      word-break: break-all;
+    }
+
+    /* Botão Principal */
     .submit-btn {
       width: 100%;
-      background: var(--text-color);
-      color: var(--bg-color);
-      border: 1px solid var(--border-color);
-      padding: 15px;
-      font-family: 'Inter', sans-serif;
-      font-weight: 800;
-      font-size: 14px;
-      text-transform: uppercase;
-      cursor: pointer;
-      box-shadow: var(--btn-shadow);
-      margin-top: 10px;
-    }
-
-    .submit-btn:hover:not(:disabled) {
-      background: var(--accent-color);
+      background: var(--accent-red);
       color: #FFFFFF;
+      border: 2px solid var(--border-color);
+      padding: 0.95rem 1.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      margin-top: 1.25rem;
+      transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
     }
 
-    .btn-secondary {
-      background: var(--input-bg);
-      color: var(--text-color);
-      box-shadow: none;
-      margin-top: 8px;
-      padding: 12px;
-      font-size: 12px;
+    .submit-btn:hover {
+      background: var(--accent-red-hover);
+      transform: translate(-1px, -1px);
+      box-shadow: var(--shadow-hard);
     }
 
-    .btn-secondary:hover {
-      background: var(--card-bg);
-      color: var(--text-color);
+    .submit-btn:active {
+      transform: translate(1px, 1px);
+      box-shadow: 1px 1px 0px var(--border-color);
+    }
+
+    .submit-btn.btn-secondary {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      margin-top: 0.85rem;
+    }
+
+    .submit-btn.btn-secondary:hover {
+      background: var(--bg-elevated);
     }
 
     .submit-btn.btn-pix {
-      background: var(--pix-green);
-      color: #FFFFFF;
+      background: #0d9488;
       border-color: var(--border-color);
     }
 
-    .submit-btn.btn-pix:hover:not(:disabled) {
+    .submit-btn.btn-pix:hover {
       background: #0f766e;
     }
 
-    /* Etapa 2: Métodos de Pagamento */
+    /* Resumo Etapa 2 */
+    .summary-badge {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-color);
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.6;
+    }
+
+    /* Abas de Pagamento */
     .tabs-header {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 20px;
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
     }
 
     .tab-btn {
-      background: var(--input-bg);
-      color: var(--text-color);
-      border: 1px solid var(--border-color);
-      padding: 12px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
+      flex: 1;
+      padding: 0.75rem 0.5rem;
+      border: 2px solid var(--border-color);
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
       cursor: pointer;
-      text-align: center;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.1s, box-shadow 0.1s;
     }
 
     .tab-btn.active {
-      background: var(--text-color);
-      color: var(--bg-color);
-      border-color: var(--text-color);
-      box-shadow: 2px 2px 0px var(--accent-color);
+      background: var(--border-color);
+      color: var(--bg-surface);
+      box-shadow: none;
     }
 
-    .mp-container {
-      background: var(--input-bg);
-      border: 1px solid var(--border-color);
-      min-height: 48px;
-      height: 48px;
-      display: block;
-      margin-bottom: 4px;
-      position: relative;
-    }
-
-    .mp-container iframe {
-      width: 100% !important;
-      height: 100% !important;
-      min-height: 46px !important;
-      border: none !important;
-    }
-
+    /* Exibição do PIX */
     .pix-display-box {
       display: none;
-      background: var(--input-bg);
-      border: 1px solid var(--border-color);
-      padding: 20px;
+      margin-top: 1.5rem;
+      padding: 1.5rem;
+      background: var(--bg-elevated);
+      border: 2px solid var(--border-color);
       text-align: center;
-      margin-top: 16px;
     }
 
     .pix-qr-img {
-      max-width: 200px;
-      margin: 12px auto;
+      width: 200px;
+      height: 200px;
+      margin: 1.25rem auto;
       display: block;
       border: 1px solid var(--border-color);
       background: #FFFFFF;
-      padding: 8px;
+      padding: 6px;
     }
 
     .pix-code-input {
-      font-size: 11px;
-      padding: 8px;
+      font-size: 0.75rem !important;
       text-align: center;
-      margin-bottom: 8px;
-      background: var(--card-bg);
+      background: var(--bg-surface) !important;
+      margin-bottom: 0.75rem;
     }
 
     .pix-status-polling {
-      display: inline-flex;
+      margin-top: 1.25rem;
+      display: flex;
       align-items: center;
-      gap: 8px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      color: var(--accent-color);
-      margin-top: 12px;
-      font-weight: 700;
+      justify-content: center;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
     }
 
     .pulse-dot {
       width: 8px;
       height: 8px;
-      background-color: var(--accent-color);
+      background: #0d9488;
       border-radius: 50% !important;
       display: inline-block;
       animation: pulse 1.5s infinite;
     }
 
     @keyframes pulse {
-      0% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.8); }
-      100% { opacity: 1; transform: scale(1); }
+      0% { transform: scale(0.95); opacity: 0.7; }
+      50% { transform: scale(1.3); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.7; }
     }
 
     .error-msg {
-      background: var(--urgency-bg);
-      color: var(--accent-color);
-      border: 1px solid var(--accent-color);
-      padding: 10px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      margin-bottom: 14px;
+      background: rgba(217, 43, 43, 0.08);
+      border: 1px solid var(--accent-red);
+      border-left: 4px solid var(--accent-red);
+      color: var(--accent-red);
+      padding: 0.75rem 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      margin-bottom: 1.5rem;
       display: none;
     }
 
-    .summary-badge {
-      background: var(--input-bg);
-      border: 1px solid var(--border-color);
-      border-left: 4px solid var(--accent-color);
-      padding: 10px 14px;
-      margin-bottom: 20px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      line-height: 1.6;
-    }
-
     .secure-footer {
-      margin-top: 24px;
       text-align: center;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
       color: var(--text-muted);
-      line-height: 1.5;
+      line-height: 1.6;
+      margin-top: 1.5rem;
     }
 
-    #cardPaymentBrick_container {
-      min-height: 280px;
-      width: 100%;
-      background: var(--card-bg);
-      margin-top: 10px;
+    /* BOTAO FLUTUANTE DE TEMA */
+    .theme-floating-btn {
+      position: fixed !important;
+      bottom: 1.75rem !important;
+      right: 1.75rem !important;
+      z-index: 99999 !important;
+      width: 52px;
+      height: 52px;
+      background: var(--bg-surface);
+      border: 2px solid var(--border-color);
+      box-shadow: var(--shadow-hard);
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s ease;
+      user-select: none;
     }
 
-    /* Força estética brutalista suíça em todos os elementos do Brick */
-    #cardPaymentBrick_container * {
-      border-radius: 0px !important;
-      box-sizing: border-box;
+    .theme-floating-btn:hover {
+      transform: translate(-3px, -3px) scale(1.06);
+      box-shadow: 6px 6px 0px var(--border-color);
     }
 
-    #cardPaymentBrick_container iframe {
-      border-radius: 0px !important;
+    .theme-floating-btn:active {
+      transform: translate(2px, 2px) scale(0.96);
+      box-shadow: 2px 2px 0px var(--border-color);
     }
 
-    /* Botão de pagamento do Brick padronizado no estilo CRIVOS */
-    #cardPaymentBrick_container button[type="submit"],
-    #cardPaymentBrick_container .mp-bricks-btn {
-      font-family: 'JetBrains Mono', monospace !important;
-      font-weight: 700 !important;
-      letter-spacing: 0.5px !important;
-      text-transform: uppercase !important;
-      border-radius: 0px !important;
-      background-color: var(--accent-color) !important;
-      color: #FFFFFF !important;
-      border: 1px solid var(--border-color) !important;
-      box-shadow: 2px 2px 0px var(--border-color) !important;
-      cursor: pointer !important;
-      transition: transform 0.1s ease, box-shadow 0.1s ease !important;
+    .theme-icon-wrap {
+      font-size: 1.25rem;
+      line-height: 1;
+      display: inline-block;
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
-    #cardPaymentBrick_container button[type="submit"]:hover,
-    #cardPaymentBrick_container .mp-bricks-btn:hover {
-      transform: translate(-1px, -1px);
-      box-shadow: 3px 3px 0px var(--border-color) !important;
-    }
-
-    @media (max-width: 540px) {
-      .grid-2 {
-        grid-template-columns: 1fr;
-      }
-      .steps-nav {
-        grid-template-columns: 1fr;
-      }
+    /* FOOTER */
+    .footer {
+      border-top: 1px solid var(--border-color);
+      background: var(--bg-surface);
+      padding: 1.25rem 1.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-align: center;
     }
   </style>
 </head>
 <body>
 
-  <header class="top-bar">
-    <a href="index.html" class="back-link">[← VOLTAR À VITRINE]</a>
-    <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()">[ ◐ TEMA ]</button>
+  <!-- TOPBAR INSTITUCIONAL -->
+  <header class="topbar">
+    <div class="topbar-container">
+      <a href="/" class="brand">
+        <span class="brand-sq"></span>
+        <span class="brand-name">CRIVOS</span>
+        <span class="brand-tag">// CHECKOUT SEGURO</span>
+      </a>
+
+      <div class="nav-actions">
+        <a href="/" class="nav-link-btn">← Voltar à Vitrine</a>
+      </div>
+    </div>
   </header>
 
-  <div class="checkout-container">
-    
-    <!-- Barra de Progresso das Etapas -->
-    <div class="steps-nav">
-      <div id="step-nav-1" class="step-indicator active">
-        <span>[01]</span> DADOS DO EDITAL &amp; ACESSO
+  <div class="checkout-wrapper">
+    <div class="checkout-container">
+      
+      <!-- Barra de Progresso das Etapas -->
+      <div class="steps-nav">
+        <div id="step-nav-1" class="step-indicator active">
+          <span>[01]</span> DADOS DO EDITAL &amp; ACESSO
+        </div>
+        <div id="step-nav-2" class="step-indicator">
+          <span>[02]</span> CHECKOUT CRIPTOGRAFADO
+        </div>
       </div>
-      <div id="step-nav-2" class="step-indicator">
-        <span>[02]</span> CHECKOUT SEGURO
-      </div>
-    </div>
 
-    <div id="checkout-error" class="error-msg"></div>
+      <div id="checkout-error" class="error-msg"></div>
 
-    <!-- ======================================================== -->
-    <!-- ETAPA 1: DADOS DO CONCURSO, ROTINA E E-MAIL               -->
-    <!-- ======================================================== -->
-    <div id="stage-1">
-      <div class="header-tag">[ ETAPA 01 // ESPECIFICAÇÃO DE ENGENHARIA ]</div>
-      <h1>Seu Concurso &amp; Rotina</h1>
-      <p class="step-desc">
-        Informe seu concurso-alvo, disponibilidade semanal de horas e anexe seu edital (opcional). Seu ecossistema de estudos será dimensionado sob medida para sua realidade.
-      </p>
+      <!-- ======================================================== -->
+      <!-- ETAPA 1: DADOS DO CONCURSO, ROTINA E E-MAIL               -->
+      <!-- ======================================================== -->
+      <div id="stage-1" class="checkout-card">
+        <div class="header-tag">[ ETAPA 01 // ESPECIFICAÇÃO DE ENGENHARIA ]</div>
+        <h1>Seu Concurso &amp; Rotina</h1>
+        <p class="step-desc">
+          Informe seu concurso-alvo, disponibilidade semanal de horas e anexe seu edital (opcional). Seu ecossistema de estudos será dimensionado sob medida para sua realidade.
+        </p>
 
-      <form id="form-stage-1" onsubmit="goToStage2(event)">
-        <!-- E-mail de Acesso -->
-        <div class="form-group">
-          <label for="user-email">E-MAIL DO CANDIDATO <span class="req">*</span></label>
-          <input type="email" id="user-email" placeholder="seu.email@dominio.com" required />
-          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);margin-top:4px;">
-            Este será o login para envio do seu link de calibração tática em até 48h.
-          </div>
-        </div>
-
-        <!-- Concurso e Cargo -->
-        <div class="grid-2">
+        <form id="form-stage-1" onsubmit="goToStage2(event)">
+          <!-- E-mail de Acesso -->
           <div class="form-group">
-            <label for="user-concurso">CONCURSO / EXAME ALVO <span class="req">*</span></label>
-            <input type="text" id="user-concurso" placeholder="Ex: SEFAZ, Receita Federal, CNU, OAB, etc." required />
-          </div>
-          <div class="form-group">
-            <label for="user-cargo">CARGO / ESPECIALIDADE <span class="req">*</span></label>
-            <input type="text" id="user-cargo" placeholder="Ex: Auditor Fiscal, Analista de TI, etc." required />
-          </div>
-        </div>
-
-        <!-- Disponibilidade Semanal de Horas de Estudo -->
-        <div class="form-group">
-          <label for="user-availability">DISPONIBILIDADE SEMANAL DE HORAS DE ESTUDO <span class="req">*</span></label>
-          <textarea id="user-availability" rows="4" placeholder="Descreva com o máximo de detalhes possível sua rotina semanal de estudos:&#10;• Segunda a Sexta: Ex: 3h líquidas/dia (noite, 19h às 22h)&#10;• Sábados: Ex: 6h líquidas (manhã e tarde)&#10;• Domingos: Ex: 3h para simulados / revisões (ou descanso)&#10;• Rotina de trabalho: Trabalho das 8h às 18h em dias úteis..." required></textarea>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);margin-top:4px;">
-            Quanto mais específico sobre dias, turnos e horas líquidas disponíveis, mais assertiva será a distribuição de metas no seu cronograma diário.
-          </div>
-        </div>
-
-        <!-- Seleção de Plano -->
-        <div class="form-group">
-          <label for="product-select">PLANO ESCOLHIDO <span class="req">*</span></label>
-          <select id="product-select">
-            <option value="tatico">Nível 1 · Tático — R$ 67,00 (Pagamento Único)</option>
-            <option value="arsenal">Nível 2 · Arsenal (Com Motor SM-2) — R$ 124,00</option>
-            <option value="elite">Nível 3 · Elite (Pacote Completo) — R$ 221,00</option>
-          </select>
-        </div>
-
-        <div id="plan-description-box" class="plan-description">
-          Carregando detalhes do sistema...
-        </div>
-
-        <!-- Edital: Upload Opcional do PDF -->
-        <div class="form-group">
-          <label for="edital-file">ANEXAR EDITAL (PDF / DOCUMENTO) <span style="font-size:10px;color:var(--text-muted);font-weight:normal;">[ OPCIONAL ]</span></label>
-          <div class="upload-zone" onclick="document.getElementById('edital-file').click()">
-            <input type="file" id="edital-file" accept=".pdf,.doc,.docx,.png,.jpg" style="display:none;" onchange="handleFileSelect(event)" />
-            <div>📎 Clique ou arraste o PDF do edital aqui (opcional)</div>
-            <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">
-              Caso não tenha o arquivo em mãos agora, nossa equipe de engenharia localizará o documento oficial da banca examinadora com base no concurso e cargo informados.
+            <label for="user-email">E-MAIL DO CANDIDATO <span class="req">*</span></label>
+            <input type="email" id="user-email" placeholder="seu.email@dominio.com" required autocomplete="email" />
+            <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-top:4px;">
+              Este será o login para envio da sua chave de acesso e link de calibração tática em até 48h.
             </div>
-            <span id="file-chosen-text" class="file-selected-name"></span>
           </div>
-        </div>
 
-        <button type="submit" class="submit-btn">
-          [ AVANÇAR PARA PAGAMENTO // R$ <span class="current-price-label">67,00</span> ] →
-        </button>
-      </form>
-    </div>
-
-    <!-- ======================================================== -->
-    <!-- ETAPA 2: CHECKOUT TRANSPARENTE (PIX / CARTÃO)             -->
-    <!-- ======================================================== -->
-    <div id="stage-2" style="display:none;">
-      <div class="header-tag">[ ETAPA 02 // CHECKOUT CRIPTOGRAFADO MERCADO PAGO ]</div>
-      <h1>Pagamento Seguro</h1>
-
-      <!-- Resumo dos Dados Preenchidos na Etapa 1 -->
-      <div class="summary-badge" id="order-summary-box">
-        <div><strong>CANDIDATO:</strong> <span id="sum-email">...</span></div>
-        <div><strong>EDITAL ALVO:</strong> <span id="sum-concurso">...</span> (<span id="sum-cargo">...</span>)</div>
-        <div><strong>DISPONIBILIDADE:</strong> <span id="sum-rotina">...</span></div>
-        <div><strong>EDITAL:</strong> <span id="sum-edital">...</span></div>
-        <div><strong>PLANO:</strong> <span id="sum-plano">...</span> — <strong>R$ <span class="current-price-label">67,00</span></strong></div>
-      </div>
-
-      <!-- Abas de Pagamento -->
-      <label>ESCOLHA O MÉTODO DE PAGAMENTO</label>
-      <div class="tabs-header">
-        <button type="button" class="tab-btn active" id="tab-pix-btn" onclick="switchPaymentMethod('pix')">
-          ⚡ PIX (IMEDIATO)
-        </button>
-        <button type="button" class="tab-btn" id="tab-card-btn" onclick="switchPaymentMethod('card')">
-          💳 CARTÃO DE CRÉDITO
-        </button>
-      </div>
-
-      <!-- MÉTODO 1: PIX -->
-      <div id="method-pix">
-        <form id="pix-form" onsubmit="handlePixSubmit(event)">
+          <!-- Concurso e Cargo -->
           <div class="grid-2">
             <div class="form-group">
-              <label for="pix-name">NOME COMPLETO <span class="req">*</span></label>
-              <input type="text" id="pix-name" placeholder="Ex: Carlos Silva" required />
+              <label for="user-concurso">CONCURSO / EXAME ALVO <span class="req">*</span></label>
+              <input type="text" id="user-concurso" placeholder="Ex: SEFAZ, Receita Federal, CNU, OAB, etc." required />
             </div>
             <div class="form-group">
-              <label for="pix-cpf">CPF / CNPJ <span class="req">*</span></label>
-              <input type="text" id="pix-cpf" placeholder="000.000.000-00" required />
+              <label for="user-cargo">CARGO / ESPECIALIDADE <span class="req">*</span></label>
+              <input type="text" id="user-cargo" placeholder="Ex: Auditor Fiscal, Analista de TI, etc." required />
             </div>
           </div>
 
-          <button type="submit" id="pix-submit-btn" class="submit-btn btn-pix">
-            [ GERAR QR CODE PIX // R$ <span class="current-price-label">67,00</span> ]
+          <!-- Disponibilidade Semanal de Horas de Estudo -->
+          <div class="form-group">
+            <label for="user-availability">DISPONIBILIDADE SEMANAL DE HORAS DE ESTUDO <span class="req">*</span></label>
+            <textarea id="user-availability" rows="4" placeholder="Descreva com o máximo de detalhes possível sua rotina semanal de estudos:&#10;• Segunda a Sexta: Ex: 3h líquidas/dia (noite, 19h às 22h)&#10;• Sábados: Ex: 6h líquidas (manhã e tarde)&#10;• Domingos: Ex: 3h para simulados / revisões (ou descanso)&#10;• Rotina de trabalho: Trabalho das 8h às 18h em dias úteis..." required></textarea>
+            <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-top:4px;">
+              Quanto mais específico sobre dias, turnos e horas líquidas disponíveis, mais assertiva será a distribuição de metas no seu cronograma diário.
+            </div>
+          </div>
+
+          <!-- Seleção de Plano -->
+          <div class="form-group">
+            <label for="product-select">PLANO ESCOLHIDO <span class="req">*</span></label>
+            <select id="product-select">
+              <option value="tatico">Nível 1 · Tático — R$ 67,00 (Pagamento Único)</option>
+              <option value="arsenal">Nível 2 · Arsenal (Com Motor SM-2) — R$ 124,00</option>
+              <option value="elite">Nível 3 · Elite (Pacote Completo) — R$ 221,00</option>
+            </select>
+          </div>
+
+          <div id="plan-description-box" class="plan-description">
+            Carregando detalhes do sistema...
+          </div>
+
+          <!-- Edital: Upload Opcional do PDF -->
+          <div class="form-group">
+            <label for="edital-file">ANEXAR EDITAL (PDF / DOCUMENTO) <span style="font-size:10px;color:var(--text-muted);font-weight:normal;">[ OPCIONAL ]</span></label>
+            <div class="upload-zone" onclick="document.getElementById('edital-file').click()">
+              <input type="file" id="edital-file" accept=".pdf,.doc,.docx,.png,.jpg" style="display:none;" onchange="handleFileSelect(event)" />
+              <div>📎 Clique ou arraste o PDF do edital aqui (opcional)</div>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">
+                Caso não tenha o arquivo em mãos agora, nossa equipe de engenharia localizará o documento oficial da banca examinadora com base no concurso e cargo informados.
+              </div>
+              <span id="file-chosen-text" class="file-selected-name"></span>
+            </div>
+          </div>
+
+          <button type="submit" class="submit-btn">
+            <span>[ AVANÇAR PARA PAGAMENTO // R$ <span class="current-price-label">67,00</span> ]</span>
+            <span>→</span>
           </button>
         </form>
+      </div>
 
-        <div id="pix-display" class="pix-display-box">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--pix-green);">
-            [✓ PIX GERADO // AGUARDANDO PAGAMENTO]
-          </div>
-          <img id="pix-qr-img" class="pix-qr-img" alt="QR Code PIX Mercado Pago" />
-          
-          <p style="font-size:11px;font-family:'JetBrains Mono',monospace;margin-bottom:8px;">
-            Escaneie o QR Code no app do seu banco ou copie o código Pix abaixo:
-          </p>
+      <!-- ======================================================== -->
+      <!-- ETAPA 2: CHECKOUT TRANSPARENTE (PIX / CARTÃO)             -->
+      <!-- ======================================================== -->
+      <div id="stage-2" class="checkout-card" style="display:none;">
+        <div class="header-tag">[ ETAPA 02 // CHECKOUT CRIPTOGRAFADO MERCADO PAGO ]</div>
+        <h1>Pagamento Seguro</h1>
 
-          <input type="text" id="pix-code-str" class="pix-code-input" readonly />
-          <button type="button" class="submit-btn" style="margin-top:0;padding:10px;font-size:12px;" onclick="copyPixCode()">
-            [ COPIAR CÓDIGO PIX ]
+        <!-- Resumo dos Dados Preenchidos na Etapa 1 -->
+        <div class="summary-badge" id="order-summary-box">
+          <div><strong>CANDIDATO:</strong> <span id="sum-email">...</span></div>
+          <div><strong>EDITAL ALVO:</strong> <span id="sum-concurso">...</span> (<span id="sum-cargo">...</span>)</div>
+          <div><strong>DISPONIBILIDADE:</strong> <span id="sum-rotina">...</span></div>
+          <div><strong>EDITAL:</strong> <span id="sum-edital">...</span></div>
+          <div><strong>PLANO:</strong> <span id="sum-plano">...</span> — <strong>R$ <span class="current-price-label">67,00</span></strong></div>
+        </div>
+
+        <!-- Abas de Pagamento -->
+        <label>ESCOLHA O MÉTODO DE PAGAMENTO</label>
+        <div class="tabs-header">
+          <button type="button" class="tab-btn active" id="tab-pix-btn" onclick="switchPaymentMethod('pix')">
+            ⚡ PIX (IMEDIATO)
           </button>
+          <button type="button" class="tab-btn" id="tab-card-btn" onclick="switchPaymentMethod('card')">
+            💳 CARTÃO DE CRÉDITO
+          </button>
+        </div>
 
-          <div class="pix-status-polling">
-            <span class="pulse-dot"></span>
-            <span>Sincronizando com o Banco Central...</span>
+        <!-- MÉTODO 1: PIX -->
+        <div id="method-pix">
+          <form id="pix-form" onsubmit="handlePixSubmit(event)">
+            <div class="grid-2">
+              <div class="form-group">
+                <label for="pix-name">NOME COMPLETO <span class="req">*</span></label>
+                <input type="text" id="pix-name" placeholder="Ex: Carlos Silva" required />
+              </div>
+              <div class="form-group">
+                <label for="pix-cpf">CPF / CNPJ <span class="req">*</span></label>
+                <input type="text" id="pix-cpf" placeholder="000.000.000-00" required />
+              </div>
+            </div>
+
+            <button type="submit" id="pix-submit-btn" class="submit-btn btn-pix">
+              <span>[ GERAR QR CODE PIX // R$ <span class="current-price-label">67,00</span> ]</span>
+              <span>⚡</span>
+            </button>
+          </form>
+
+          <div id="pix-display" class="pix-display-box">
+            <div style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--pix-green);">
+              [✓ PIX GERADO // AGUARDANDO PAGAMENTO]
+            </div>
+            <img id="pix-qr-img" class="pix-qr-img" alt="QR Code PIX Mercado Pago" />
+            
+            <p style="font-size:11px;font-family:var(--font-mono);margin-bottom:8px;">
+              Escaneie o QR Code no app do seu banco ou copie o código Pix abaixo:
+            </p>
+
+            <input type="text" id="pix-code-str" class="pix-code-input" readonly />
+            <button type="button" class="submit-btn" style="margin-top:0;padding:10px;font-size:12px;" onclick="copyPixCode()">
+              [ COPIAR CÓDIGO PIX ]
+            </button>
+
+            <div class="pix-status-polling">
+              <span class="pulse-dot"></span>
+              <span>Sincronizando com o Banco Central...</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- MÉTODO 2: CARTÃO DE CRÉDITO COM CHECKOUT BRICK OFICIAL -->
-      <div id="method-card" style="display:none;">
-        <div id="cardPaymentBrick_container" style="min-height: 280px; width: 100%;">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-muted);padding:20px;text-align:center;">
-            [ CARREGANDO TERMINAL DE CARTÃO CRIPTOGRAFADO... ]
+        <!-- MÉTODO 2: CARTÃO DE CRÉDITO COM CHECKOUT BRICK OFICIAL -->
+        <div id="method-card" style="display:none;">
+          <div id="cardPaymentBrick_container" style="min-height: 280px; width: 100%;">
+            <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-muted);padding:20px;text-align:center;">
+              [ CARREGANDO TERMINAL DE CARTÃO CRIPTOGRAFADO... ]
+            </div>
           </div>
         </div>
+
+        <button type="button" class="submit-btn btn-secondary" onclick="backToStage1()">
+          [← VOLTAR E EDITAR DADOS DO CONCURSO]
+        </button>
       </div>
 
-      <button type="button" class="submit-btn btn-secondary" onclick="backToStage1()">
-        [← VOLTAR E EDITAR DADOS DO CONCURSO]
-      </button>
-    </div>
-
-    <div class="secure-footer">
-      CRIVOS // Sistemas de Estudo Sob Demanda • Processamento criptografado via Mercado Pago<br>
-      Acesso liberado e início da calibração tática em até 48h após a confirmação.
+      <div class="secure-footer">
+        CRIVOS // Sistemas de Estudo Sob Demanda • Processamento criptografado via Mercado Pago<br>
+        Acesso liberado e início da calibração tática em até 48h após a confirmação.
+      </div>
     </div>
   </div>
 
-  <script>
+  <!-- BOTAO FLUTUANTE DE TEMA -->
+  <button class="theme-floating-btn" id="theme-toggle" type="button" title="Alternar Modo Claro / Escuro" aria-label="Alternar Tema">
+    <span class="theme-icon-wrap" id="theme-icon">◐</span>
+  </button>
+
+  <footer class="footer">
+    CRIVOS // ENGENHARIA TÁTICA PARA CONCURSOS E EXAMES · SEGURANÇA E PROTOCOLO
+  </footer>
+
+<script>
+
     // Gerenciador de Tema
     function toggleTheme() {
       const html = document.documentElement;
@@ -1212,6 +1325,45 @@
         brickMsg('[ ERRO ] ' + (err && (err.message || JSON.stringify(err)) || 'falha ao inicializar'));
       }
     }
-  </script>
+  
+
+// Sincronização adicional do botão flutuante de tema oficial
+(function() {
+  const themeBtn = document.getElementById('theme-toggle');
+  const themeIcon = document.getElementById('theme-icon');
+
+  function updateThemeIcon(isDark) {
+    if (themeIcon) {
+      themeIcon.textContent = isDark ? '◑' : '◐';
+    }
+  }
+
+  const savedTheme = localStorage.getItem('crivos_theme') || localStorage.getItem('crivos_web_theme');
+  if (savedTheme === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    updateThemeIcon(true);
+  }
+
+  if (themeBtn) {
+    themeBtn.onclick = function() {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const next = isDark ? 'light' : 'dark';
+      if (next === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+      }
+      localStorage.setItem('crivos_theme', next);
+      localStorage.setItem('crivos_web_theme', next);
+      updateThemeIcon(next === 'dark');
+
+      if (themeIcon) {
+        themeIcon.style.transform = 'rotate(180deg)';
+        setTimeout(() => { themeIcon.style.transform = 'none'; }, 350);
+      }
+    };
+  }
+})();
+</script>
 </body>
 </html>
