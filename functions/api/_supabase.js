@@ -188,7 +188,7 @@ export async function sendResendEmail(env, { to, subject, html, text }) {
     return { id: `simulated-${Date.now()}` };
   }
 
-  const fromEmail = env?.CRIVOS_EMAIL_FROM || 'CRIVOS // Sistemas <onboarding@resend.dev>';
+  const fromEmail = env?.CRIVOS_EMAIL_FROM || 'CRIVOS // Sistemas de Estudo <contato@crivos.me>';
 
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',
