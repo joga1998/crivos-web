@@ -77,6 +77,25 @@ export async function provisionUserOrder(env, { orderId, mpPaymentId, paymentMet
     return { success: true, alreadyProvisioned: true, userId: order.user_id };
   }
 
+  // Trava de Lock atômico contra concorrência imediata (ex: process-card e webhook-mp simultâneos)
+  // Marca temporariamente a ordem com lock para que a segunda chamada paralela encontre status "provisioning"
+  if (order.status === 'provisioning') {
+    console.log(`[Provision] Ordem ${order.id} já está em processo de provisionamento por outra requisição simultânea.`);
+    return { success: true, inProgress: true };
+  }
+
+  try {
+    await supabaseRest(env, `/orders?id=eq.${encodeURIComponent(order.id)}`, {
+      method: 'PATCH',
+      body: {
+        status: 'provisioning',
+        updated_at: new Date().toISOString(),
+      },
+    });
+  } catch (lockErr) {
+    console.warn(`[Provision] Falha ao definir lock 'provisioning' na ordem ${order.id}:`, lockErr.message);
+  }
+
   const email = order.email.trim().toLowerCase();
   const tempPassword = generateTacticalPassword();
   const concursoNome = order.concurso_nome || order.concurso || 'Concurso CRIVOS';

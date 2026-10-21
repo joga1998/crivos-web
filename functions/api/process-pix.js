@@ -145,16 +145,30 @@ export async function onRequestPost(context) {
       );
     }
 
-    // Se temos orderId, vincula payment_id e dados do pagador na tabela orders
+    // Se temos orderId, vincula payment_id e dados do pagador na tabela orders preservando notes anteriores
     if (orderId && mpData?.id) {
       try {
+        let existingNotes = {};
+        try {
+          const currentOrderRes = await supabaseRest(env, `/orders?id=eq.${encodeURIComponent(orderId)}&select=notes`);
+          if (Array.isArray(currentOrderRes) && currentOrderRes[0]?.notes) {
+            existingNotes = JSON.parse(currentOrderRes[0].notes);
+          }
+        } catch (readNotesErr) {}
+
         const fullName = `${firstName || ''} ${lastName || ''}`.trim() || undefined;
+        const mergedNotes = {
+          ...existingNotes,
+          full_name: fullName || existingNotes.full_name,
+          cpf: cleanDocNumber || existingNotes.cpf,
+        };
+
         await supabaseRest(env, `/orders?id=eq.${encodeURIComponent(orderId)}`, {
           method: 'PATCH',
           body: {
             payment_id: String(mpData.id),
             payment_method: 'pix',
-            notes: JSON.stringify({ full_name: fullName, cpf: cleanDocNumber }),
+            notes: JSON.stringify(mergedNotes),
             updated_at: new Date().toISOString(),
           },
         });

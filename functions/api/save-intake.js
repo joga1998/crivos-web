@@ -72,8 +72,18 @@ export async function onRequestPost(context) {
 
     // 1. Cria o registro inicial em `orders` com status `pending`
     const generatedOrderId = `ORD-${Date.now()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
-    const parsedHours = parseInt(String(availability || '20').match(/\d+/)?.[0] || '20', 10);
-    const safeHours = Number.isFinite(parsedHours) && parsedHours > 0 ? Math.min(168, parsedHours) : 20;
+    
+    // Extrai horas semanais totais se presentes ("Carga Semanal Total Estimada: 18" ou "18h")
+    let safeHours = 20;
+    const weeklyMatch = String(availability || '').match(/Carga Semanal Total Estimada:\s*(\d+)/i) 
+      || String(availability || '').match(/(\d+)\s*h\s*\/\s*semana/i)
+      || String(availability || '').match(/\b(\d+)\s*horas?\s*semanais?/i);
+    if (weeklyMatch && weeklyMatch[1]) {
+      safeHours = Math.min(168, Math.max(1, parseInt(weeklyMatch[1], 10)));
+    } else {
+      const parsedHours = parseInt(String(availability || '20').match(/\d+/)?.[0] || '20', 10);
+      safeHours = Number.isFinite(parsedHours) && parsedHours > 0 ? Math.min(168, parsedHours) : 20;
+    }
 
     const orderPayload = {
       id: generatedOrderId,
