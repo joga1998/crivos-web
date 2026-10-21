@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CRIVOS // Área do Candidato — Acesso ao Painel</title>
-  <meta name="description" content="Acesse seu Sistema Operacional de Estudos CRIVOS com seu e-mail e chave de acesso tática.">
+  <title>CRIVOS // ÁREA DO CANDIDATO — ACESSO AO PAINEL</title>
+  <meta name="description" content="ACESSE SEU SISTEMA OPERACIONAL DE ESTUDOS CRIVOS COM SEU E-MAIL E CHAVE DE ACESSO TÁTICA.">
   
   <!-- Favicon oficial: Quadrado Vermelho Brutalista -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%23D92B2B'/></svg>">
@@ -25,7 +25,7 @@
     })();
   </script>
 
-  <!-- SDK Oficial Supabase JS v2 -->
+  <!-- Biblioteca de Conexão com Servidor -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -79,8 +79,6 @@
     }
 
     body {
-      font-variant: small-caps;
-      letter-spacing: 0.02em;
       background-color: var(--bg-primary);
       color: var(--text-primary);
       font-family: var(--font-sans);
@@ -88,7 +86,23 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      text-transform: uppercase;
       -webkit-font-smoothing: antialiased;
+    }
+
+    input, textarea, select, button {
+      font-family: inherit;
+    }
+
+    /* Manter digitação de credenciais fiel */
+    input[type="email"],
+    input[type="password"] {
+      text-transform: none !important;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      text-transform: uppercase !important;
     }
 
     /* TOPBAR INSTITUCIONAL */
@@ -241,13 +255,11 @@
       font-size: 0.72rem;
       font-weight: 700;
       letter-spacing: 0.05em;
-      text-transform: uppercase;
       margin-bottom: 0.45rem;
       color: var(--text-primary);
     }
 
     .form-input {
-      font-variant: normal !important;
       width: 100%;
       background: var(--bg-surface);
       color: var(--text-primary);
@@ -429,8 +441,8 @@
       </a>
 
       <div class="nav-actions">
-        <a href="/" class="nav-link-btn">← Início</a>
-        <a href="https://crivos-demo.pages.dev" target="_blank" rel="noopener noreferrer" class="nav-link-btn" style="background:var(--bg-elevated)">Demo Ao Vivo ↗</a>
+        <a href="/" class="nav-link-btn">← INÍCIO</a>
+        <a href="https://crivos-demo.pages.dev" target="_blank" rel="noopener noreferrer" class="nav-link-btn" style="background:var(--bg-elevated)">DEMO AO VIVO ↗</a>
       </div>
     </div>
   </header>
@@ -447,7 +459,7 @@
       </div>
 
       <p class="login-intro">
-        Informe o e-mail cadastrado na contratação e sua chave de acesso enviada por e-mail após a confirmação do pagamento.
+        INFORME O E-MAIL CADASTRADO NA CONTRATAÇÃO E SUA CHAVE DE ACESSO ENVIADA POR E-MAIL APÓS A CONFIRMAÇÃO DO PAGAMENTO.
       </p>
 
       <form id="login-form">
@@ -471,8 +483,8 @@
 
       <div class="login-footer-actions">
         <div class="login-footer-row">
-          <a href="#" id="link-forgot" class="login-link-secondary">Esqueceu sua chave de acesso?</a>
-          <a href="/" class="login-link-secondary">← Voltar à Vitrine</a>
+          <a href="#" id="link-forgot" class="login-link-secondary">ESQUECEU SUA CHAVE DE ACESSO?</a>
+          <a href="/" class="login-link-secondary">← VOLTAR À VITRINE</a>
         </div>
         
         <a href="https://crivos-demo.pages.dev" target="_blank" rel="noopener noreferrer" class="demo-callout-btn">
@@ -488,11 +500,11 @@
   </button>
 
   <footer class="footer">
-    CRIVOS // SISTEMA OPERACIONAL DE ESTUDOS · AMBIENTE SEGURO
+    CRIVOS // SISTEMA OPERACIONAL DE ESTUDOS · SEGURANÇA E PROTOCOLO DE ACESSO
   </footer>
 
   <script>
-    // Inicialização do Supabase Client
+    // Inicialização da Autenticação do Aluno
     const SUPABASE_URL = 'https://dmmtmfjlieqeqwlhtgrr.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_pRdjFhU4VWrjVOOSUcNB5Q_9ZnJwFNw';
     
@@ -502,7 +514,7 @@
         sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       }
     } catch(e) {
-      console.warn('Erro ao carregar Supabase:', e);
+      console.warn('Erro ao conectar ao servidor:', e);
     }
 
     const form = document.getElementById('login-form');
@@ -515,7 +527,7 @@
     function showFeedback(msg, isError = true) {
       feedback.style.display = 'block';
       feedback.className = 'login-feedback ' + (isError ? 'error' : 'success');
-      feedback.textContent = (isError ? '⚠ ' : '✓ ') + msg;
+      feedback.textContent = (isError ? '⚠ ' : '✓ ') + msg.toUpperCase();
     }
 
     form.addEventListener('submit', async (e) => {
@@ -570,20 +582,20 @@
 
     linkForgot.addEventListener('click', async (e) => {
       e.preventDefault();
-      const email = emailInput.value.trim() || prompt('Informe seu e-mail cadastrado para enviarmos instruções de recuperação:');
+      const email = emailInput.value.trim() || prompt('INFORME SEU E-MAIL CADASTRADO PARA ENVIARMOS INSTRUÇÕES DE RECUPERAÇÃO:');
       if (!email) return;
 
       if (!sbClient) {
-        alert('Serviço indisponível no momento.');
+        alert('SERVIÇO INDISPONÍVEL NO MOMENTO.');
         return;
       }
 
       try {
         const { error } = await sbClient.auth.resetPasswordForEmail(email);
         if (error) throw error;
-        alert('✓ Instruções de redefinição de chave foram enviadas para ' + email);
+        alert('✓ INSTRUÇÕES DE REDEFINIÇÃO DE CHAVE FORAM ENVIADAS PARA ' + email.toUpperCase());
       } catch (err) {
-        alert('Erro ao solicitar redefinição: ' + (err.message || 'Falha no envio.'));
+        alert('ERRO AO SOLICITAR REDEFINIÇÃO: ' + (err.message || 'FALHA NO ENVIO.').toUpperCase());
       }
     });
 

@@ -100,8 +100,6 @@
     }
 
     body {
-      font-variant: small-caps;
-      letter-spacing: 0.02em;
       background-color: var(--bg-primary);
       color: var(--text-primary);
       font-family: var(--font-sans);
@@ -109,7 +107,24 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      text-transform: uppercase;
       -webkit-font-smoothing: antialiased;
+    }
+
+    input, textarea, select, button {
+      font-family: inherit;
+    }
+
+    input[type="email"],
+    input[type="password"],
+    input[type="text"],
+    textarea {
+      text-transform: none !important;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      text-transform: uppercase !important;
     }
 
     /* TOPBAR INSTITUCIONAL PADRONIZADA */
