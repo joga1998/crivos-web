@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#111111"/>
+  <rect x="96" y="96" width="130" height="130" fill="#D92B2B" stroke="#111111" stroke-width="4"/>
+  <text x="96" y="340" fill="#FFFFFF" font-family="'Inter', sans-serif" font-weight="900" font-size="88" letter-spacing="-3">CRIVOS</text>
+  <text x="96" y="396" fill="#A3A39E" font-family="'JetBrains Mono', monospace" font-weight="700" font-size="24" letter-spacing="2">// SISTEMA TÁTICO</text>
+</svg>
