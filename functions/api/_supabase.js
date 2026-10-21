@@ -361,7 +361,7 @@ export function renderEmailPanelReady({ email, planTitle, concurso, cargo, panel
 
 // Disparo de notificação de nova venda para o administrador via Google Apps Script Webhook (joga8991@gmail.com)
 export async function sendAdminSaleNotification(env, saleData) {
-  const webhookUrl = env?.ADMIN_NOTIFICATION_WEBHOOK_URL || 'https://script.google.com/macros/s/AKfycbxDL-z-XqqNNJkstGjYaiCo3K8SXXKdx5GNOE3NQDd6WfgKx8pw84GwqSK1RtLQ7Ko2xw/exec';
+  const webhookUrl = env?.ADMIN_NOTIFICATION_WEBHOOK_URL || 'https://script.google.com/macros/s/AKfycbx9qWCrkuvEKZZrMjInOhBjrMd8bItUq6pHUPR5m-fMqK0A8wKQVLuTboRFaBsRamNh/exec';
   if (!webhookUrl) return;
 
   try {
