@@ -560,6 +560,133 @@
             flex-shrink: 0;
         }
 
+        /* Botão do Menu Mobile */
+        .mobile-menu-btn {
+            display: none;
+            align-items: center;
+            gap: 0.45rem;
+            font-family: var(--font-mono);
+            font-size: 0.74rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 0.55rem 0.85rem;
+            border: 2px solid var(--border-color);
+            background: var(--bg-surface);
+            color: var(--text-primary);
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+            transition: all 0.12s ease;
+            white-space: nowrap;
+        }
+
+        .mobile-menu-btn:hover {
+            background: var(--bg-elevated);
+            transform: translate(-1px, -1px);
+        }
+
+        .mobile-menu-btn .menu-icon {
+            font-size: 1rem;
+            line-height: 1;
+        }
+
+        /* Gaveta Mobile (Drawer) */
+        .mobile-drawer {
+            position: fixed;
+            top: 70px;
+            left: 0;
+            width: 100%;
+            height: calc(100dvh - 70px);
+            background-color: var(--bg-primary);
+            border-bottom: 2px solid var(--border-color);
+            z-index: 998;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow-y: auto;
+            transform: translateY(-115%);
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s ease;
+        }
+
+        .mobile-drawer.open {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .mobile-drawer-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1.15rem;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 1.25rem;
+        }
+
+        .mobile-drawer-close {
+            background: var(--bg-surface);
+            border: 2px solid var(--border-color);
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            font-weight: 800;
+            padding: 0.45rem 0.75rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.12s ease;
+        }
+
+        .mobile-drawer-close:hover {
+            background: var(--accent-red);
+            color: #FFFFFF;
+        }
+
+        .mobile-drawer-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            flex: 1;
+            margin-bottom: 1.5rem;
+        }
+
+        .mobile-drawer-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            padding: 0.95rem 1rem;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            box-shadow: 2px 2px 0px var(--border-color);
+            text-decoration: none;
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            font-weight: 800;
+            transition: transform 0.12s ease, background-color 0.12s ease;
+        }
+
+        .mobile-drawer-link:hover,
+        .mobile-drawer-link:active {
+            transform: translateX(4px);
+            background: var(--bg-elevated);
+            color: var(--accent-red);
+        }
+
+        .mobile-drawer-link .m-link-num {
+            color: var(--accent-red);
+        }
+
+        .mobile-drawer-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            padding-top: 1.25rem;
+            border-top: 2px solid var(--border-color);
+        }
+
         /* Botão Flutuante de Modo Claro / Escuro (Sempre visível no canto inferior direito da tela) */
         .theme-floating-btn {
             position: fixed !important;
@@ -1963,6 +2090,9 @@
             .nav-links {
                 display: none;
             }
+            .mobile-menu-btn {
+                display: inline-flex;
+            }
         }
 
         @media (max-width: 768px) {
@@ -2078,6 +2208,48 @@
                 <div class="nav-actions">
                     <a href="/login.html" class="nav-login">Área do Candidato ↗</a>
                     <a href="#precos" class="nav-cta">Montar Meu Plano →</a>
+                    <button class="mobile-menu-btn" id="mobile-menu-btn" type="button" aria-label="Abrir Menu de Navegação">
+                        <span class="menu-icon">☰</span>
+                        <span>MENU</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- GAVETA DE MENU MOBILE (AGLUTINANDO NAVEGAÇÃO DA HEADBAR) -->
+            <div class="mobile-drawer" id="mobile-drawer" aria-hidden="true">
+                <div class="mobile-drawer-top">
+                    <span class="mono-tag dark">NAVEGAÇÃO TÁTICA</span>
+                    <button class="mobile-drawer-close" id="mobile-drawer-close" type="button" aria-label="Fechar Menu">[ ✕ FECHAR ]</button>
+                </div>
+                <nav class="mobile-drawer-nav" aria-label="Navegação Mobile">
+                    <a href="#demonstracao" class="mobile-drawer-link">
+                        <span><strong class="m-link-num">01.</strong> SIMULADOR E RAIO-X</span>
+                        <span>↗</span>
+                    </a>
+                    <a href="#anatomia" class="mobile-drawer-link">
+                        <span><strong class="m-link-num">02.</strong> ARQUITETURA DO SISTEMA</span>
+                        <span>↗</span>
+                    </a>
+                    <a href="#comparativo" class="mobile-drawer-link">
+                        <span><strong class="m-link-num">03.</strong> COMPARATIVO DIRETO</span>
+                        <span>↗</span>
+                    </a>
+                    <a href="#como-funciona" class="mobile-drawer-link">
+                        <span><strong class="m-link-num">04.</strong> COMO FUNCIONA EM 3 ETAPAS</span>
+                        <span>↗</span>
+                    </a>
+                    <a href="#precos" class="mobile-drawer-link">
+                        <span><strong class="m-link-num">05.</strong> PLANOS E INVESTIMENTO</span>
+                        <span>↗</span>
+                    </a>
+                    <a href="#faq" class="mobile-drawer-link">
+                        <span><strong class="m-link-num">06.</strong> DÚVIDAS FREQUENTES</span>
+                        <span>↗</span>
+                    </a>
+                </nav>
+                <div class="mobile-drawer-actions">
+                    <a href="/login.html" class="btn btn-secondary" style="width: 100%;">Área do Candidato ↗</a>
+                    <a href="#precos" class="btn btn-primary" style="width: 100%;">Montar Meu Plano Agora →</a>
                 </div>
             </div>
         </header>
@@ -3310,6 +3482,72 @@
                         }
                     });
                 }
+            });
+
+            /* ------------------------------------------------------------------
+               8. MOBILE MENU DRAWER CONTROLLER
+               ------------------------------------------------------------------ */
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileDrawer = document.getElementById('mobile-drawer');
+            const mobileDrawerClose = document.getElementById('mobile-drawer-close');
+
+            function toggleMobileDrawer(open) {
+                if (!mobileDrawer) return;
+                if (open) {
+                    mobileDrawer.classList.add('open');
+                    mobileDrawer.setAttribute('aria-hidden', 'false');
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    mobileDrawer.classList.remove('open');
+                    mobileDrawer.setAttribute('aria-hidden', 'true');
+                    document.body.style.overflow = '';
+                }
+            }
+
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    const isOpen = mobileDrawer && mobileDrawer.classList.contains('open');
+                    toggleMobileDrawer(!isOpen);
+                });
+            }
+
+            if (mobileDrawerClose) {
+                mobileDrawerClose.addEventListener('click', () => {
+                    toggleMobileDrawer(false);
+                });
+            }
+
+            /* ------------------------------------------------------------------
+               9. CLEAN SMOOTH SCROLL (SEM HASH NA URL: #precos, #faq etc)
+               ------------------------------------------------------------------ */
+            document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+                anchor.addEventListener('click', function (e) {
+                    const href = this.getAttribute('href');
+                    if (!href || href === '#') return;
+
+                    const targetElement = document.querySelector(href);
+                    if (targetElement) {
+                        e.preventDefault();
+
+                        // Fecha o menu mobile caso esteja aberto
+                        toggleMobileDrawer(false);
+
+                        // Calcula rolagem suave com compensação da topbar fixa (70px)
+                        const topbarOffset = 70;
+                        const elementPos = targetElement.getBoundingClientRect().top;
+                        const targetY = elementPos + window.pageYOffset - topbarOffset;
+
+                        window.scrollTo({
+                            top: targetY,
+                            behavior: 'smooth'
+                        });
+
+                        // Garante que o #hash nunca apareça na URL da barra de endereços
+                        if (window.history && window.history.replaceState) {
+                            window.history.replaceState(null, null, window.location.pathname + window.location.search);
+                        }
+                    }
+                });
             });
         })();
     </script>
