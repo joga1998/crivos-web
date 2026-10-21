@@ -24,6 +24,8 @@
     })();
   </script>
 
+    <!-- Base Oficial de Concursos para Autocomplete -->
+  <script src="data/concursos-abertos.js"></script>
   <!-- SDK Oficial do Mercado Pago V2 -->
   <script src="https://sdk.mercadopago.com/js/v2"></script>
 
@@ -593,6 +595,304 @@
       color: var(--text-muted);
       text-align: center;
     }
+
+    /* ======================================================== */
+    /* AUTOCOMPLETE BRUTALISTA DE CONCURSOS                     */
+    /* ======================================================== */
+    .autocomplete-wrapper {
+      position: relative;
+    }
+
+    .autocomplete-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--bg-surface);
+      border: 2px solid var(--border-color);
+      box-shadow: var(--shadow-lg);
+      z-index: 100;
+      max-height: 280px;
+      overflow-y: auto;
+      display: none;
+    }
+
+    .autocomplete-dropdown.open {
+      display: block;
+    }
+
+    .autocomplete-item {
+      padding: 0.75rem 0.85rem;
+      border-bottom: 1px solid var(--border-subtle);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+      transition: background-color 0.1s ease;
+    }
+
+    .autocomplete-item:hover,
+    .autocomplete-item.selected {
+      background-color: var(--bg-elevated);
+    }
+
+    .autocomplete-item:last-child {
+      border-bottom: none;
+    }
+
+    .ac-main {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .ac-title {
+      font-family: var(--font-sans);
+      font-weight: 800;
+      font-size: 0.82rem;
+      color: var(--text-primary);
+    }
+
+    .ac-meta {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--text-muted);
+    }
+
+    .ac-tag {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 0.2rem 0.4rem;
+      border: 1px solid var(--border-color);
+      background: var(--bg-surface);
+      color: var(--accent-red);
+      flex-shrink: 0;
+    }
+
+    .ac-custom-trigger {
+      padding: 0.75rem 0.85rem;
+      background: var(--bg-elevated);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--accent-red);
+      cursor: pointer;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .ac-custom-trigger:hover {
+      background: rgba(217, 43, 43, 0.08);
+    }
+
+    /* Pílulas de Concursos Populares / Atalhos */
+    .quick-chips-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.5rem;
+    }
+
+    .quick-chip {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      padding: 0.25rem 0.55rem;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      cursor: pointer;
+      box-shadow: 1px 1px 0px var(--border-color);
+      transition: all 0.1s ease;
+      user-select: none;
+    }
+
+    .quick-chip:hover {
+      border-color: var(--accent-red);
+      color: var(--accent-red);
+      transform: translate(-1px, -1px);
+      box-shadow: 2px 2px 0px var(--border-color);
+    }
+
+    /* ======================================================== */
+    /* GAMIFICAÇÃO DA ROTINA & DISPONIBILIDADE                  */
+    /* ======================================================== */
+    .routine-box {
+      border: 2px solid var(--border-color);
+      background: var(--bg-elevated);
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .routine-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .routine-kpi-badge {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 900;
+      background: var(--bg-surface);
+      border: 2px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      padding: 0.35rem 0.75rem;
+      color: var(--accent-red);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    /* Seletor de Dias da Semana */
+    .days-selector {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.35rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .day-toggle-btn {
+      background: var(--bg-surface);
+      border: 2px solid var(--border-color);
+      box-shadow: 2px 2px 0px var(--border-color);
+      padding: 0.6rem 0.2rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 800;
+      cursor: pointer;
+      text-align: center;
+      color: var(--text-primary);
+      transition: all 0.12s cubic-bezier(0.34, 1.56, 0.64, 1);
+      user-select: none;
+    }
+
+    .day-toggle-btn:hover {
+      transform: translate(-1px, -1px);
+    }
+
+    .day-toggle-btn.active {
+      background: var(--accent-red);
+      color: #FFFFFF;
+      border-color: var(--border-color);
+      box-shadow: none;
+      transform: translate(1px, 1px);
+    }
+
+    /* Slider Interativo de Horas */
+    .hours-control-block {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      padding: 1rem 1.15rem;
+      margin-bottom: 1rem;
+    }
+
+    .hours-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .hours-display {
+      font-family: var(--font-mono);
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: var(--text-primary);
+    }
+
+    .hours-slider {
+      width: 100%;
+      height: 10px;
+      appearance: none;
+      background: var(--border-subtle);
+      border: 1px solid var(--border-color);
+      outline: none;
+      cursor: pointer;
+      margin-bottom: 0.5rem;
+    }
+
+    .hours-slider::-webkit-slider-thumb {
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      background: var(--accent-red);
+      border: 2px solid var(--border-color);
+      cursor: pointer;
+      box-shadow: 2px 2px 0px var(--border-color);
+      transition: transform 0.1s ease;
+    }
+
+    .hours-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+
+    .slider-ticks {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+    }
+
+    /* Turno Preferencial Pílulas */
+    .shifts-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.4rem;
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: 500px) {
+      .shifts-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .shift-btn {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      padding: 0.5rem 0.2rem;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      color: var(--text-secondary);
+      box-shadow: 1px 1px 0px var(--border-color);
+      transition: all 0.1s ease;
+    }
+
+    .shift-btn.active {
+      background: var(--border-color);
+      color: var(--bg-surface);
+      box-shadow: none;
+      font-weight: 800;
+    }
+
+    /* Detalhes Adicionais Sanfona */
+    .routine-extra-toggle {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      text-decoration: underline;
+      display: inline-block;
+      margin-top: 0.25rem;
+    }
+
+    .routine-extra-toggle:hover {
+      color: var(--accent-red);
+    }
+
   </style>
 </head>
 <body>
@@ -648,23 +948,103 @@
           </div>
 
           <!-- Concurso e Cargo -->
-          <div class="grid-2">
-            <div class="form-group">
-              <label for="user-concurso">CONCURSO / EXAME ALVO <span class="req">*</span></label>
-              <input type="text" id="user-concurso" placeholder="Ex: SEFAZ, Receita Federal, CNU, OAB, etc." required />
+          <!-- Concurso com Autocomplete & Atalhos Rápidos -->
+          <div class="form-group">
+            <label for="user-concurso">CONCURSO / EXAME ALVO <span class="req">*</span></label>
+            <div class="autocomplete-wrapper">
+              <input type="text" id="user-concurso" placeholder="Digite para buscar seu concurso ou selecione abaixo..." required autocomplete="off" />
+              <div id="concurso-dropdown" class="autocomplete-dropdown"></div>
             </div>
-            <div class="form-group">
-              <label for="user-cargo">CARGO / ESPECIALIDADE <span class="req">*</span></label>
-              <input type="text" id="user-cargo" placeholder="Ex: Auditor Fiscal, Analista de TI, etc." required />
+            
+            <!-- Pílulas Rápidas de Concursos em Alta -->
+            <div class="quick-chips-row" id="quick-concursos-chips">
+              <!-- Gerado dinamicamente via JS -->
             </div>
           </div>
 
-          <!-- Disponibilidade Semanal de Horas de Estudo -->
+          <!-- Cargo / Especialidade -->
           <div class="form-group">
-            <label for="user-availability">DISPONIBILIDADE SEMANAL DE HORAS DE ESTUDO <span class="req">*</span></label>
-            <textarea id="user-availability" rows="4" placeholder="Descreva com o máximo de detalhes possível sua rotina semanal de estudos:&#10;• Segunda a Sexta: Ex: 3h líquidas/dia (noite, 19h às 22h)&#10;• Sábados: Ex: 6h líquidas (manhã e tarde)&#10;• Domingos: Ex: 3h para simulados / revisões (ou descanso)&#10;• Rotina de trabalho: Trabalho das 8h às 18h em dias úteis..." required></textarea>
-            <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-top:4px;">
-              Quanto mais específico sobre dias, turnos e horas líquidas disponíveis, mais assertiva será a distribuição de metas no seu cronograma diário.
+            <label for="user-cargo">CARGO / ESPECIALIDADE / LINHA <span class="req">*</span></label>
+            <input type="text" id="user-cargo" placeholder="Ex: Auditor-Fiscal, Escrevente Técnico, Analista de TI..." required />
+            <div id="cargos-suggestions" class="quick-chips-row" style="margin-top:0.4rem;display:none;"></div>
+          </div>
+
+          <!-- Disponibilidade Semanal Gamificada e Interativa -->
+          <div class="form-group">
+            <label>DISPONIBILIDADE SEMANAL DE HORAS DE ESTUDO <span class="req">*</span></label>
+            
+            <div class="routine-box">
+              <div class="routine-header">
+                <div>
+                  <div style="font-family:var(--font-mono);font-size:0.75rem;font-weight:800;color:var(--text-primary);">
+                    SIMULADOR DE CARGA HORÁRIA
+                  </div>
+                  <div style="font-family:var(--font-mono);font-size:0.68rem;color:var(--text-muted);">
+                    Selecione seus dias ativos e a meta diária pretendida
+                  </div>
+                </div>
+                <div class="routine-kpi-badge" id="routine-kpi-badge">
+                  <span>⚡</span>
+                  <span id="routine-weekly-total">18h</span>
+                  <span style="font-size:0.68rem;color:var(--text-muted);">/SEMANA</span>
+                </div>
+              </div>
+
+              <!-- 1. Seletor dos Dias da Semana -->
+              <div style="font-family:var(--font-mono);font-size:0.7rem;font-weight:700;margin-bottom:0.45rem;color:var(--text-secondary);">
+                1. DIAS ATIVOS NA ROTINA:
+              </div>
+              <div class="days-selector" id="days-selector">
+                <button type="button" class="day-toggle-btn active" data-day="seg">SEG</button>
+                <button type="button" class="day-toggle-btn active" data-day="ter">TER</button>
+                <button type="button" class="day-toggle-btn active" data-day="qua">QUA</button>
+                <button type="button" class="day-toggle-btn active" data-day="qui">QUI</button>
+                <button type="button" class="day-toggle-btn active" data-day="sex">SEX</button>
+                <button type="button" class="day-toggle-btn active" data-day="sab">SÁB</button>
+                <button type="button" class="day-toggle-btn" data-day="dom">DOM</button>
+              </div>
+
+              <!-- 2. Slider Interativo de Horas Diárias (Escala 30 min, 0.5h até 24h) -->
+              <div class="hours-control-block">
+                <div class="hours-label-row">
+                  <span style="font-family:var(--font-mono);font-size:0.72rem;font-weight:800;">
+                    2. HORAS LÍQUIDAS / DIA:
+                  </span>
+                  <span class="hours-display" id="hours-display">3.0h / DIA</span>
+                </div>
+
+                <input type="range" id="hours-slider" class="hours-slider" min="0.5" max="24" step="0.5" value="3.0" />
+                
+                <div class="slider-ticks">
+                  <span>30min</span>
+                  <span>4h</span>
+                  <span>8h (Dedicação Exclusiva)</span>
+                  <span>12h</span>
+                  <span>24h</span>
+                </div>
+              </div>
+
+              <!-- 3. Turno Principal de Estudo -->
+              <div style="font-family:var(--font-mono);font-size:0.7rem;font-weight:700;margin-bottom:0.45rem;color:var(--text-secondary);">
+                3. TURNO PRINCIPAL PREDOMINANTE:
+              </div>
+              <div class="shifts-grid" id="shifts-grid">
+                <button type="button" class="shift-btn active" data-shift="noite">🌙 NOITE (PÓS-EXP)</button>
+                <button type="button" class="shift-btn" data-shift="manha">☀️ MANHÃ (CEDO)</button>
+                <button type="button" class="shift-btn" data-shift="tarde">⛅ TARDE</button>
+                <button type="button" class="shift-btn" data-shift="integral">⚡ INTEGRAL / MISTO</button>
+              </div>
+
+              <!-- Campo oculto para envio da especificação compilada -->
+              <input type="hidden" id="user-availability" name="availability" required />
+
+              <!-- Campo Opcional Expansível para Detalhamento Específico -->
+              <div>
+                <a href="#" class="routine-extra-toggle" id="toggle-extra-notes">+ ADICIONAR DETALHES ESPECÍFICOS DA SUA ROTINA (OPCIONAL)</a>
+                <div id="extra-notes-box" style="display:none;margin-top:0.6rem;">
+                  <textarea id="user-extra-notes" rows="2" placeholder="Ex: Trabalho em escala 12x36, tenho folgas nas terças e quintas, preciso focar 100% em Direito aos sábados..."></textarea>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -1381,6 +1761,288 @@
     };
   }
 })();
+
+// ========================================================
+// GERENCIADOR DE AUTOCOMPLETE DE CONCURSOS & ROTINA INTERATIVA
+// ========================================================
+(function initInteractivePlanning() {
+  // 1. Dados de Concursos
+  const concursosList = window.CRIVOS_CONCURSOS_DATA || [
+    { nome: "CNU — Concurso Nacional Unificado", banca: "CESGRANRIO", cargos: ["Auditor-Fiscal do Trabalho", "Analista em TI", "EPPGG", "APO"] },
+    { nome: "TJSP — Tribunal de Justiça de São Paulo", banca: "VUNESP", cargos: ["Escrevente Técnico Judiciário", "Oficial de Justiça"] },
+    { nome: "Receita Federal do Brasil (RFB)", banca: "FGV", cargos: ["Auditor-Fiscal", "Analista-Tributário"] },
+    { nome: "SEFAZ-SP — Fazenda São Paulo", banca: "FGV", cargos: ["Auditor Fiscal da Receita Estadual", "Analista em Finanças"] },
+    { nome: "Polícia Federal (PF)", banca: "CEBRASPE", cargos: ["Agente de Polícia", "Escrivão", "Delegado", "Perito Criminal"] },
+    { nome: "PRF — Polícia Rodoviária Federal", banca: "CEBRASPE", cargos: ["Policial Rodoviário Federal", "Agente Administrativo"] },
+    { nome: "OAB — Exame de Ordem Unificado", banca: "FGV", cargos: ["1ª Fase Objetiva", "2ª Fase Prático-Profissional"] },
+    { nome: "PPGHS / UERJ — Mestrado em História", banca: "CEPUERJ", cargos: ["História Social do Território (Linha 1)", "Poder e Sociedade (Linha 2)"] }
+  ];
+
+  const concursoInput = document.getElementById('user-concurso');
+  const cargoInput = document.getElementById('user-cargo');
+  const dropdown = document.getElementById('concurso-dropdown');
+  const chipsContainer = document.getElementById('quick-concursos-chips');
+  const cargoSuggestionsBox = document.getElementById('cargos-suggestions');
+
+  // Renderiza Chips Rápidos (Populares)
+  if (chipsContainer) {
+    const popularList = concursosList.slice(0, 6);
+    chipsContainer.innerHTML = popularList.map(c => `
+      <button type="button" class="quick-chip" data-name="${c.nome}">
+        ${c.nome.split('—')[0].trim()}
+      </button>
+    `).join('');
+
+    chipsContainer.addEventListener('click', e => {
+      const chip = e.target.closest('.quick-chip');
+      if (!chip) return;
+      selectConcursoByName(chip.dataset.name);
+    });
+  }
+
+  function renderDropdown(items, query = '') {
+    if (!dropdown) return;
+    if (!items.length) {
+      dropdown.innerHTML = `
+        <div class="autocomplete-item" style="cursor:default;">
+          <span class="ac-meta">Nenhum concurso pré-cadastrado com "${query}".</span>
+        </div>
+        <div class="ac-custom-trigger" id="ac-use-custom">
+          <span>+ Usar "${query}" como meu concurso específico</span>
+        </div>
+      `;
+      dropdown.classList.add('open');
+      const customBtn = document.getElementById('ac-use-custom');
+      if (customBtn) {
+        customBtn.onclick = () => {
+          dropdown.classList.remove('open');
+          cargoInput.focus();
+        };
+      }
+      return;
+    }
+
+    dropdown.innerHTML = items.map(c => `
+      <div class="autocomplete-item" data-id="${c.id || ''}" data-name="${c.nome}">
+        <div class="ac-main">
+          <span class="ac-title">${c.nome}</span>
+          <span class="ac-meta">${c.banca ? 'Banca: ' + c.banca : ''} ${c.esfera ? '· ' + c.esfera : ''} ${c.status ? '· ' + c.status : ''}</span>
+        </div>
+        ${c.banca ? `<span class="ac-tag">${c.banca}</span>` : ''}
+      </div>
+    `).join('') + `
+      <div class="ac-custom-trigger" id="ac-custom-option">
+        <span>+ Meu concurso não está na lista (Inserir outro)</span>
+      </div>
+    `;
+
+    dropdown.classList.add('open');
+
+    dropdown.querySelectorAll('.autocomplete-item').forEach(el => {
+      el.onclick = () => {
+        selectConcursoByName(el.dataset.name);
+      };
+    });
+
+    const customOpt = document.getElementById('ac-custom-option');
+    if (customOpt) {
+      customOpt.onclick = () => {
+        dropdown.classList.remove('open');
+        concursoInput.focus();
+      };
+    }
+  }
+
+  function selectConcursoByName(name) {
+    if (!concursoInput) return;
+    concursoInput.value = name;
+    if (dropdown) dropdown.classList.remove('open');
+
+    const found = concursosList.find(c => c.nome.toLowerCase() === name.toLowerCase());
+    if (found && Array.isArray(found.cargos) && found.cargos.length > 0) {
+      if (cargoSuggestionsBox) {
+        cargoSuggestionsBox.style.display = 'flex';
+        cargoSuggestionsBox.innerHTML = `<span style="font-family:var(--font-mono);font-size:0.68rem;color:var(--text-muted);display:flex;align-items:center;margin-right:0.3rem;">CARGOS:</span>` +
+          found.cargos.map(cg => `
+            <button type="button" class="quick-chip cargo-chip" data-cargo="${cg}">${cg}</button>
+          `).join('');
+
+        cargoSuggestionsBox.querySelectorAll('.cargo-chip').forEach(btn => {
+          btn.onclick = () => {
+            if (cargoInput) cargoInput.value = btn.dataset.cargo;
+          };
+        });
+      }
+      if (cargoInput && !cargoInput.value) {
+        cargoInput.value = found.cargos[0];
+      }
+    } else {
+      if (cargoSuggestionsBox) cargoSuggestionsBox.style.display = 'none';
+    }
+    if (cargoInput) cargoInput.focus();
+  }
+
+  if (concursoInput) {
+    concursoInput.addEventListener('input', e => {
+      const q = e.target.value.trim().toLowerCase();
+      if (!q) {
+        renderDropdown(concursosList.slice(0, 8), '');
+        return;
+      }
+      const filtered = concursosList.filter(c => {
+        return c.nome.toLowerCase().includes(q) ||
+          (c.banca && c.banca.toLowerCase().includes(q)) ||
+          (Array.isArray(c.cargos) && c.cargos.some(cg => cg.toLowerCase().includes(q)));
+      });
+      renderDropdown(filtered, e.target.value.trim());
+    });
+
+    concursoInput.addEventListener('focus', () => {
+      const q = concursoInput.value.trim().toLowerCase();
+      if (!q) {
+        renderDropdown(concursosList.slice(0, 8), '');
+      } else {
+        const filtered = concursosList.filter(c => c.nome.toLowerCase().includes(q));
+        renderDropdown(filtered, concursoInput.value.trim());
+      }
+    });
+
+    document.addEventListener('click', e => {
+      if (!e.target.closest('.autocomplete-wrapper')) {
+        if (dropdown) dropdown.classList.remove('open');
+      }
+    });
+  }
+
+  // ========================================================
+  // ROTINA GAMIFICADA & CÁLCULO DE HORAS
+  // ========================================================
+  const daysSelector = document.getElementById('days-selector');
+  const hoursSlider = document.getElementById('hours-slider');
+  const hoursDisplay = document.getElementById('hours-display');
+  const shiftsGrid = document.getElementById('shifts-grid');
+  const kpiTotal = document.getElementById('routine-weekly-total');
+  const hiddenAvailability = document.getElementById('user-availability');
+  const extraToggle = document.getElementById('toggle-extra-notes');
+  const extraBox = document.getElementById('extra-notes-box');
+  const extraTextarea = document.getElementById('user-extra-notes');
+
+  let activeDays = new Set(['seg', 'ter', 'qua', 'qui', 'sex', 'sab']);
+  let activeShift = 'noite';
+  let dailyHours = 3.0;
+
+  const dayNames = {
+    seg: 'Segunda',
+    ter: 'Terça',
+    qua: 'Quarta',
+    qui: 'Quinta',
+    sex: 'Sexta',
+    sab: 'Sábado',
+    dom: 'Domingo'
+  };
+
+  const shiftLabels = {
+    noite: 'Noite (Pós-expediente, 19h às 22h)',
+    manha: 'Manhã (Cedo, antes do trabalho)',
+    tarde: 'Tarde',
+    integral: 'Período Integral / Misto'
+  };
+
+  function updateCompiledRoutine() {
+    const hoursNum = parseFloat(hoursSlider ? hoursSlider.value : dailyHours) || 3.0;
+    const daysCount = activeDays.size;
+    const weeklyTotal = (hoursNum * daysCount).toFixed(1).replace('.0', '');
+
+    if (hoursDisplay) {
+      hoursDisplay.textContent = `${hoursNum.toFixed(1)}h / DIA`;
+    }
+
+    if (kpiTotal) {
+      kpiTotal.textContent = `${weeklyTotal}h`;
+    }
+
+    const sortedDays = ['seg', 'ter', 'qua', 'qui', 'sex', 'sab', 'dom']
+      .filter(d => activeDays.has(d))
+      .map(d => dayNames[d])
+      .join(', ');
+
+    const extraNotes = extraTextarea ? extraTextarea.value.trim() : '';
+
+    let compiled = `• Meta Diária: ${hoursNum}h líquidas/dia\n`;
+    compiled += `• Dias Ativos: ${daysCount > 0 ? sortedDays : 'Nenhum dia selecionado'}\n`;
+    compiled += `• Carga Semanal Total Estimada: ${weeklyTotal} horas líquidas\n`;
+    compiled += `• Turno Principal: ${shiftLabels[activeShift] || activeShift}`;
+    
+    if (extraNotes) {
+      compiled += `\n• Observações Adicionais do Candidato: ${extraNotes}`;
+    }
+
+    if (hiddenAvailability) {
+      hiddenAvailability.value = compiled;
+    }
+  }
+
+  // Toggle dos dias
+  if (daysSelector) {
+    daysSelector.addEventListener('click', e => {
+      const btn = e.target.closest('.day-toggle-btn');
+      if (!btn) return;
+      const day = btn.dataset.day;
+      if (activeDays.has(day)) {
+        if (activeDays.size <= 1) {
+          alert('Selecione ao menos 1 dia de estudo na sua rotina semanal.');
+          return;
+        }
+        activeDays.delete(day);
+        btn.classList.remove('active');
+      } else {
+        activeDays.add(day);
+        btn.classList.add('active');
+      }
+      updateCompiledRoutine();
+    });
+  }
+
+  // Slider de horas
+  if (hoursSlider) {
+    hoursSlider.addEventListener('input', () => {
+      dailyHours = parseFloat(hoursSlider.value);
+      updateCompiledRoutine();
+    });
+  }
+
+  // Seletor de turno
+  if (shiftsGrid) {
+    shiftsGrid.addEventListener('click', e => {
+      const btn = e.target.closest('.shift-btn');
+      if (!btn) return;
+      shiftsGrid.querySelectorAll('.shift-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeShift = btn.dataset.shift;
+      updateCompiledRoutine();
+    });
+  }
+
+  // Toggle de anotações extras
+  if (extraToggle && extraBox) {
+    extraToggle.addEventListener('click', e => {
+      e.preventDefault();
+      const isHidden = extraBox.style.display === 'none';
+      extraBox.style.display = isHidden ? 'block' : 'none';
+      extraToggle.textContent = isHidden 
+        ? '- OCULTAR DETALHES ESPECÍFICOS' 
+        : '+ ADICIONAR DETALHES ESPECÍFICOS DA SUA ROTINA (OPCIONAL)';
+    });
+  }
+
+  if (extraTextarea) {
+    extraTextarea.addEventListener('input', updateCompiledRoutine);
+  }
+
+  // Inicializa o valor compilado
+  updateCompiledRoutine();
+})();
+
 </script>
 </body>
 </html>
