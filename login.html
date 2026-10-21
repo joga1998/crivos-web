@@ -523,6 +523,14 @@
       feedback.textContent = (isError ? '⚠ ' : '✓ ') + msg;
     }
 
+    try {
+      const qParams = new URLSearchParams(window.location.search);
+      const qMsg = qParams.get('msg');
+      if (qMsg) {
+        showFeedback(qMsg, false);
+      }
+    } catch(e) {}
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = emailInput.value.trim();
