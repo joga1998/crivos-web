@@ -319,12 +319,12 @@ function generateSwissEditorialHtml(bodyHtml, docTitle = 'GUIA DE ESTUDOS PÓS-E
 <body>
   <div class="document-container">
     <div class="doc-hero">
-      <div class="doc-hero-tag">// CRIVOS MATERIAL OFICIAL</div>
+      <div class="doc-hero-tag">// CRIVOS DOCUMENTAÇÃO OFICIAL</div>
       <div class="doc-hero-title">${docTitle}</div>
       <div class="doc-hero-meta">
-        <span>SISTEMA OPERACIONAL DE ESTUDOS</span>
-        <span>PADRÃO: EDITORIAL SUÍÇO / BRUTALISTA</span>
-        <span>LINK: CRIVOS.ME</span>
+        <span>SISTEMA OPERACIONAL DE ESTUDOS PÓS-EDITAL</span>
+        <span>UNIDADE DE INTELIGÊNCIA &amp; PERFORMANCE</span>
+        <span>DOMÍNIO: CRIVOS.ME</span>
       </div>
     </div>
     <div class="doc-content">
@@ -397,16 +397,18 @@ async function renderPdf(inputPath, outputPdfPath, customTitle) {
       preferCSSPageSize: true,
       displayHeaderFooter: true,
       headerTemplate: `
-        <div style="font-family: 'JetBrains Mono', monospace; font-size: 8px; width: 100%; box-sizing: border-box; padding: 0 14mm; display: flex; justify-content: space-between; border-bottom: 1px solid #111111; padding-bottom: 4px; color: #111111; font-weight: 700;">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 8px; width: 100%; box-sizing: border-box; padding: 0 14mm; display: flex; justify-content: space-between; border-bottom: 1px solid #111111; padding-bottom: 4px; color: #111111; font-weight: 700; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
           <span>[ CRIVOS // SISTEMA OPERACIONAL DE ESTUDOS PÓS-EDITAL ]</span>
           <span class="title"></span>
         </div>
       `,
       footerTemplate: `
-        <div style="font-family: 'JetBrains Mono', monospace; font-size: 8px; width: 100%; box-sizing: border-box; padding: 0 14mm; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #111111; padding-top: 5px; color: #111111;">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 8px; width: 100%; box-sizing: border-box; padding: 0 14mm; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #111111; padding-top: 5px; color: #111111; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
           <div style="display: flex; align-items: center; gap: 6px;">
-            <span style="display: inline-block; width: 9px; height: 9px; background: #D92B2B; border: 1px solid #111111;"></span>
-            <span style="font-family: 'Inter', sans-serif; font-weight: 800; font-size: 11px; letter-spacing: -0.03em; text-transform: uppercase;">CRIVOS</span>
+            <svg width="9" height="9" viewBox="0 0 9 9" style="display: inline-block; flex-shrink: 0;">
+              <rect x="0.5" y="0.5" width="8" height="8" fill="#D92B2B" stroke="#111111" stroke-width="1"/>
+            </svg>
+            <span style="font-family: 'Inter', sans-serif; font-weight: 800; font-size: 11px; letter-spacing: -0.03em; text-transform: uppercase; color: #111111;">CRIVOS</span>
           </div>
           <div>
             <span style="margin-right: 14px; font-weight: 700; color: #111111;">crivos.me</span>

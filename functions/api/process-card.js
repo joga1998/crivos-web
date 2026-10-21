@@ -102,7 +102,7 @@ export async function onRequestPost(context) {
       payment_method_id,
       issuer_id: issuer_id ? String(issuer_id) : undefined,
       external_reference: orderId ? String(orderId) : undefined,
-      notification_url: `${(env?.API_BASE_URL || 'https://crivos-web.pages.dev').replace(/\/+$/, '')}/api/webhook-mp`,
+      notification_url: `${(env?.API_BASE_URL || 'https://crivos.me').replace(/\/+$/, '')}/api/webhook-mp`,
       payer: {
         email: email.trim(),
         identification: cleanDocNumber

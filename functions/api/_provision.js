@@ -77,12 +77,15 @@ export async function provisionUserOrder(env, { orderId, mpPaymentId, paymentMet
     return { success: true, alreadyProvisioned: true, userId: order.user_id };
   }
 
-  // Se a ordem já foi marcada como approved (ex: por process-card.js) mas user_id ainda não foi atrelado,
-  // apenas o fluxo de processamento de cartão ou quem chegou primeiro executa.
-  // Usamos status "provisioning" como lock atômico.
+  // Se a ordem já estiver em "provisioning" há MENOS de 30 segundos, evita corrida simultânea.
+  // Se estiver travada em "provisioning" há mais de 30s (ex: falha temporária anterior), libera a tentativa.
   if (order.status === 'provisioning') {
-    console.log(`[Provision] Ordem ${order.id} já está em processo de provisionamento por outra requisição simultânea.`);
-    return { success: true, inProgress: true };
+    const updatedAt = order.updated_at ? new Date(order.updated_at).getTime() : 0;
+    const isRecent = (Date.now() - updatedAt) < 30000;
+    if (isRecent) {
+      console.log(`[Provision] Ordem ${order.id} já está em processo de provisionamento recente.`);
+      return { success: true, inProgress: true };
+    }
   }
 
   try {
