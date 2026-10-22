@@ -250,6 +250,9 @@ export async function provisionUserOrder(env, { orderId, mpPaymentId, paymentMet
     };
     const formattedPrice = planPrices[order.plan_tier] || (order.amount_cents ? (order.amount_cents / 100).toFixed(2).replace('.', ',') : '0,00');
 
+        const hasOrderBump = !!(parsedNotes.order_bump || (order.amount_cents && [9400, 15100, 24800].includes(order.amount_cents)));
+    const bumpTitle = hasOrderBump ? (parsedNotes.order_bump_title || 'Dossiê de Véspera D-7 & Pegadinhas da Banca (+ R$ 27,00)') : 'Nenhum';
+
     await sendAdminSaleNotification(env, {
       plan_title: planTitle,
       amount: formattedPrice,
@@ -264,6 +267,9 @@ export async function provisionUserOrder(env, { orderId, mpPaymentId, paymentMet
       payment_id: String(mpPaymentId || order.payment_id || ''),
       temp_password: tempPassword,
       edital_url: order.edital_file_url || null,
+      order_bump: hasOrderBump ? 'SIM' : 'NÃO',
+      order_bump_title: bumpTitle,
+      upsell: hasOrderBump ? 'SIM (+ R$ 27,00)' : 'NÃO',
     });
     console.log(`[Provision] Notificação enviada para o admin (joga8991@gmail.com) da ordem ${order.id}`);
   } catch (adminErr) {

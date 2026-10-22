@@ -96,8 +96,8 @@ export async function onRequestPost(context) {
 
     const mpPayload = {
       token,
-      transaction_amount: selected.amount,
-      description: selected.title,
+      transaction_amount: finalAmount,
+      description: finalDesc,
       installments: Number(installments) || 1,
       payment_method_id,
       issuer_id: issuer_id ? String(issuer_id) : undefined,
@@ -228,6 +228,8 @@ export async function onRequestPost(context) {
         const mergedNotes = {
           ...existingNotes,
           cpf: cleanDocNumber || existingNotes.cpf,
+          order_bump: !!orderBump,
+          order_bump_title: orderBump ? 'Dossiê de Véspera D-7 & Pegadinhas da Banca' : null,
         };
 
         const isApproved = (mpData.status === 'approved' || mpData.status === 'in_process');

@@ -143,7 +143,36 @@ async function main() {
         const profs = await profRes.json();
         if (profs && profs.length > 0) {
           targetUserId = profs[0].id;
-          console.log(`  ✓ Usuário localizado: ${targetUserId} (${profs[0].full_name || 'Sem nome'})`);
+          console.log(`  ✓ Usuário localizado em profiles: ${targetUserId} (${profs[0].full_name || 'Sem nome'})`);
+        }
+      }
+      
+      // Fallback 1: Buscar em orders
+      if (!targetUserId) {
+        const ordRes = await fetch(`${supabaseUrl}/rest/v1/orders?email=eq.${encodeURIComponent(email)}&order=created_at.desc&limit=1&select=user_id,id`, {
+          headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}` }
+        });
+        if (ordRes.ok) {
+          const ords = await ordRes.json();
+          if (ords && ords.length > 0 && ords[0].user_id) {
+            targetUserId = ords[0].user_id;
+            console.log(`  ✓ Usuário localizado via orders: ${targetUserId}`);
+          }
+        }
+      }
+
+      // Fallback 2: Buscar em auth/v1/admin/users
+      if (!targetUserId) {
+        const authRes = await fetch(`${supabaseUrl}/auth/v1/admin/users`, {
+          headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}` }
+        });
+        if (authRes.ok) {
+          const authData = await authRes.json();
+          const found = (authData.users || []).find(u => u.email && u.email.toLowerCase() === email.toLowerCase());
+          if (found) {
+            targetUserId = found.id;
+            console.log(`  ✓ Usuário localizado via auth users: ${targetUserId}`);
+          }
         }
       }
     } catch (e) {

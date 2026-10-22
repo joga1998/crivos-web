@@ -36,7 +36,7 @@ export async function onRequestPost(context) {
 
   try {
     const body = await request.json();
-    const { plan, email, firstName, lastName, docType, docNumber, orderId } = body;
+    const { plan, email, firstName, lastName, docType, docNumber, orderId, orderBump } = body;
 
     // Tabela oficial de preços no servidor (anti-adulteração de preços no frontend)
     const planPrices = {
@@ -89,8 +89,8 @@ export async function onRequestPost(context) {
     const idempotencyKey = `pix-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
     const mpPayload = {
-      transaction_amount: selected.amount,
-      description: selected.title,
+      transaction_amount: finalAmount,
+      description: finalDesc,
       payment_method_id: 'pix',
       external_reference: orderId ? String(orderId) : undefined,
       notification_url: `${(env?.API_BASE_URL || 'https://crivos.me').replace(/\/+$/, '')}/api/webhook-mp`,
@@ -161,6 +161,8 @@ export async function onRequestPost(context) {
           ...existingNotes,
           full_name: fullName || existingNotes.full_name,
           cpf: cleanDocNumber || existingNotes.cpf,
+          order_bump: !!orderBump,
+          order_bump_title: orderBump ? 'Dossiê de Véspera D-7 & Pegadinhas da Banca' : null,
           qr_code: mpData?.point_of_interaction?.transaction_data?.qr_code || existingNotes.qr_code,
           ticket_url: mpData?.point_of_interaction?.transaction_data?.ticket_url || existingNotes.ticket_url,
         };

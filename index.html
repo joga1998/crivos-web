@@ -1985,6 +1985,39 @@
             }
         }
     </style>
+
+  <!-- CRIVOS // INFRAESTRUTURA DE PERFORMANCE & RASTREAMENTO INSTITUCIONAL -->
+  <script>
+    window.CRIVOS_TRACKING = {
+      metaPixelId: window.META_PIXEL_ID || null,
+      clarityId: window.CLARITY_PROJECT_ID || null,
+      gtagId: window.GTAG_CONVERSION_ID || null
+    };
+
+    // 1. Inicializador Meta Pixel (Stub Padrão de Alta Resiliência)
+    if (window.CRIVOS_TRACKING.metaPixelId) {
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', window.CRIVOS_TRACKING.metaPixelId);
+      fbq('track', 'PageView');
+    }
+
+    // 2. Inicializador Microsoft Clarity (Gravação Anônima de Sessões / UX)
+    if (window.CRIVOS_TRACKING.clarityId) {
+      (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", window.CRIVOS_TRACKING.clarityId);
+    }
+  </script>
+
 </head>
 <body>
 

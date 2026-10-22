@@ -360,12 +360,40 @@ async function renderPdf(inputPath, outputPdfPath, customTitle) {
       docTitle = h1Match[1].replace(/[*_#]/g, '').trim();
     }
 
+    // Pré-processamento do Markdown: limpa sintaxes GitHub Alerts, converte cronograma em tabelas executivas e trata diagramas
+    let cleanMd = mdContent
+      .replace(/>\s*\[!(IMPORTANT|NOTE|TIP|INFO)\]/gi, '> **[$1]**')
+      .replace(/>\s*\[!(WARNING|CAUTION|DANGER)\]/gi, '> **[ALERTA]**')
+      .replace(/```mermaid[\s\S]*?```/gi, (match) => {
+        const lines = match.replace(/```mermaid|```/g, '').trim().split('\n');
+        const phases = lines.filter(l => l.includes('FASE') || l.includes('Sem.'));
+        if (phases.length) {
+          return '> **FLUXO TÁTICO DAS FASES:**\n' + phases.map(p => '> - ' + p.replace(/[\[\]"\<br\>]/g, ' ').trim()).join('\n');
+        }
+        return '';
+      });
+
+    // Converte blocos semanais de cronograma em listas para formato de tabela executiva
+    cleanMd = cleanMd.replace(/(#### Semana \d+:[^\n]+\n+)([\s\S]*?)(?=\n#### Semana|\n### 2\.2|\n## 03|$)/gi, (match, header, body) => {
+      const dayMatches = [...body.matchAll(/- \*\*(\d{2}\/\d{2}\/\d{4}) · ([^·\n]+) · ([^\*\n]+)\*\*[\s\r\n]+([\s\S]*?)(?=\n- \*\*|$)/g)];
+      if (!dayMatches.length) return match;
+
+      let table = `${header}\n| DATA | DIA | CARGA | ATIVIDADE PROGRAMADA |\n| :--- | :--- | :--- | :--- |\n`;
+      for (const m of dayMatches) {
+        const date = m[1].trim();
+        const weekday = m[2].trim();
+        const load = m[3].trim();
+        const desc = m[4].replace(/\r?\n\s*/g, ' ').replace(/\|/g, '-').trim();
+        table += `| **${date}** | ${weekday} | `${load}` | ${desc} |\n`;
+      }
+      return table + '\n';
+    });
+
     let parsedHtml = '';
     if (marked) {
-      parsedHtml = marked.parse(mdContent);
+      parsedHtml = marked.parse(cleanMd);
     } else {
-      // Fallback simples
-      parsedHtml = `<pre>${mdContent}</pre>`;
+      parsedHtml = `<pre>${cleanMd}</pre>`;
     }
 
     const styledHtml = generateSwissEditorialHtml(parsedHtml, docTitle);
