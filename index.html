@@ -2751,7 +2751,397 @@
 
             </div>
         </section>
+<!-- ==========================================
+     06. SEÇÃO DE DÚVIDAS FREQUENTES (FAQ)
+     Cole logo abaixo do fechamento da #precos e antes do <footer>
+     ========================================== -->
+<style>
+    .crivos-faq-section {
+        background-color: #F4F4F0;
+        color: #111111;
+        border-top: 2px solid #111111;
+        padding: 96px 24px;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
 
+    .crivos-faq-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .crivos-faq-header {
+        margin-bottom: 56px;
+        border-bottom: 2px solid #111111;
+        padding-bottom: 32px;
+    }
+
+    .crivos-faq-meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+
+    .crivos-faq-tag-primary {
+        background-color: #111111;
+        color: #FFFFFF;
+        padding: 6px 12px;
+        border: 1px solid #111111;
+    }
+
+    .crivos-faq-tag-secondary {
+        background-color: #FFFFFF;
+        color: #D92B2B;
+        padding: 6px 12px;
+        border: 1px solid #111111;
+    }
+
+    .crivos-faq-title {
+        font-size: clamp(28px, 4vw, 48px);
+        font-weight: 900;
+        line-height: 1.05;
+        letter-spacing: -0.04em;
+        text-transform: uppercase;
+        margin: 0 0 16px 0;
+        color: #111111;
+    }
+
+    .crivos-faq-subtitle {
+        font-size: 17px;
+        line-height: 1.6;
+        color: #333333;
+        max-width: 760px;
+        margin: 0;
+    }
+
+    .crivos-faq-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .crivos-faq-item {
+        background-color: #FFFFFF;
+        border: 2px solid #111111;
+        box-shadow: 4px 4px 0px #111111;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .crivos-faq-item.is-active {
+        border-color: #111111;
+        box-shadow: 6px 6px 0px #D92B2B;
+    }
+
+    .crivos-faq-trigger {
+        width: 100%;
+        background: none;
+        border: none;
+        padding: 24px 28px;
+        text-align: left;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        color: #111111;
+        font-family: inherit;
+    }
+
+    .crivos-faq-trigger:hover {
+        background-color: #FAFAFA;
+    }
+
+    .crivos-faq-trigger-left {
+        display: flex;
+        align-items: baseline;
+        gap: 16px;
+    }
+
+    .crivos-faq-index {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 13px;
+        font-weight: 700;
+        color: #D92B2B;
+        flex-shrink: 0;
+    }
+
+    .crivos-faq-question {
+        font-size: clamp(16px, 2vw, 20px);
+        font-weight: 800;
+        line-height: 1.3;
+        letter-spacing: -0.02em;
+        text-transform: uppercase;
+    }
+
+    .crivos-faq-icon {
+        width: 32px;
+        height: 32px;
+        border: 2px solid #111111;
+        background-color: #F4F4F0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 18px;
+        font-weight: 700;
+        flex-shrink: 0;
+        transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .crivos-faq-item.is-active .crivos-faq-icon {
+        background-color: #D92B2B;
+        color: #FFFFFF;
+    }
+
+    .crivos-faq-content {
+        display: none;
+        padding: 0 28px 28px 64px;
+        border-top: 1px solid #E5E5E0;
+    }
+
+    .crivos-faq-item.is-active .crivos-faq-content {
+        display: block;
+    }
+
+    .crivos-faq-answer {
+        padding-top: 20px;
+        font-size: 16px;
+        line-height: 1.65;
+        color: #222222;
+        margin: 0;
+    }
+
+    .crivos-faq-answer strong {
+        color: #111111;
+        font-weight: 700;
+    }
+
+    .crivos-faq-footer-bar {
+        margin-top: 48px;
+        background-color: #111111;
+        color: #FFFFFF;
+        border: 2px solid #111111;
+        box-shadow: 4px 4px 0px #D92B2B;
+        padding: 28px 32px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+    }
+
+    .crivos-faq-footer-text strong {
+        display: block;
+        font-size: 18px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: -0.02em;
+        margin-bottom: 4px;
+    }
+
+    .crivos-faq-footer-text span {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 13px;
+        color: #CCCCCC;
+    }
+
+    .crivos-faq-cta {
+        display: inline-block;
+        background-color: #D92B2B;
+        color: #FFFFFF;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        text-decoration: none;
+        padding: 14px 24px;
+        border: 2px solid #FFFFFF;
+        transition: transform 0.1s ease, background-color 0.15s ease;
+    }
+
+    .crivos-faq-cta:hover {
+        background-color: #FFFFFF;
+        color: #111111;
+    }
+
+    @media (max-width: 640px) {
+        .crivos-faq-section {
+            padding: 64px 16px;
+        }
+        .crivos-faq-trigger {
+            padding: 20px 18px;
+        }
+        .crivos-faq-content {
+            padding: 0 18px 20px 18px;
+        }
+        .crivos-faq-footer-bar {
+            padding: 24px 20px;
+        }
+        .crivos-faq-cta {
+            width: 100%;
+            text-align: center;
+        }
+    }
+</style>
+
+<section id="faq" class="crivos-faq-section" aria-labelledby="faq-heading">
+    <div class="crivos-faq-container">
+        <div class="crivos-faq-header">
+            <div class="crivos-faq-meta">
+                <span class="crivos-faq-tag-primary">06 // DÚVIDAS FREQUENTES</span>
+                <span class="crivos-faq-tag-secondary">AUDITORIA DE OPERAÇÃO E GARANTIAS</span>
+            </div>
+            <h2 id="faq-heading" class="crivos-faq-title">
+                PERGUNTAS OBJETIVAS. RESPOSTAS SEM RODEIOS.
+            </h2>
+            <p class="crivos-faq-subtitle">
+                Tudo o que você precisa saber sobre o processamento do seu edital, prazos de entrega e funcionamento do painel antes de iniciar.
+            </p>
+        </div>
+
+        <div class="crivos-faq-grid">
+            <!-- PERGUNTA 01 -->
+            <div class="crivos-faq-item is-active">
+                <button type="button" class="crivos-faq-trigger" aria-expanded="true">
+                    <span class="crivos-faq-trigger-left">
+                        <span class="crivos-faq-index">[ 01 ]</span>
+                        <span class="crivos-faq-question">Como funciona a entrega individual em até 24h (ou 6h no Elite)?</span>
+                    </span>
+                    <span class="crivos-faq-icon" aria-hidden="true">−</span>
+                </button>
+                <div class="crivos-faq-content">
+                    <p class="crivos-faq-answer">
+                        Assim que o pagamento é confirmado, você preenche um formulário rápido indicando seu concurso alvo, o edital (PDF ou link) e quantas horas reais tem disponíveis por dia da semana. Nossa engenharia disseca os pesos estatísticos da banca, monta seu ciclo até o D+1 pós-prova e libera seu acesso exclusivo em <strong>app.crivos.me</strong> em até <strong>24 horas</strong> (ou em até <strong>6 horas</strong> para quem opta pelo plano Elite).
+                    </p>
+                </div>
+            </div>
+
+            <!-- PERGUNTA 02 -->
+            <div class="crivos-faq-item">
+                <button type="button" class="crivos-faq-trigger" aria-expanded="false">
+                    <span class="crivos-faq-trigger-left">
+                        <span class="crivos-faq-index">[ 02 ]</span>
+                        <span class="crivos-faq-question">É uma assinatura mensal ou pagamento único?</span>
+                    </span>
+                    <span class="crivos-faq-icon" aria-hidden="true">+</span>
+                </button>
+                <div class="crivos-faq-content">
+                    <p class="crivos-faq-answer">
+                        <strong>Pagamento estritamente único por edital.</strong> Não cobramos mensalidades recorrentes nem prendemos o limite do seu cartão. Você adquire o sistema calibrado para a sua prova e tem acesso completo durante todo o ciclo de preparação até a realização do exame.
+                    </p>
+                </div>
+            </div>
+
+            <!-- PERGUNTA 03 -->
+            <div class="crivos-faq-item">
+                <button type="button" class="crivos-faq-trigger" aria-expanded="false">
+                    <span class="crivos-faq-trigger-left">
+                        <span class="crivos-faq-index">[ 03 ]</span>
+                        <span class="crivos-faq-question">Eu preciso configurar matérias ou montar planilhas do zero?</span>
+                    </span>
+                    <span class="crivos-faq-icon" aria-hidden="true">+</span>
+                </button>
+                <div class="crivos-faq-content">
+                    <p class="crivos-faq-answer">
+                        <strong>Zero configuração manual.</strong> Diferente de templates no Notion ou aplicativos em branco onde você gasta semanas cadastrando disciplinas e pesos, a entrega da CRIVOS é 100% pronta para execução. Você faz login e já encontra a meta diária mastigada, o cronômetro de blocos e as revisões espaçadas populadas para o seu edital.
+                    </p>
+                </div>
+            </div>
+
+            <!-- PERGUNTA 04 -->
+            <div class="crivos-faq-item">
+                <button type="button" class="crivos-faq-trigger" aria-expanded="false">
+                    <span class="crivos-faq-trigger-left">
+                        <span class="crivos-faq-index">[ 04 ]</span>
+                        <span class="crivos-faq-question">E se eu atrasar uma meta ou minha rotina mudar no meio do caminho?</span>
+                    </span>
+                    <span class="crivos-faq-icon" aria-hidden="true">+</span>
+                </button>
+                <div class="crivos-faq-content">
+                    <p class="crivos-faq-answer">
+                        O cronograma da CRIVOS é elástico. Caso você perca um dia de estudo por imprevisto, o sistema recalibra a rota priorizando os tópicos que concentram 80% dos pontos da prova (Corte de Pareto), impedindo o efeito bola de neve. Além disso, todos os planos contam com <strong>7 dias gratuitos de calibração e ajuste fino de rotina</strong>.
+                    </p>
+                </div>
+            </div>
+
+            <!-- PERGUNTA 05 -->
+            <div class="crivos-faq-item">
+                <button type="button" class="crivos-faq-trigger" aria-expanded="false">
+                    <span class="crivos-faq-trigger-left">
+                        <span class="crivos-faq-index">[ 05 ]</span>
+                        <span class="crivos-faq-question">A CRIVOS substitui cursinhos ou plataformas de questões?</span>
+                    </span>
+                    <span class="crivos-faq-icon" aria-hidden="true">+</span>
+                </button>
+                <div class="crivos-faq-content">
+                    <p class="crivos-faq-answer">
+                        A CRIVOS substitui o estudo passivo e desorientado por direção tática. Você não vai assistir a centenas de horas de videoaulas aqui: o painel ordena exatamente qual tópico estudar hoje, qual lei seca ler, a bateria de questões filtrada para resolver na sua plataforma habitual e gerencia sua memória de longo prazo com flashcards nativos no algoritmo <strong>SM-2</strong>.
+                    </p>
+                </div>
+            </div>
+
+            <!-- PERGUNTA 06 -->
+            <div class="crivos-faq-item">
+                <button type="button" class="crivos-faq-trigger" aria-expanded="false">
+                    <span class="crivos-faq-trigger-left">
+                        <span class="crivos-faq-index">[ 06 ]</span>
+                        <span class="crivos-faq-question">Serve para qualquer concurso público ou exame?</span>
+                    </span>
+                    <span class="crivos-faq-icon" aria-hidden="true">+</span>
+                </button>
+                <div class="crivos-faq-content">
+                    <p class="crivos-faq-answer">
+                        Sim. Mapeamos editais de todas as grandes bancas (CEBRASPE, FGV, FCC, VUNESP, CESGRANRIO, AOCP, IDECAN) em carreiras Fiscais, Tribunais, Policiais, Administrativas, Bancárias, Militares, além de OAB e ENEM. Mesmo em concursos municipais ou específicos, basta anexar o PDF do seu edital após a compra para dissecarmos cada disciplina.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="crivos-faq-footer-bar">
+            <div class="crivos-faq-footer-text">
+                <strong>PRONTO PARA BLINDAR SUA EXECUÇÃO ATÉ O DIA DA PROVA?</strong>
+                <span>[ SLA DE ENTREGA ATIVO: ATÉ 24H // 6H NO ELITE ]</span>
+            </div>
+            <a href="#precos" class="crivos-faq-cta">Montar Meu Plano Agora →</a>
+        </div>
+    </div>
+</section>
+
+<script>
+    (function () {
+        const faqItems = document.querySelectorAll('.crivos-faq-item');
+        faqItems.forEach((item) => {
+            const trigger = item.querySelector('.crivos-faq-trigger');
+            const icon = item.querySelector('.crivos-faq-icon');
+
+            trigger.addEventListener('click', () => {
+                const isOpen = item.classList.contains('is-active');
+
+                // Fecha os demais itens para manter a leitura limpa
+                faqItems.forEach((otherItem) => {
+                    otherItem.classList.remove('is-active');
+                    const otherTrigger = otherItem.querySelector('.crivos-faq-trigger');
+                    const otherIcon = otherItem.querySelector('.crivos-faq-icon');
+                    if (otherTrigger) otherTrigger.setAttribute('aria-expanded', 'false');
+                    if (otherIcon) otherIcon.textContent = '+';
+                });
+
+                // Alterna o item clicado
+                if (!isOpen) {
+                    item.classList.add('is-active');
+                    trigger.setAttribute('aria-expanded', 'true');
+                    icon.textContent = '−';
+                }
+            });
+        });
+    })();
+</script>
         <!-- 12. FINAL CONVERSION BANNER -->
         <section class="cta-banner">
             <div class="container">
