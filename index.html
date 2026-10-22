@@ -3368,6 +3368,65 @@
 setTimeout(() => {
   try { fetch('/api/cron-recovery').catch(() => {}); } catch(e) {}
 }, 3000);
-</script>
+
+        // Controle de Navegação Tática do Slider de Planos
+        let activePlanIdx = 1; // Default no Arsenal (Destaque)
+        function goToPlan(index) {
+            const track = document.getElementById('pricing-track');
+            const btns = document.querySelectorAll('.pricing-tab-btn');
+            const cards = document.querySelectorAll('.price-card');
+            
+            if (index < 0) index = 0;
+            if (index >= cards.length) index = cards.length - 1;
+            activePlanIdx = index;
+
+            btns.forEach((b, i) => {
+                if (i === index) b.classList.add('active');
+                else b.classList.remove('active');
+            });
+
+            if (track && cards[index]) {
+                const targetCard = cards[index];
+                const scrollLeft = targetCard.offsetLeft - track.offsetLeft - (track.clientWidth - targetCard.clientWidth) / 2;
+                track.scrollTo({ left: Math.max(0, scrollLeft), behavior: 'smooth' });
+            }
+        }
+
+        function slidePlans(direction) {
+            goToPlan(activePlanIdx + direction);
+        }
+
+        // Listener de scroll para atualizar botões de abas no swipe móvel
+        document.addEventListener('DOMContentLoaded', () => {
+            const track = document.getElementById('pricing-track');
+            if (track) {
+                let scrollTimeout;
+                track.addEventListener('scroll', () => {
+                    clearTimeout(scrollTimeout);
+                    scrollTimeout = setTimeout(() => {
+                        const cards = document.querySelectorAll('.price-card');
+                        const center = track.scrollLeft + track.clientWidth / 2;
+                        let closestIdx = 0;
+                        let minDiff = Infinity;
+                        cards.forEach((card, idx) => {
+                            const cardCenter = card.offsetLeft + card.clientWidth / 2;
+                            const diff = Math.abs(center - cardCenter);
+                            if (diff < minDiff) {
+                                minDiff = diff;
+                                closestIdx = idx;
+                            }
+                        });
+                        const btns = document.querySelectorAll('.pricing-tab-btn');
+                        btns.forEach((b, i) => {
+                            if (i === closestIdx) b.classList.add('active');
+                            else b.classList.remove('active');
+                        });
+                        activePlanIdx = closestIdx;
+                    }, 50);
+                });
+            }
+        });
+
+    </script>
 </body>
 </html>
