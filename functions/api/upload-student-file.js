@@ -23,6 +23,27 @@ export async function onRequestPost(context) {
       });
     }
 
+    // Validação estrita de plano: o upload autônomo no painel é restrito ao plano Prime
+    let userPanel = null;
+    if (panelId) {
+      const panels = await supabaseRest(env, `/user_panels?id=eq.${encodeURIComponent(panelId)}`);
+      if (Array.isArray(panels) && panels.length > 0) userPanel = panels[0];
+    }
+    if (!userPanel) {
+      const panels = await supabaseRest(env, `/user_panels?user_id=eq.${encodeURIComponent(userId)}&order=created_at.desc&limit=1`);
+      if (Array.isArray(panels) && panels.length > 0) userPanel = panels[0];
+    }
+
+    const planTier = (userPanel?.plan_tier || '').toLowerCase();
+    if (planTier !== 'prime') {
+      return new Response(JSON.stringify({ 
+        error: 'O envio de arquivos pelo painel é um recurso exclusivo do Plano CRIVOS PRIME. Para integrar suas apostilas, realize o upgrade para o Prime.' 
+      }), {
+        status: 403,
+        headers: corsHeaders,
+      });
+    }
+
     const filename = file.name || 'material_candidato.pdf';
     const sanitizedFileName = filename.replace(/[^a-zA-Z0-9._-]/g, '_');
     const storagePath = `${userId}/${Date.now()}_${sanitizedFileName}`;
