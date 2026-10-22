@@ -473,9 +473,107 @@
       flex-wrap: wrap;
       gap: 1.5rem;
     }
+  
+    /* BACKGROUND CANVAS & SCROLL PROGRESS */
+    #coord-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      display: block;
+    }
+    .scroll-progress-track {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: transparent;
+      z-index: 1001;
+    }
+    .scroll-progress-bar {
+      height: 100%;
+      width: 0%;
+      background: var(--accent-red);
+    }
+
+    .page-wrapper {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ELEMENTOS TRANSLÚCIDOS COM BLUR ELEGANTE */
+    .header {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    [data-theme="dark"] .header {
+      background: rgba(22, 24, 29, 0.88);
+    }
+
+    .hero {
+      background: transparent;
+    }
+
+    .section {
+      background: transparent;
+    }
+
+    .metric-card, .contrast-card, .price-card, .dossier-table {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    [data-theme="dark"] .metric-card, 
+    [data-theme="dark"] .contrast-card, 
+    [data-theme="dark"] .price-card, 
+    [data-theme="dark"] .dossier-table {
+      background: rgba(22, 24, 29, 0.88);
+    }
+
+    /* BOTÃO FLUTUANTE DE TEMA */
+    .theme-floating-btn {
+      position: fixed !important;
+      bottom: 1.75rem !important;
+      right: 1.75rem !important;
+      z-index: 99999 !important;
+      width: 50px;
+      height: 50px;
+      background: var(--bg-surface);
+      border: 2px solid var(--border-color);
+      box-shadow: var(--shadow-hard);
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.25rem;
+      user-select: none;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .theme-floating-btn:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0px var(--border-color);
+    }
+    [data-theme="dark"] .theme-floating-btn:hover {
+      box-shadow: 6px 6px 0px #000000;
+    }
+
   </style>
 </head>
 <body>
+
+  <!-- SCROLL PROGRESS & CANVAS -->
+  <div class="scroll-progress-track">
+    <div class="scroll-progress-bar" id="scroll-bar"></div>
+  </div>
+  <canvas id="coord-canvas"></canvas>
+
+  <div class="page-wrapper">
+
 
   <!-- TOP BAR -->
   <aside class="topbar">
@@ -731,18 +829,32 @@
   </section>
 
   <!-- FOOTER -->
+  
+  <!-- FOOTER -->
   <footer class="footer">
     <div class="container footer-flex">
       <div>
-        <strong>CRIVOS // SISTEMA OPERACIONAL PÓS-EDITAL</strong><br>
-        <span style="color:#888888;">Engenharia Reversa para Concursos Públicos e Exames Oficiais.</span>
+        <div style="display:flex;align-items:center;gap:0.65rem;margin-bottom:0.4rem;">
+          <span style="display:inline-block;width:12px;height:12px;background:var(--accent-red);flex-shrink:0;"></span>
+          <span style="font-family:var(--font-sans);font-weight:900;font-size:1.25rem;letter-spacing:-0.5px;color:#FFFFFF;">CRIVOS</span>
+        </div>
+        <div style="font-family:var(--font-mono);font-size:0.75rem;color:#A0A0A0;text-transform:uppercase;letter-spacing:0.04em;">
+          Inteligência para Concursos e Exames
+        </div>
       </div>
-      <div>
-        <a href="https://app.crivos.me" target="_blank" style="color:var(--accent-red);font-weight:bold;margin-right:1rem;">ÁREA DO ALUNO ↗</a>
-        <a href="/payment.html?concurso=TJSP&cargo=Escrevente%20Técnico%20Judiciário&produto=elite" style="color:#FFFFFF;text-decoration:underline;">MATRICULAR AGORA</a>
+      <div style="font-family:var(--font-mono);font-size:0.75rem;">
+        <a href="https://app.crivos.me" target="_blank" style="color:var(--accent-red);font-weight:bold;margin-right:1.5rem;">ÁREA DO ALUNO ↗</a>
+        <a href="/payment.html?concurso=TJSP&cargo=Escrevente%20Técnico%20Judiciário&produto=elite" style="color:#FFFFFF;text-decoration:underline;">MATRICULAR NO TJSP</a>
       </div>
     </div>
   </footer>
+  </div> <!-- /page-wrapper -->
+
+  <!-- BOTÃO FLUTUANTE DE TEMA -->
+  <button class="theme-floating-btn" id="theme-toggle" type="button" title="Alternar Modo Claro / Escuro" aria-label="Alternar Tema">
+    <span id="theme-icon">◐</span>
+  </button>
+
 
 <script>
     function toggleMenu() {
@@ -756,5 +868,86 @@
       }
     }
   </script>
+
+  <script>
+    // 1. ALTERNÂNCIA DE TEMA (CLARO / ESCURO)
+    const themeBtn = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+
+    function applyTheme(isDark) {
+      if (isDark) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        if (themeIcon) themeIcon.textContent = '◑';
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+        if (themeIcon) themeIcon.textContent = '◐';
+      }
+    }
+
+    const savedTheme = localStorage.getItem('crivos_theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    let isDark = savedTheme ? savedTheme === 'dark' : prefersDark;
+    applyTheme(isDark);
+
+    if (themeBtn) {
+      themeBtn.addEventListener('click', () => {
+        isDark = !isDark;
+        applyTheme(isDark);
+        localStorage.setItem('crivos_theme', isDark ? 'dark' : 'light');
+      });
+    }
+
+    // 2. SCROLL PROGRESS
+    window.addEventListener('scroll', () => {
+      const bar = document.getElementById('scroll-bar');
+      if (bar) {
+        const scrolled = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+        bar.style.width = Math.min(Math.max(scrolled, 0), 100) + '%';
+      }
+    });
+
+    // 3. CANVAS DE COORDENADAS INTERATIVO
+    const canvas = document.getElementById('coord-canvas');
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      let width = window.innerWidth;
+      let height = window.innerHeight;
+
+      function resize() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      const dots = [];
+      const step = 48;
+      for (let x = 24; x < 2400; x += step) {
+        for (let y = 24; y < 1600; y += step) {
+          dots.push({ x, y, baseAlpha: 0.12 });
+        }
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, width, height);
+        const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+        ctx.fillStyle = dark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.12)';
+
+        for (let i = 0; i < dots.length; i++) {
+          const d = dots[i];
+          if (d.x < width && d.y < height) {
+            ctx.fillRect(d.x, d.y, 1.5, 1.5);
+          }
+        }
+        requestAnimationFrame(draw);
+      }
+      requestAnimationFrame(draw);
+    }
+  </script>
+
 </body>
 </html>
