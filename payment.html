@@ -27,7 +27,7 @@
   </script>
 
     <!-- Base Oficial de Concursos para Autocomplete -->
-  <script src="data/concursos-abertos.js"></script>
+  <script src="data/concursos-abertos.js?v=20261021_abertos"></script>
   <!-- SDK Oficial do Mercado Pago V2 -->
   <script src="https://sdk.mercadopago.com/js/v2"></script>
 
@@ -541,6 +541,63 @@
       display: none;
     }
 
+    
+    /* Order Bump Box Oficial CRIVOS */
+    .order-bump-box {
+      background: var(--bg-surface);
+      border: 2px dashed var(--accent-red);
+      padding: 1.1rem;
+      margin-bottom: 1.35rem;
+      box-shadow: 2px 2px 0px var(--border-color);
+      transition: background-color 0.15s ease;
+    }
+    .order-bump-box:hover {
+      background: var(--bg-elevated);
+    }
+    .order-bump-label {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      cursor: pointer;
+      user-select: none;
+    }
+    .order-bump-checkbox {
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      accent-color: var(--accent-red);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .order-bump-content {
+      flex: 1;
+    }
+    .order-bump-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      font-weight: 800;
+      background: var(--accent-red);
+      color: #FFFFFF;
+      padding: 1px 6px;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .order-bump-title {
+      font-family: var(--font-sans);
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1.25;
+      margin-bottom: 3px;
+    }
+    .order-bump-desc {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
     .secure-footer {
       text-align: center;
       font-family: var(--font-mono);
@@ -896,6 +953,39 @@
     }
 
   </style>
+
+  <!-- CRIVOS // INFRAESTRUTURA DE PERFORMANCE & RASTREAMENTO INSTITUCIONAL -->
+  <script>
+    window.CRIVOS_TRACKING = {
+      metaPixelId: window.META_PIXEL_ID || null,
+      clarityId: window.CLARITY_PROJECT_ID || null,
+      gtagId: window.GTAG_CONVERSION_ID || null
+    };
+
+    // 1. Inicializador Meta Pixel (Stub Padrão de Alta Resiliência)
+    if (window.CRIVOS_TRACKING.metaPixelId) {
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', window.CRIVOS_TRACKING.metaPixelId);
+      fbq('track', 'PageView');
+    }
+
+    // 2. Inicializador Microsoft Clarity (Gravação Anônima de Sessões / UX)
+    if (window.CRIVOS_TRACKING.clarityId) {
+      (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window, document, "clarity", "script", window.CRIVOS_TRACKING.clarityId);
+    }
+  </script>
+
 </head>
 <body>
 
@@ -1099,6 +1189,21 @@
           <div><strong>PLANO:</strong> <span id="sum-plano">...</span> — <strong>R$ <span class="current-price-label">67,00</span></strong></div>
         </div>
 
+        
+        <!-- Order Bump Voluntário (Aumento de AOV) -->
+        <div class="order-bump-box" id="order-bump-container">
+          <label class="order-bump-label" for="order-bump-checkbox">
+            <input type="checkbox" id="order-bump-checkbox" class="order-bump-checkbox" onchange="toggleOrderBump(this)" />
+            <div class="order-bump-content">
+              <span class="order-bump-badge">OFERTA ÚNICA // + R$ 27,00</span>
+              <div class="order-bump-title">SIM! Adicionar o Dossiê de Véspera D-7 &amp; Pegadinhas da Banca</div>
+              <div class="order-bump-desc">
+                Caderno tático extra em PDF com o mapeamento das 50 pegadinhas clássicas da sua banca examinadora (Cebraspe / FGV / Vunesp) e checklist de revisão rápida para os últimos 7 dias.
+              </div>
+            </div>
+          </label>
+        </div>
+
         <!-- Abas de Pagamento -->
         <label>ESCOLHA O MÉTODO DE PAGAMENTO</label>
         <div class="tabs-header">
@@ -1269,6 +1374,29 @@
     const produtoParam = (urlParams.get('produto') || '').toLowerCase();
     if (produtoParam && planData[produtoParam]) {
       productSelect.value = produtoParam;
+    }
+
+    
+    let orderBumpActive = false;
+    const ORDER_BUMP_PRICE = 27.00;
+
+    function toggleOrderBump(checkbox) {
+      orderBumpActive = !!checkbox.checked;
+      const basePrice = parseFloat(planData[productSelect.value].price);
+      const finalPrice = orderBumpActive ? (basePrice + ORDER_BUMP_PRICE) : basePrice;
+      const formatted = finalPrice.toFixed(2).replace('.', ',');
+      
+      priceLabels.forEach(lbl => lbl.textContent = formatted);
+
+      // Recarrega o Brick de cartão com o novo valor se estiver aberto
+      if (currentMethod === 'card' && cardBrickInitialized) {
+        reloadCardBrick();
+      }
+    }
+
+    function getCurrentTransactionAmount() {
+      const basePrice = parseFloat(planData[productSelect.value].price);
+      return orderBumpActive ? (basePrice + ORDER_BUMP_PRICE) : basePrice;
     }
 
     function updatePlanUI() {
@@ -1526,6 +1654,8 @@
             docType: 'CPF',
             docNumber: cpf,
             orderId: userOrderData.orderId || undefined,
+            orderBump: orderBumpActive,
+            orderBump: orderBumpActive,
           }),
         });
 
@@ -1714,6 +1844,7 @@
                       docType: cardFormData.payer?.identification?.type,
                       docNumber: cardFormData.payer?.identification?.number,
                       orderId: userOrderData.orderId || undefined,
+            orderBump: orderBumpActive,
                     }),
                   });
 
@@ -1799,15 +1930,16 @@
 (function initInteractivePlanning() {
   // 1. Dados de Concursos
   const concursosList = window.CRIVOS_CONCURSOS_DATA || [
-    { nome: "CNU — Concurso Nacional Unificado", banca: "CESGRANRIO", cargos: ["Auditor-Fiscal do Trabalho", "Analista em TI", "EPPGG", "APO"] },
-    { nome: "TJSP — Tribunal de Justiça de São Paulo", banca: "VUNESP", cargos: ["Escrevente Técnico Judiciário", "Oficial de Justiça"] },
-    { nome: "Receita Federal do Brasil (RFB)", banca: "FGV", cargos: ["Auditor-Fiscal", "Analista-Tributário"] },
-    { nome: "SEFAZ-SP — Fazenda São Paulo", banca: "FGV", cargos: ["Auditor Fiscal da Receita Estadual", "Analista em Finanças"] },
-    { nome: "Polícia Federal (PF)", banca: "CEBRASPE", cargos: ["Agente de Polícia", "Escrivão", "Delegado", "Perito Criminal"] },
-    { nome: "PRF — Polícia Rodoviária Federal", banca: "CEBRASPE", cargos: ["Policial Rodoviário Federal", "Agente Administrativo"] },
-    { nome: "OAB — Exame de Ordem Unificado", banca: "FGV", cargos: ["1ª Fase Objetiva", "2ª Fase Prático-Profissional"] },
-    { nome: "PPGHS / UERJ — Mestrado em História", banca: "CEPUERJ", cargos: ["História Social do Território (Linha 1)", "Poder e Sociedade (Linha 2)"] }
-  ];
+    { nome: "CGU — Controladoria-Geral da União", banca: "CEBRASPE", cargos: ["Auditor Federal de Finanças e Controle (AFFC) — Auditoria e Fiscalização", "Auditor Federal de Finanças e Controle (AFFC) — TI"] },
+    { nome: "Câmara dos Deputados", banca: "CEBRASPE", cargos: ["Analista Legislativo — Consultoria Legislativa", "Analista Legislativo — Informática Legislativa", "Policial Legislativo"] },
+    { nome: "TJSP — Tribunal de Justiça de São Paulo", banca: "VUNESP", cargos: ["Escrevente Técnico Judiciário", "Oficial de Justiça Avaliador"] },
+    { nome: "ABDI — Agência Brasileira de Desenvolvimento Industrial", banca: "FGV", cargos: ["Analista I — Políticas Públicas de Inovação", "Especialista em Gestão"] },
+    { nome: "TSE / TREs — Concurso Unificado da Justiça Eleitoral", banca: "CEBRASPE", cargos: ["Analista Judiciário — Área Judiciária", "Técnico Judiciário — Área Administrativa"] },
+    { nome: "Marinha do Brasil — Quadros de Oficiais", banca: "Comando da Marinha (DEnsM)", cargos: ["Oficial Superior do Quadro Complementar", "Quadro de Apoio à Saúde"] },
+    { nome: "ALEPA — Assembleia Legislativa do Pará", banca: "CEBRASPE / IDECAN", cargos: ["Analista Legislativo — Área Jurídica", "Técnico Legislativo"] },
+    { nome: "PMESP — Polícia Militar do Estado de São Paulo", banca: "FGV / VUNESP", cargos: ["Soldado PM de 2ª Classe", "Aluno-Oficial PM (Barro Branco)"] },
+    { nome: "PPGHS / UERJ — Mestrado em História Social", banca: "Banca Própria / UERJ", cargos: ["Aluno Regular de Mestrado Acadêmico (PPGHS 2027)"] },
+    { nome: "OAB — Exame de Ordem Unificado", banca: "FGV", cargos: ["Advogado / Habilitação Profissional — 1ª Fase Objetiva", "2ª Fase Prático-Profissional"] }  ];
 
   const concursoInput = document.getElementById('user-concurso');
   const cargoInput = document.getElementById('user-cargo');
