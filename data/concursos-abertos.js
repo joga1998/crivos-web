@@ -1,22 +1,37 @@
 // Base estática oficial de concursos abertos para o checkout CRIVOS
 window.CRIVOS_CONCURSOS_DATA = [
   {
-    "id": "cnu_2026",
-    "nome": "CNU — Concurso Nacional Unificado",
-    "banca": "CESGRANRIO",
-    "orgao": "Governo Federal / MGI",
+    "id": "cgu_auditor",
+    "nome": "CGU — Controladoria-Geral da União",
+    "banca": "CEBRASPE",
+    "orgao": "Controladoria-Geral da União",
     "cargos": [
-      "Auditor-Fiscal do Trabalho (AFT)",
-      "Analista em Tecnologia da Informação (ATI)",
-      "Especialista em Políticas Públicas (EPPGG)",
-      "Analista de Planejamento e Orçamento (APO)",
-      "Técnico em Indigenismo",
-      "Analista de Comércio Exterior"
+      "Auditor Federal de Finanças e Controle (AFFC) — Auditoria e Fiscalização",
+      "Auditor Federal de Finanças e Controle (AFFC) — Tecnologia da Informação",
+      "Auditor Federal de Finanças e Controle (AFFC) — Correição e Combate à Corrupção"
     ],
-    "escolaridade": "Médio e Superior",
+    "escolaridade": "Superior",
     "esfera": "Federal",
-    "status": "Edital Publicado / Em Andamento",
-    "salario_max": "R$ 22.921,00",
+    "status": "Inscrições Abertas",
+    "salario_max": "R$ 21.583,00",
+    "popular": true
+  },
+  {
+    "id": "camara_deputados",
+    "nome": "Câmara dos Deputados",
+    "banca": "CEBRASPE",
+    "orgao": "Congresso Nacional / Poder Legislativo",
+    "cargos": [
+      "Analista Legislativo — Consultoria Legislativa",
+      "Analista Legislativo — Técnica Legislativa",
+      "Analista Legislativo — Informática Legislativa",
+      "Analista Legislativo — Contador",
+      "Policial Legislativo"
+    ],
+    "escolaridade": "Superior",
+    "esfera": "Federal",
+    "status": "Inscrições Abertas",
+    "salario_max": "R$ 34.812,00",
     "popular": true
   },
   {
@@ -32,311 +47,150 @@ window.CRIVOS_CONCURSOS_DATA = [
     ],
     "escolaridade": "Médio e Superior",
     "esfera": "Estadual",
-    "status": "Inscrições Abertas / Edital Publicado",
+    "status": "Inscrições Abertas",
     "salario_max": "R$ 9.158,00",
     "popular": true
   },
   {
-    "id": "receita_federal",
-    "nome": "Receita Federal do Brasil (RFB)",
+    "id": "abdi_analista",
+    "nome": "ABDI — Agência Brasileira de Desenvolvimento Industrial",
     "banca": "FGV",
-    "orgao": "Ministério da Fazenda",
+    "orgao": "Agência Brasileira de Desenvolvimento Industrial",
     "cargos": [
-      "Auditor-Fiscal da Receita Federal",
-      "Analista-Tributário da Receita Federal"
+      "Analista I — Políticas Públicas de Inovação",
+      "Analista I — Transformação Digital e Indústria 4.0",
+      "Especialista em Gestão de Projetos"
     ],
     "escolaridade": "Superior",
     "esfera": "Federal",
-    "status": "Autorizado / Novo Ciclo",
-    "salario_max": "R$ 23.500,00",
+    "status": "Inscrições Abertas",
+    "salario_max": "R$ 16.034,00",
     "popular": true
   },
   {
-    "id": "sefaz_sp",
-    "nome": "SEFAZ-SP — Secretaria da Fazenda de São Paulo",
+    "id": "tse_unificado",
+    "nome": "TSE / TREs — Concurso Unificado da Justiça Eleitoral",
+    "banca": "CEBRASPE",
+    "orgao": "Tribunal Superior Eleitoral e TREs",
+    "cargos": [
+      "Analista Judiciário — Área Judiciária",
+      "Analista Judiciário — Área Administrativa",
+      "Analista Judiciário — Tecnologia da Informação",
+      "Técnico Judiciário — Área Administrativa",
+      "Técnico Judiciário — Agente da Polícia Judicial"
+    ],
+    "escolaridade": "Superior",
+    "esfera": "Federal",
+    "status": "Inscrições Abertas",
+    "salario_max": "R$ 15.288,00",
+    "popular": true
+  },
+  {
+    "id": "pmesp_soldado",
+    "nome": "PMESP — Polícia Militar do Estado de São Paulo",
     "banca": "FGV / VUNESP",
-    "orgao": "Secretaria da Fazenda de SP",
-    "cargos": [
-      "Auditor Fiscal da Receita Estadual (AFRE)",
-      "Analista em Finanças e Planejamento"
-    ],
-    "escolaridade": "Superior",
-    "esfera": "Estadual",
-    "status": "Edital Autorizado / Comissão Formada",
-    "salario_max": "R$ 31.200,00",
-    "popular": true
-  },
-  {
-    "id": "sefaz_rj",
-    "nome": "SEFAZ-RJ — Secretaria da Fazenda do Rio de Janeiro",
-    "banca": "CEBRASPE",
-    "orgao": "Governo do Estado do RJ",
-    "cargos": [
-      "Auditor Fiscal da Receita Estadual",
-      "Analista de Finanças Públicas"
-    ],
-    "escolaridade": "Superior",
-    "esfera": "Estadual",
-    "status": "Banca Definida / Iminente",
-    "salario_max": "R$ 27.430,00",
-    "popular": true
-  },
-  {
-    "id": "policia_federal",
-    "nome": "Polícia Federal (PF)",
-    "banca": "CEBRASPE",
-    "orgao": "Ministério da Justiça",
-    "cargos": [
-      "Agente de Polícia Federal",
-      "Escrivão de Polícia Federal",
-      "Papiloscopista Policial Federal",
-      "Delegado de Polícia Federal",
-      "Perito Criminal Federal"
-    ],
-    "escolaridade": "Superior",
-    "esfera": "Federal",
-    "status": "Autorizado / Comissão Formada",
-    "salario_max": "R$ 25.800,00",
-    "popular": true
-  },
-  {
-    "id": "prf",
-    "nome": "PRF — Polícia Rodoviária Federal",
-    "banca": "CEBRASPE",
-    "orgao": "Ministério da Justiça",
-    "cargos": [
-      "Policial Rodoviário Federal",
-      "Agente Administrativo (Médio)"
-    ],
-    "escolaridade": "Médio e Superior",
-    "esfera": "Federal",
-    "status": "Autorização Solicitada / Previsto",
-    "salario_max": "R$ 16.550,00",
-    "popular": true
-  },
-  {
-    "id": "tcu",
-    "nome": "TCU — Tribunal de Contas da União",
-    "banca": "FGV / CEBRASPE",
-    "orgao": "Tribunal de Contas da União",
-    "cargos": [
-      "Auditor Federal de Controle Externo (AUFC)",
-      "Técnico Federal de Controle Externo (TEFC)"
-    ],
-    "escolaridade": "Superior",
-    "esfera": "Federal",
-    "status": "Comissão Formada / Previsto",
-    "salario_max": "R$ 25.900,00",
-    "popular": true
-  },
-  {
-    "id": "tcdf",
-    "nome": "TCDF — Tribunal de Contas do Distrito Federal",
-    "banca": "CEBRASPE",
-    "orgao": "Tribunal de Contas do DF",
-    "cargos": [
-      "Auditor de Controle Externo",
-      "Auditor de Controle Externo (TI)",
-      "Analista Administrativo de Controle Externo"
-    ],
-    "escolaridade": "Superior",
-    "esfera": "Distrital",
-    "status": "Inscrições Abertas / Edital Publicado",
-    "salario_max": "R$ 21.183,00",
-    "popular": true
-  },
-  {
-    "id": "banco_do_brasil",
-    "nome": "Banco do Brasil (BB)",
-    "banca": "CESGRANRIO",
-    "orgao": "Banco do Brasil S.A.",
-    "cargos": [
-      "Escriturário — Agente Comercial",
-      "Escriturário — Agente de Tecnologia (TI)"
-    ],
-    "escolaridade": "Médio",
-    "esfera": "Federal (Empresa Pública)",
-    "status": "Validade Prorrogada / Novo Ciclo",
-    "salario_max": "R$ 6.200,00",
-    "popular": true
-  },
-  {
-    "id": "caixa_economica",
-    "nome": "Caixa Econômica Federal (CEF)",
-    "banca": "CESGRANRIO",
-    "orgao": "Caixa Econômica Federal",
-    "cargos": [
-      "Técnico Bancário Novo",
-      "Técnico Bancário — Tecnologia da Informação (TI)",
-      "Engenheiro de Segurança do Trabalho",
-      "Médico do Trabalho"
-    ],
-    "escolaridade": "Médio e Superior",
-    "esfera": "Federal (Empresa Pública)",
-    "status": "Edital Publicado / Convocação",
-    "salario_max": "R$ 14.915,00",
-    "popular": true
-  },
-  {
-    "id": "bndes",
-    "nome": "BNDES — Banco Nacional de Desenvolvimento Econômico e Social",
-    "banca": "CESGRANRIO",
-    "orgao": "BNDES",
-    "cargos": [
-      "Analista — Administração / Economia",
-      "Analista — Tecnologia da Informação",
-      "Analista — Direito",
-      "Analista — Engenharia",
-      "Analista — Ciência de Dados"
-    ],
-    "escolaridade": "Superior",
-    "esfera": "Federal (Empresa Pública)",
-    "status": "Edital Publicado / Concurso Vigente",
-    "salario_max": "R$ 20.900,00",
-    "popular": true
-  },
-  {
-    "id": "petrobras",
-    "nome": "Petrobras — Petróleo Brasileiro S.A.",
-    "banca": "CEBRASPE",
-    "orgao": "Petrobras",
-    "cargos": [
-      "Profissional Petrobras de Nível Técnico Júnior",
-      "Engenharia de Petróleo / Processamento",
-      "Tecnologia da Informação e Análise de Sistemas"
-    ],
-    "escolaridade": "Médio Técnico e Superior",
-    "esfera": "Federal (Sociedade de Economia Mista)",
-    "status": "Inscrições Abertas / Edital Publicado",
-    "salario_max": "R$ 13.800,00",
-    "popular": true
-  },
-  {
-    "id": "dpe_rj",
-    "nome": "DPE-RJ — Defensoria Pública do Rio de Janeiro",
-    "banca": "FGV",
-    "orgao": "Defensoria Pública do Estado do RJ",
-    "cargos": [
-      "Técnico Médio de Defensoria",
-      "Técnico Superior Jurídico",
-      "Defensor Público Substituto"
-    ],
-    "escolaridade": "Médio e Superior",
-    "esfera": "Estadual",
-    "status": "Banca FGV Contratada / Iminente",
-    "salario_max": "R$ 29.800,00",
-    "popular": true
-  },
-  {
-    "id": "pm_sp",
-    "nome": "PM-SP — Polícia Militar do Estado de São Paulo",
-    "banca": "VUNESP / FGV",
-    "orgao": "Secretaria de Segurança Pública de SP",
+    "orgao": "Polícia Militar do Estado de SP",
     "cargos": [
       "Soldado PM de 2ª Classe",
-      "Aluno-Oficial PM (Academia do Barro Branco)"
+      "Aluno-Oficial PM (Barro Branco)"
     ],
-    "escolaridade": "Médio",
+    "escolaridade": "Médio e Superior",
     "esfera": "Estadual",
-    "status": "Inscrições Abertas (2.700 vagas)",
+    "status": "Inscrições Abertas",
     "salario_max": "R$ 4.852,00",
     "popular": true
   },
   {
-    "id": "pc_sp",
-    "nome": "PC-SP — Polícia Civil do Estado de São Paulo",
-    "banca": "VUNESP",
-    "orgao": "Polícia Civil de SP",
+    "id": "ppghs_uerj",
+    "nome": "PPGHS / UERJ — Mestrado em História Social",
+    "banca": "Banca Própria / UERJ",
+    "orgao": "Universidade do Estado do Rio de Janeiro",
     "cargos": [
-      "Investigador de Polícia",
-      "Escrivão de Polícia",
-      "Delegado de Polícia",
-      "Médico Legista",
-      "Perito Criminal"
+      "Aluno Regular de Mestrado Acadêmico (PPGHS 2027)",
+      "Candidato a Bolsa de Pesquisa CAPES/FAPERJ"
+    ],
+    "escolaridade": "Superior",
+    "esfera": "Estadual / Acadêmica",
+    "status": "Inscrições Abertas",
+    "salario_max": "Bolsa R$ 2.100,00",
+    "popular": true
+  },
+  {
+    "id": "oab_exame_unificado",
+    "nome": "OAB — Exame de Ordem Unificado",
+    "banca": "FGV",
+    "orgao": "Conselho Federal da Ordem dos Advogados do Brasil",
+    "cargos": [
+      "Advogado / Habilitação Profissional — 1ª Fase Objetiva",
+      "Advogado / Habilitação Profissional — 2ª Fase Prático-Profissional"
+    ],
+    "escolaridade": "Superior (Direito)",
+    "esfera": "Nacional / Profissional",
+    "status": "Inscrições Abertas",
+    "salario_max": "Habilitação Federal",
+    "popular": true
+  },
+  {
+    "id": "inb_industrias_nucleares",
+    "nome": "INB — Indústrias Nucleares do Brasil",
+    "banca": "FUNDEP / CEBRASPE",
+    "orgao": "Ministério de Minas e Energia",
+    "cargos": [
+      "Engenheiro Químico / Mecânico / Elétrico",
+      "Técnico em Mineração e Radioproteção",
+      "Assistente em Administração"
+    ],
+    "escolaridade": "Médio, Técnico e Superior",
+    "esfera": "Federal",
+    "status": "Inscrições Abertas",
+    "salario_max": "R$ 11.240,00",
+    "popular": false
+  },
+  {
+    "id": "ifsp_docente_tae",
+    "nome": "IFSP — Instituto Federal de São Paulo",
+    "banca": "Comissão Permanente / Própria",
+    "orgao": "Instituto Federal de Educação, Ciência e Tecnologia",
+    "cargos": [
+      "Professor de Ensino Básico, Técnico e Tecnológico (EBTT)",
+      "Técnico-Administrativo em Educação (TAE) — Nível E",
+      "Assistente de Alunos"
+    ],
+    "escolaridade": "Médio e Superior",
+    "esfera": "Federal",
+    "status": "Inscrições Abertas",
+    "salario_max": "R$ 10.481,00",
+    "popular": false
+  },
+  {
+    "id": "sp_regulacao_arsesp",
+    "nome": "ARSESP — Agência Reguladora de Serviços Públicos de SP",
+    "banca": "VUNESP",
+    "orgao": "Governo do Estado de São Paulo",
+    "cargos": [
+      "Especialista em Regulação e Fiscalização",
+      "Analista de Suporte à Regulação"
     ],
     "escolaridade": "Superior",
     "esfera": "Estadual",
-    "status": "Comissão Formada / Edital Previsto",
-    "salario_max": "R$ 15.037,00",
-    "popular": true
-  },
-  {
-    "id": "oab_exame",
-    "nome": "OAB — Exame de Ordem Unificado",
-    "banca": "FGV",
-    "orgao": "Conselho Federal da OAB",
-    "cargos": [
-      "Exame de Ordem (1ª Fase Objetiva)",
-      "Exame de Ordem (2ª Fase Prático-Profissional)"
-    ],
-    "escolaridade": "Superior / Bacharel em Direito",
-    "esfera": "Nacional / Conselho Profissional",
-    "status": "Calendário Oficial Contínuo",
-    "salario_max": "Habilitação Profissional",
-    "popular": true
-  },
-  {
-    "id": "anatel",
-    "nome": "ANATEL — Agência Nacional de Telecomunicações",
-    "banca": "CEBRASPE",
-    "orgao": "Agência Reguladora Federal",
-    "cargos": [
-      "Especialista em Regulação de Serviços Públicos",
-      "Analista Administrativo"
-    ],
-    "escolaridade": "Superior",
-    "esfera": "Federal",
-    "status": "Edital Publicado",
-    "salario_max": "R$ 16.413,00",
+    "status": "Inscrições Abertas",
+    "salario_max": "R$ 14.800,00",
     "popular": false
   },
   {
-    "id": "anvisa",
-    "nome": "ANVISA — Agência Nacional de Vigilância Sanitária",
-    "banca": "CEBRASPE",
-    "orgao": "Agência Reguladora Federal",
+    "id": "prefeitura_sp",
+    "nome": "Prefeitura de São Paulo (PMSP)",
+    "banca": "VUNESP",
+    "orgao": "Secretaria Municipal de Gestão de SP",
     "cargos": [
-      "Especialista em Regulação e Vigilância Sanitária",
-      "Analista Administrativo",
-      "Técnico em Regulação"
+      "Auditor Fiscal Tributário Municipal (ISS SP)",
+      "Analista de Planejamento e Desenvolvimento Organizacional",
+      "Professor de Educação Infantil e Fundamental (PEIF)"
     ],
     "escolaridade": "Médio e Superior",
-    "esfera": "Federal",
-    "status": "Concurso Vigente / Fila de Chamada",
-    "salario_max": "R$ 17.500,00",
+    "esfera": "Municipal",
+    "status": "Inscrições Abertas",
+    "salario_max": "R$ 24.115,00",
     "popular": false
-  },
-  {
-    "id": "fepese_casan",
-    "nome": "CASAN — Companhia Catarinense de Águas e Saneamento",
-    "banca": "FEPESE",
-    "orgao": "Governo de Santa Catarina",
-    "cargos": [
-      "Assistente Administrativo",
-      "Engenheiro Sanitarista",
-      "Técnico em Saneamento",
-      "Advogado"
-    ],
-    "escolaridade": "Médio e Superior",
-    "esfera": "Estadual (SC)",
-    "status": "Edital Publicado / Inscrições",
-    "salario_max": "R$ 10.420,00",
-    "popular": false
-  },
-  {
-    "id": "ppghs_uerj_2027",
-    "nome": "PPGHS / UERJ — Mestrado em História Social",
-    "banca": "CEPUERJ / BANCA EXAMINADORA",
-    "orgao": "Universidade do Estado do Rio de Janeiro",
-    "cargos": [
-      "História Social do Território (Linha 1)",
-      "Poder e Sociedade (Linha 2)",
-      "Cultura e Memória (Linha 3)"
-    ],
-    "escolaridade": "Superior / Pós-Graduação Stricto Sensu",
-    "esfera": "Estadual (RJ)",
-    "status": "Edital Publicado / Inscrições Abertas",
-    "salario_max": "Bolsa FAPERJ / CAPES Nota 6",
-    "popular": true
   }
 ];

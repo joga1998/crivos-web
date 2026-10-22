@@ -70,6 +70,15 @@ export async function onRequestPost(context) {
     const cleanPlan = (plan || 'tatico').toLowerCase();
     const amount = planPrices[cleanPlan] || 67.00;
 
+    // 0. Extração de Parâmetros de Rastreamento (UTMs e Click IDs)
+    const utmSource = (contentType.includes('application/json') ? body.utm_source : formData.get('utm_source')) || '';
+    const utmMedium = (contentType.includes('application/json') ? body.utm_medium : formData.get('utm_medium')) || '';
+    const utmCampaign = (contentType.includes('application/json') ? body.utm_campaign : formData.get('utm_campaign')) || '';
+    const utmContent = (contentType.includes('application/json') ? body.utm_content : formData.get('utm_content')) || '';
+    const utmTerm = (contentType.includes('application/json') ? body.utm_term : formData.get('utm_term')) || '';
+    const fbclid = (contentType.includes('application/json') ? body.fbclid : formData.get('fbclid')) || '';
+    const gclid = (contentType.includes('application/json') ? body.gclid : formData.get('gclid')) || '';
+
     // 1. Cria o registro inicial em `orders` com status `pending`
     const generatedOrderId = `ORD-${Date.now()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
     
@@ -94,7 +103,16 @@ export async function onRequestPost(context) {
       plan_tier: cleanPlan,
       amount_cents: Math.round(amount * 100),
       status: 'pending',
-      notes: JSON.stringify({ availability: String(availability || '').trim() }),
+      notes: JSON.stringify({
+        availability: String(availability || '').trim(),
+        utm_source: utmSource || undefined,
+        utm_medium: utmMedium || undefined,
+        utm_campaign: utmCampaign || undefined,
+        utm_content: utmContent || undefined,
+        utm_term: utmTerm || undefined,
+        fbclid: fbclid || undefined,
+        gclid: gclid || undefined,
+      }),
     };
 
     const insertResult = await supabaseRest(env, '/orders', {

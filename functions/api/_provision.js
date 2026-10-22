@@ -270,6 +270,48 @@ export async function provisionUserOrder(env, { orderId, mpPaymentId, paymentMet
     console.error('[Provision] Erro ao notificar administrador sobre a venda:', adminErr);
   }
 
+  // 10. Disparo Server-Side Meta Conversions API (CAPI) para Registro Confiavel de Compras PIX / Cartao
+  try {
+    const metaPixelId = env?.META_PIXEL_ID || env?.PIXEL_ID;
+    const metaCapiToken = env?.META_CAPI_TOKEN || env?.META_ACCESS_TOKEN;
+    if (metaPixelId && metaCapiToken) {
+      const emailNormalized = email.trim().toLowerCase();
+      const emailBuffer = new TextEncoder().encode(emailNormalized);
+      const emailHashBuffer = await crypto.subtle.digest("SHA-256", emailBuffer);
+      const emailHashHex = Array.from(new Uint8Array(emailHashBuffer))
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+      const orderValue = order.amount_cents ? (order.amount_cents / 100) : 67.0;
+      const capiPayload = {
+        data: [{
+          event_name: "Purchase",
+          event_time: Math.floor(Date.now() / 1000),
+          event_id: order.id,
+          action_source: "website",
+          user_data: {
+            em: [emailHashHex],
+            external_id: [userId],
+          },
+          custom_data: {
+            currency: "BRL",
+            value: orderValue,
+            content_ids: [order.plan_tier],
+            content_name: concursoNome,
+            content_type: "product",
+          },
+        }],
+      };
+      await fetch("https://graph.facebook.com/v19.0/" + metaPixelId + "/events?access_token=" + metaCapiToken, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(capiPayload),
+      });
+      console.log("[Provision CAPI] Evento Purchase disparado via Server-Side para order " + order.id);
+    }
+  } catch (capiError) {
+    console.warn("[Provision CAPI] Excecao no disparo Meta CAPI:", capiError.message);
+  }
+
   return {
     success: true,
     userId,

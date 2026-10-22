@@ -1334,6 +1334,29 @@
     // ==========================================
     // TRANSIÇÃO DE ETAPAS (1 -> 2 e 2 -> 1)
     // ==========================================
+    
+    // Gerenciador de Rastreamento & Atribuicao de Midia Paga (UTMs & Click IDs)
+    (function initAttributionTracking() {
+      const params = new URLSearchParams(window.location.search);
+      const keys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "fbclid", "gclid"];
+      keys.forEach((k) => {
+        const val = params.get(k);
+        if (val) {
+          sessionStorage.setItem("crv_" + k, val);
+          localStorage.setItem("crv_" + k, val);
+        }
+      });
+    })();
+
+    function getTrackedParams() {
+      const keys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "fbclid", "gclid"];
+      const data = {};
+      keys.forEach((k) => {
+        data[k] = sessionStorage.getItem("crv_" + k) || localStorage.getItem("crv_" + k) || "";
+      });
+      return data;
+    }
+
     let userOrderData = {};
 
     async function goToStage2(e) {
@@ -1374,6 +1397,8 @@
         formData.append('cargo', cargo);
         formData.append('availability', availability);
         formData.append('plan', planKey);
+        const trackData = getTrackedParams();
+        Object.keys(trackData).forEach(k => { if (trackData[k]) formData.append(k, trackData[k]); });
         if (file) {
           formData.append('editalFile', file);
         }
