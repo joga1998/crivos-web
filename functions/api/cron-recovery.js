@@ -45,7 +45,7 @@ async function handleRecovery(context) {
     // =========================================================================
     // 1. RECUPERAÇÃO DE PIX GERADO E PENDENTE (> 5 MINUTOS, < 24 HORAS)
     // =========================================================================
-    const pixFilter = `/orders?status=eq.pending&payment_method=eq.pix&created_at=lte.${fiveMinutesAgo}&created_at=gte.${twentyFourHoursAgo}&select=id,payment_id,email,concurso_nome,cargo,plan_tier,created_at,notes&order=created_at.desc&limit=20`;
+    const pixFilter = `/orders?status=eq.pending&payment_method=eq.pix&created_at=lte.${fiveMinutesAgo}&created_at=gte.${twentyFourHoursAgo}&select=id,status,payment_id,email,concurso_nome,cargo,plan_tier,created_at,notes&order=created_at.desc&limit=20`;
     
     let pixOrders = [];
     try {
@@ -171,7 +171,7 @@ async function handleRecovery(context) {
     // =========================================================================
     // 2. RECUPERAÇÃO DE CHECKOUT ABANDONADO (> 15 MINUTOS, < 24 HORAS)
     // =========================================================================
-    const abandonedFilter = `/orders?status=eq.pending&payment_method=is.null&created_at=lte.${fifteenMinutesAgo}&created_at=gte.${twentyFourHoursAgo}&select=id,email,concurso_nome,cargo,plan_tier,created_at,notes&order=created_at.desc&limit=20`;
+    const abandonedFilter = `/orders?status=eq.pending&payment_method=is.null&created_at=lte.${fifteenMinutesAgo}&created_at=gte.${twentyFourHoursAgo}&select=id,status,payment_method,email,concurso_nome,cargo,plan_tier,created_at,notes&order=created_at.desc&limit=20`;
 
     let abandonedOrders = [];
     try {
