@@ -2793,12 +2793,101 @@
 
                 <div class="footer-bottom">
                     <span>© 2026 CRIVOS (CRIVOS.ME) — TODOS OS DIREITOS RESERVADOS.</span>
-                    <span>ENGENHARIA TÁTICA PARA CONCURSOS E EXAMES</span>
+                    <a href="javascript:void(0)" onclick="openPrivacyModal()" style="color: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='var(--accent-red)'" onmouseout="this.style.color='inherit'">POLÍTICA DE PRIVACIDADE</a>
                 </div>
             </div>
         </footer>
 
     </div>
+
+    <!-- MODAL DE POLÍTICA DE PRIVACIDADE (PADRÃO EDITORIAL BRUTALISTA) -->
+    <div id="privacy-modal" style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(0,0,0,0.75); backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:16px;">
+        <div style="background:var(--bg-card); color:var(--text-main); border:2px solid var(--border-color); max-width:760px; width:100%; max-height:88vh; display:flex; flex-direction:column; box-shadow:8px 8px 0px #000000; position:relative;">
+            <!-- Header do Modal -->
+            <div style="background:var(--text-main); color:var(--bg-main); padding:16px 20px; display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--border-color);">
+                <div style="font-family:var(--font-mono); font-size:12px; font-weight:800; letter-spacing:0.05em; display:flex; align-items:center; gap:8px;">
+                    <span style="display:inline-block; width:10px; height:10px; background:var(--accent-red);"></span>
+                    CRIVOS // PROTOCOLO DE PRIVACIDADE E SEGURANÇA DE DADOS
+                </div>
+                <button type="button" onclick="closePrivacyModal()" aria-label="Fechar" style="background:transparent; border:none; color:inherit; font-family:var(--font-mono); font-size:18px; font-weight:900; cursor:pointer; padding:0 6px; line-height:1;">✕</button>
+            </div>
+            <!-- Corpo de Texto da Política -->
+            <div style="padding:28px 24px; overflow-y:auto; font-size:13px; line-height:1.75; font-family:var(--font-sans);">
+                <p style="margin-top:0; font-family:var(--font-mono); font-size:11px; color:var(--text-muted); text-transform:uppercase;">
+                    Última Atualização: Outubro de 2026 // Em conformidade com a LGPD (Lei nº 13.709/2018)
+                </p>
+
+                <h4 style="font-family:var(--font-mono); font-size:13px; text-transform:uppercase; margin:20px 0 8px; color:var(--accent-red);">
+                    1. Coleta e Finalidade dos Dados
+                </h4>
+                <p>
+                    A <strong>CRIVOS</strong> coleta apenas as informações estritamente necessárias para a elaboração técnica do seu Sistema Operacional de Estudos e processamento transacional. Os dados coletados incluem: nome completo, endereço de e-mail, concurso/cargo pretendido, rotina semanal declarada de estudos e, eventualmente, arquivos de editais ou materiais submetidos para ancoragem do plano.
+                </p>
+
+                <h4 style="font-family:var(--font-mono); font-size:13px; text-transform:uppercase; margin:20px 0 8px; color:var(--accent-red);">
+                    2. Tratamento e Sigilo de Materiais Pessoais
+                </h4>
+                <p>
+                    Arquivos submetidos por alunos (editais, cadernos, apostilas e notas pessoais) são armazenados em ambiente de nuvem seguro e isolado por chave de usuário. Sob nenhuma circunstância vendemos, compartilhamos, licenciamos ou expomos seus materiais a terceiros ou outros candidatos. O acesso é restrito exclusivamente aos engenheiros responsáveis pela montagem do seu painel e rotina.
+                </p>
+
+                <h4 style="font-family:var(--font-mono); font-size:13px; text-transform:uppercase; margin:20px 0 8px; color:var(--accent-red);">
+                    3. Segurança das Transações Financeiras
+                </h4>
+                <p>
+                    Todas as transações de pagamento (Pix e Cartão de Crédito) são processadas via criptografia de ponta a ponta pela infraestrutura bancária do <strong>Mercado Pago</strong> (PCI-DSS Compliance). A CRIVOS não armazena nem tem acesso aos dados completos do seu cartão de crédito (número, validade ou CVV).
+                </p>
+
+                <h4 style="font-family:var(--font-mono); font-size:13px; text-transform:uppercase; margin:20px 0 8px; color:var(--accent-red);">
+                    4. Cookies e Tecnologias de Métricas
+                </h4>
+                <p>
+                    Utilizamos cookies funcionais e de desempenho estritamente para manter sua sessão conectada no painel de estudos, armazenar preferências de visualização (como Modo Claro / Escuro) e medir anonimamente o tráfego do website para melhoria de performance e experiência do usuário.
+                </p>
+
+                <h4 style="font-family:var(--font-mono); font-size:13px; text-transform:uppercase; margin:20px 0 8px; color:var(--accent-red);">
+                    5. Seus Direitos (LGPD) e Canal de Contato
+                </h4>
+                <p>
+                    Em conformidade com a LGPD, você possui o direito de solicitar a confirmação, retificação, exportação ou exclusão definitiva de seus dados cadastrais a qualquer momento. Para solicitações relacionadas à privacidade e proteção de dados, entre em contato direto pelo e-mail oficial: <a href="mailto:contato@crivos.me" style="color:var(--accent-red); font-weight:700; text-decoration:underline;">contato@crivos.me</a>.
+                </p>
+            </div>
+            <!-- Footer do Modal -->
+            <div style="padding:14px 20px; background:var(--bg-main); border-top:1px solid var(--border-color); display:flex; justify-content:flex-end;">
+                <button type="button" onclick="closePrivacyModal()" class="btn btn-dark" style="padding:8px 20px; font-size:12px; font-family:var(--font-mono);">[ ENTENDIDO / FECHAR ]</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openPrivacyModal() {
+            var m = document.getElementById('privacy-modal');
+            if (m) {
+                m.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        function closePrivacyModal() {
+            var m = document.getElementById('privacy-modal');
+            if (m) {
+                m.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        }
+        // Fechar ao clicar fora do card
+        window.addEventListener('click', function(e) {
+            var m = document.getElementById('privacy-modal');
+            if (m && e.target === m) {
+                closePrivacyModal();
+            }
+        });
+        // Fechar com a tecla ESC
+        window.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closePrivacyModal();
+            }
+        });
+    </script>
 
     <!-- BOTÃO FLUTUANTE DE MODO CLARO / ESCURO (DIRETO NO BODY, SEMPRE VISÍVEL NA TELA) -->
     <button class="theme-floating-btn" id="theme-toggle" type="button" title="Alternar Modo Claro / Escuro" aria-label="Alternar Tema">
