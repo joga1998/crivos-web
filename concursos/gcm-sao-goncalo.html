@@ -567,38 +567,203 @@
     }
 
   
-    /* TOP BAR */
-    .topbar {
-      background: #111111;
-      color: #FFFFFF;
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      padding: 0.75rem 0;
-      border-bottom: 2px solid #111111;
-      font-weight: 700;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-    .topbar-flex {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-    .status-pulse {
-      display: inline-block;
-      width: 8px;
-      height: 8px;
-      background: var(--accent-red);
-      margin-right: 6px;
-      vertical-align: middle;
-      animation: pulse 1.5s infinite;
-    }
+    
     @keyframes pulse {
       0%, 100% { opacity: 1; }
       50% { opacity: 0.3; }
+    }
+
+  
+    /* ==========================================================================
+       TOPBAR & BRAND OFICIAL (COPIADA EXATAMENTE DA INDEX.HTML)
+       ========================================================================== */
+    .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background-color: rgba(244, 244, 240, 0.92);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 2px solid var(--border-color);
+        transition: background-color 0.2s ease, border-color 0.2s ease;
+        padding: 0;
+    }
+
+    [data-theme="dark"] .topbar {
+        background-color: rgba(13, 14, 17, 0.92);
+    }
+
+    .topbar-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 64px;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+        gap: 1rem;
+    }
+
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        text-decoration: none;
+        color: var(--text-primary);
+        flex-shrink: 0;
+    }
+
+    .brand-sq {
+        width: 12px;
+        height: 12px;
+        background-color: var(--accent-red);
+        display: inline-block;
+        flex-shrink: 0;
+        transition: transform 0.2s ease;
+    }
+
+    .brand:hover .brand-sq {
+        transform: rotate(90deg);
+    }
+
+    .brand-name {
+        font-family: var(--font-sans);
+        font-weight: 900;
+        font-size: 1.4rem;
+        letter-spacing: -0.04em;
+        text-transform: uppercase;
+        line-height: 1;
+        color: var(--text-primary);
+    }
+
+    .nav-links {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: clamp(1rem, 1.8vw, 2.2rem);
+        flex: 1;
+    }
+
+    .nav-link {
+        font-family: var(--font-mono);
+        font-size: clamp(0.7rem, 0.85vw, 0.78rem);
+        font-weight: 700;
+        text-transform: uppercase;
+        text-decoration: none;
+        color: var(--text-secondary);
+        transition: color 0.15s ease;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .nav-link:hover {
+        color: var(--accent-red);
+    }
+
+    .nav-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-shrink: 0;
+    }
+
+    .nav-login {
+        font-family: var(--font-mono);
+        font-size: 0.74rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        text-decoration: none;
+        color: var(--text-primary);
+        padding: 0.55rem 0.95rem;
+        border: 2px solid var(--border-color);
+        background: var(--bg-surface);
+        box-shadow: 2px 2px 0px var(--border-color);
+        transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+        white-space: nowrap;
+    }
+
+    .nav-login:hover {
+        transform: translate(-1px, -1px);
+        box-shadow: 3px 3px 0px var(--border-color);
+    }
+
+    .nav-cta {
+        font-family: var(--font-mono);
+        font-size: 0.74rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        text-decoration: none;
+        color: #FFFFFF;
+        background: var(--accent-red);
+        padding: 0.55rem 1.05rem;
+        border: 2px solid var(--border-color);
+        box-shadow: 2px 2px 0px var(--border-color);
+        transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+        white-space: nowrap;
+    }
+
+    .nav-cta:hover {
+        transform: translate(-1px, -1px);
+        box-shadow: 3px 3px 0px var(--border-color);
+    }
+
+    .mobile-menu-btn {
+        display: none;
+        align-items: center;
+        gap: 0.5rem;
+        font-family: var(--font-mono);
+        font-size: 0.74rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        padding: 0.55rem 0.9rem;
+        border: 2px solid var(--border-color);
+        background: var(--bg-surface);
+        box-shadow: 2px 2px 0px var(--border-color);
+        color: var(--text-primary);
+        cursor: pointer;
+    }
+
+    .mobile-drawer {
+        display: none;
+        position: fixed;
+        top: 64px;
+        left: 0;
+        width: 100%;
+        background: var(--bg-surface);
+        border-bottom: 2px solid var(--border-color);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+        padding: 1.5rem;
+        z-index: 999;
+    }
+
+    .mobile-drawer.active {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .mobile-drawer a {
+        font-family: var(--font-mono);
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--text-primary);
+        padding: 0.6rem 0;
+        border-bottom: 1px solid var(--border-color);
+        text-decoration: none;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    @media (max-width: 960px) {
+        .nav-links,
+        .nav-actions .nav-login,
+        .nav-actions .nav-cta {
+            display: none;
+        }
+        .mobile-menu-btn {
+            display: inline-flex;
+        }
     }
 
   </style>
@@ -613,18 +778,42 @@
 
   <div class="page-wrapper">
 
+    <!-- HEADER OFICIAL DA CRIVOS (EXATAMENTE COMO NA HOME) -->
+    <header class="topbar">
+        <div class="topbar-container">
+            <a href="/" class="brand">
+                <span class="brand-sq"></span>
+                <span class="brand-name">CRIVOS</span>
+            </a>
+
+            <nav class="nav-links" aria-label="Navegação Principal">
+                <a href="#dossie" class="nav-link">01. RAIO-X DO EDITAL</a>
+                <a href="#pareto" class="nav-link">02. MATRIZ DE PARETO</a>
+                <a href="#planos" class="nav-link">03. PLANOS</a>
+                <a href="/#demonstracao" class="nav-link">04. SIMULADOR</a>
+            </nav>
+
+            <div class="nav-actions">
+                <a href="https://app.crivos.me" target="_blank" class="nav-login">ÁREA DO CANDIDATO ↗</a>
+                <a href="#planos" class="nav-cta">MONTAR MEU PLANO →</a>
+                <button class="mobile-menu-btn" id="mobile-toggle" onclick="toggleMenu()" type="button" aria-label="Abrir Menu">
+                    <span>☰ MENU</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- GAVETA MOBILE -->
+        <div class="mobile-drawer" id="mobile-drawer">
+            <a href="#dossie" onclick="toggleMenu()"><span>01. RAIO-X DO EDITAL</span><span>↗</span></a>
+            <a href="#pareto" onclick="toggleMenu()"><span>02. MATRIZ DE PARETO</span><span>↗</span></a>
+            <a href="#planos" onclick="toggleMenu()"><span>03. PLANOS &amp; CHECKOUT</span><span>↗</span></a>
+            <a href="https://app.crivos.me" target="_blank"><span>04. ÁREA DO CANDIDATO</span><span>↗</span></a>
+        </div>
+    </header>
+  
+
     <!-- TOP BAR -->
-    <aside class="topbar">
-      <div class="container topbar-flex">
-        <div>
-          <span class="status-pulse"></span>
-          <span>EDITAL PUBLICADO // BANCA SELECON // PROVA EM 24/01/2027</span>
-        </div>
-        <div>
-          <span>REMUNERAÇÃO: ATÉ R$ 5.124,00 COM ADICIONAIS · 100 VAGAS + 500 CR</span>
-        </div>
-      </div>
-    </aside>
+    
 
     
 
