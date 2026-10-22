@@ -86,6 +86,38 @@ window.CRIVOS_CONCURSOS_DATA = [
     "popular": true
   },
   {
+    "id": "marinha_oficiais",
+    "nome": "Marinha do Brasil — Quadros de Oficiais",
+    "banca": "Comando da Marinha (DEnsM)",
+    "orgao": "Ministério da Defesa",
+    "cargos": [
+      "Oficial Superior do Quadro Complementar",
+      "Quadro de Apoio à Saúde e Engenharia Naval",
+      "Cirurgião-Dentista e Farmacêutico Naval"
+    ],
+    "escolaridade": "Superior",
+    "esfera": "Federal / Militar",
+    "status": "Inscrições Abertas",
+    "salario_max": "R$ 11.535,00",
+    "popular": true
+  },
+  {
+    "id": "alepa_legislativo",
+    "nome": "ALEPA — Assembleia Legislativa do Pará",
+    "banca": "CEBRASPE / IDECAN",
+    "orgao": "Assembleia Legislativa Estadual",
+    "cargos": [
+      "Analista Legislativo — Especialidade Jurídica",
+      "Analista Legislativo — Finanças e Orçamento",
+      "Técnico Legislativo — Área Administrativa"
+    ],
+    "escolaridade": "Médio e Superior",
+    "esfera": "Estadual",
+    "status": "Inscrições Abertas",
+    "salario_max": "R$ 12.890,00",
+    "popular": true
+  },
+  {
     "id": "pmesp_soldado",
     "nome": "PMESP — Polícia Militar do Estado de São Paulo",
     "banca": "FGV / VUNESP",
