@@ -1,5 +1,42 @@
 [
   {
+    "id": "carreiras_militares_geral",
+    "nome": "Carreiras Militares (Forças Armadas / PM / CBM)",
+    "banca": "Exército / Marinha / FAB / FGV / VUNESP",
+    "orgao": "Ministério da Defesa e Forças Auxiliares Estaduais",
+    "cargos": [
+      "ESA — Escola de Sargentos das Armas (Exército)",
+      "EsPCEx — Escola Preparatória de Cadetes do Exército",
+      "EEAR / AFA — Força Aérea Brasileira",
+      "Escola Naval / Fuzileiros / Quadros de Oficiais (Marinha)",
+      "CFO / Soldado Polícia Militar (PM) e Bombeiros (CBM)"
+    ],
+    "escolaridade": "Médio e Superior",
+    "esfera": "Federal / Estadual (Militar)",
+    "status": "Inscrições Abertas",
+    "salario_max": "R$ 11.535,00",
+    "popular": true
+  },
+  {
+    "id": "trt4_rs",
+    "nome": "TRT-RS (TRT 4ª Região) — Tribunal Regional do Trabalho",
+    "banca": "FCC",
+    "orgao": "Tribunal Regional do Trabalho da 4ª Região (RS)",
+    "cargos": [
+      "Técnico Judiciário — Área Administrativa",
+      "Técnico Judiciário — Agente da Polícia Judicial",
+      "Técnico Judiciário — Tecnologia da Informação",
+      "Analista Judiciário — Área Judiciária",
+      "Analista Judiciário — Oficial de Justiça Avaliador Federal",
+      "Analista Judiciário — Área Administrativa"
+    ],
+    "escolaridade": "Superior",
+    "esfera": "Federal",
+    "status": "Inscrições Abertas",
+    "salario_max": "R$ 18.380,17",
+    "popular": true
+  },
+  {
     "id": "cgu_auditor",
     "nome": "CGU — Controladoria-Geral da União",
     "banca": "CEBRASPE",
