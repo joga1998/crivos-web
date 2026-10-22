@@ -534,6 +534,43 @@
       box-shadow: 6px 6px 0px #000000;
     }
 
+  
+    /* GARANTIA STRIP CORRIGIDA COM ALTO CONTRASTE */
+    .guarantee-box {
+      background: var(--bg-surface) !important;
+      border: 2px solid var(--border-color);
+      padding: 1.5rem 1.85rem;
+      box-shadow: var(--shadow-hard);
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin-top: 2rem;
+    }
+    .guarantee-box h4 {
+      color: var(--text-primary) !important;
+      font-size: 1.1rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      margin-bottom: 0.35rem;
+    }
+    .guarantee-box p {
+      color: var(--text-secondary) !important;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    .guarantee-badge-num {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: var(--accent-red);
+      background: var(--bg-primary);
+      padding: 10px 16px;
+      border: 2px solid var(--border-color);
+      box-shadow: 2px 2px 0px var(--border-color);
+      white-space: nowrap;
+    }
+
   </style>
 </head>
 <body>
@@ -773,17 +810,15 @@
       </div>
 
       <!-- SELO DE GARANTIA -->
-      <div style="background:var(--bg-surface);border:2px solid var(--border-color);padding:1.5rem;box-shadow:var(--shadow-hard);display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;">
-        <div style="font-family:var(--font-mono);font-size:1.8rem;font-weight:900;color:var(--accent-red);background:var(--bg-primary);padding:10px 16px;border:1px solid var(--border-color);">
-          7 DIAS
-        </div>
-        <div style="flex:1;">
-          <h4 style="font-size:1.1rem;font-weight:900;text-transform:uppercase;margin-bottom:0.3rem;">GARANTIA DE CALIBRAÇÃO & AJUSTE FINO</h4>
-          <p style="font-size:0.88rem;color:var(--text-secondary);line-height:1.5;">
+      <div class="guarantee-box">
+          <div class="guarantee-badge-num">7 DIAS</div>
+          <div style="flex:1;">
+            <h4>GARANTIA DE CALIBRAÇÃO &amp; AJUSTE FINO</h4>
+            <p>
             Mudou de horário de trabalho? Teve um imprevisto na rotina? Ajustamos seu cronograma gratuitamente nos primeiros 7 dias para assegurar que você chegue ao dia 14/03/2027 com 100% do edital coberto.
           </p>
+          </div>
         </div>
-      </div>
     </div>
   </section>
 
