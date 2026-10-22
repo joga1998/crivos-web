@@ -952,6 +952,22 @@
       color: var(--accent-red);
     }
 
+  
+    /* CANVAS DE COORDENADAS INTERATIVO */
+    #coord-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      display: block;
+    }
+    .topbar, .checkout-wrapper, .secure-footer {
+      position: relative;
+      z-index: 1;
+    }
+
   </style>
 
   <!-- CRIVOS // INFRAESTRUTURA DE PERFORMANCE & RASTREAMENTO INSTITUCIONAL -->
@@ -988,6 +1004,8 @@
 
 </head>
 <body>
+  <!-- CANVAS DE COORDENADAS INTERATIVO DE FUNDO -->
+  <canvas id="coord-canvas"></canvas>
 
   <!-- TOPBAR INSTITUCIONAL -->
   <header class="topbar">
@@ -2214,5 +2232,6 @@ setTimeout(() => {
 }, 2500);
 
 </script>
+  <script src="data/coord-canvas.js"></script>
 </body>
 </html>
