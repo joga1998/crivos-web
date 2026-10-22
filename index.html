@@ -1619,132 +1619,130 @@
 
         
         /* ==========================================================================
-           12. TABELA DE PLANOS // SLIDER BRUTALISTA COM CANVAS DE FUNDO (#precos)
+           12. TABELA DE PLANOS // DECK DE CARTAS EMPILHADAS (BARALHO 3D) (#precos)
            ========================================================================== */
-        .pricing-slider-container {
-            max-width: 760px !important;
-            width: 100% !important;
-            margin: 0 auto !important;
-            position: relative !important;
+        .pricing-deck-stage {
+            max-width: 820px;
+            width: 100%;
+            margin: 2rem auto 0 auto;
+            position: relative;
+            perspective: 1200px;
+            min-height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .pricing-nav-switcher {
-            display: grid !important;
-            grid-template-columns: repeat(4, 1fr) !important;
-            gap: 8px !important;
-            margin-bottom: 2rem !important;
-            background: rgba(255, 255, 255, 0.5) !important;
-            backdrop-filter: blur(8px) !important;
-            -webkit-backdrop-filter: blur(8px) !important;
-            padding: 8px !important;
+        .pricing-deck-stack {
+            position: relative;
+            width: 100%;
+            max-width: 760px;
+            height: 540px;
+        }
+
+        .deck-card {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.6) !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
             border: 2px solid var(--border-color) !important;
-            box-shadow: 4px 4px 0px var(--border-color) !important;
+            box-shadow: 6px 6px 0px var(--border-color) !important;
+            padding: 2.2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-sizing: border-box;
+            cursor: pointer;
+            transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+                        opacity 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+                        box-shadow 0.3s ease;
+            user-select: none;
+            will-change: transform, opacity;
         }
 
-        [data-theme="dark"] .pricing-nav-switcher {
-            background: rgba(18, 18, 18, 0.5) !important;
+        [data-theme="dark"] .deck-card {
+            background: rgba(18, 18, 18, 0.65) !important;
         }
 
-        .pricing-switch-btn {
-            background: transparent !important;
-            border: 1px solid transparent !important;
-            color: var(--text-secondary) !important;
-            font-family: var(--font-mono) !important;
-            font-size: 0.8rem !important;
-            font-weight: 800 !important;
-            padding: 12px 6px !important;
-            cursor: pointer !important;
-            text-align: center !important;
-            transition: all 0.15s ease !important;
-            text-transform: uppercase !important;
+        /* EFEITO DE EMPILHAMENTO TIPO BARALHO */
+        /* Carta Ativa (No Topo / Foco) */
+        .deck-card.is-active {
+            z-index: 10;
+            transform: translateY(0px) scale(1) rotate(0deg);
+            opacity: 1;
+            cursor: default;
+            border-color: var(--text-primary) !important;
+            box-shadow: 8px 8px 0px #111111 !important;
         }
 
-        .pricing-switch-btn:hover {
-            color: var(--text-primary) !important;
-            background: rgba(0, 0, 0, 0.05) !important;
-        }
-
-        .pricing-switch-btn.active {
-            background: #111111 !important;
-            color: #FFFFFF !important;
-            border: 1px solid #111111 !important;
-            box-shadow: 2px 2px 0px var(--accent-red) !important;
-        }
-
-        .pricing-viewport {
-            overflow: hidden !important;
-            width: 100% !important;
-            position: relative !important;
-            padding: 10px 4px 20px 4px !important;
-            box-sizing: border-box !important;
-        }
-
-        .pricing-slides-track {
-            display: flex !important;
-            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
-            width: 400% !important;
-            will-change: transform !important;
-        }
-
-        .pricing-slide-item {
-            width: 25% !important;
-            padding: 0 6px !important;
-            box-sizing: border-box !important;
-            flex-shrink: 0 !important;
-        }
-
-        /* Card com 50% de transparência e backdrop blur refinado */
-        .price-card {
-            background: rgba(255, 255, 255, 0.5) !important;
-            backdrop-filter: blur(10px) !important;
-            -webkit-backdrop-filter: blur(10px) !important;
-            border: 2px solid var(--border-color) !important;
-            box-shadow: var(--shadow-hard) !important;
-            padding: 2.4rem !important;
-            display: flex !important;
-            flex-direction: column !important;
-            justify-content: space-between !important;
-            position: relative !important;
-            min-height: 520px !important;
-            width: 100% !important;
-            box-sizing: border-box !important;
-        }
-
-        [data-theme="dark"] .price-card {
-            background: rgba(18, 18, 18, 0.5) !important;
-        }
-
-        .price-card.featured {
-            border-width: 3px !important;
+        .deck-card.featured.is-active {
             border-color: var(--accent-red) !important;
-            box-shadow: var(--shadow-red) !important;
+            box-shadow: 8px 8px 0px var(--accent-red) !important;
         }
 
-        .pricing-dot {
-            width: 10px !important;
-            height: 10px !important;
-            background: #CCCCCC !important;
-            border: 1px solid #111111 !important;
-            cursor: pointer !important;
-            transition: all 0.2s ease !important;
-            display: inline-block !important;
+        /* Carta Imediatamente Atrás (+1) */
+        .deck-card.is-next-1 {
+            z-index: 8;
+            transform: translateY(-22px) scale(0.96) rotate(1.2deg);
+            opacity: 0.82;
         }
 
-        .pricing-dot.active {
-            background: var(--accent-red) !important;
-            width: 28px !important;
+        /* Segunda Carta Atrás (+2) */
+        .deck-card.is-next-2 {
+            z-index: 6;
+            transform: translateY(-42px) scale(0.92) rotate(-1.5deg);
+            opacity: 0.65;
+        }
+
+        /* Terceira Carta Atrás (+3) */
+        .deck-card.is-next-3 {
+            z-index: 4;
+            transform: translateY(-60px) scale(0.88) rotate(2deg);
+            opacity: 0.45;
+        }
+
+        /* Efeito de passar a carta para trás (Descarte com swipe) */
+        .deck-card.is-swiping-out {
+            transform: translateX(-120%) rotate(-12deg) scale(0.9) !important;
+            opacity: 0 !important;
+            transition: transform 0.35s ease, opacity 0.3s ease !important;
+        }
+
+        .deck-card:not(.is-active):hover {
+            opacity: 0.95;
+            transform: translateY(-28px) scale(0.97) !important;
+        }
+
+        .deck-hint {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
         }
 
         @media (max-width: 820px) {
-            .pricing-slider-container {
-                max-width: 100% !important;
+            .pricing-deck-stack {
+                height: 580px;
+                max-width: 95vw;
             }
-            .price-card {
-                padding: 1.8rem !important;
+            .deck-card {
+                padding: 1.6rem;
             }
-            .pricing-switch-btn {
-                font-size: 0.72rem !important;
-                padding: 8px 2px !important;
+            .deck-card.is-next-1 {
+                transform: translateY(-16px) scale(0.96);
+            }
+            .deck-card.is-next-2 {
+                transform: translateY(-30px) scale(0.92);
+            }
+            .deck-card.is-next-3 {
+                transform: translateY(-44px) scale(0.88);
             }
         }
 
@@ -2661,119 +2659,96 @@
                 
                 
                 
-                <div class="pricing-slider-container">
-                    <!-- Seletor Tático por Abas -->
-                    <div class="pricing-nav-switcher" id="pricing-switcher">
-                        <button type="button" class="pricing-switch-btn" onclick="setPlanSlide(0)">01 · TÁTICO</button>
-                        <button type="button" class="pricing-switch-btn active" onclick="setPlanSlide(1)">02 · ARSENAL ★</button>
-                        <button type="button" class="pricing-switch-btn" onclick="setPlanSlide(2)">03 · ELITE</button>
-                        <button type="button" class="pricing-switch-btn" onclick="setPlanSlide(3)">04 · PRIME</button>
-                    </div>
+                
+                <div class="pricing-deck-stage" id="deck-stage">
+                    <div class="pricing-deck-stack" id="deck-stack">
 
-                    <!-- Janela do Slide -->
-                    <div class="pricing-viewport">
-                        <div class="pricing-slides-track" id="pricing-track">
-                            
-                            <!-- SLIDE 1: TÁTICO -->
-                            <div class="pricing-slide-item">
-                                <div class="price-card">
-                                    <div>
-                                        <div class="price-tier-label">NÍVEL 01 // ESSENCIAL</div>
-                                        <h3 class="price-tier-title">CRIVOS TÁTICO</h3>
-                                        <div class="price-value-box">
-                                            <div class="price-amount"><small>R$</small> 67</div>
-                                            <div class="price-payment-note">PAGAMENTO ÚNICO // ENTREGA EM ATÉ 24H</div>
-                                        </div>
-                                        <ul class="price-features">
-                                            <li><span class="check-sq">[✓]</span> <span><strong>Raio-X Estatístico do Edital</strong> com matriz de pesos</span></li>
-                                            <li><span class="check-sq">[✓]</span> <span><strong>Cronograma Diário Elástico</strong> até o dia da prova</span></li>
-                                            <li><span class="check-sq">[✓]</span> <span><strong>Guia de Estudos em PDF A4</strong> definitivo</span></li>
-                                            <li><span class="check-sq">[✓]</span> <span><strong>Timer Pomodoro Integrado</strong> e rastreador de progresso</span></li>
-                                            <li><span class="check-sq">[✓]</span> <span><strong>Garantia de 7 Dias Grátis</strong> de calibração de rota</span></li>
-                                        </ul>
-                                    </div>
-                                    <a href="/payment.html?produto=tatico" class="btn btn-secondary" style="width: 100%;">Escolher Nível Tático →</a>
+                        <!-- CARTA 1: TÁTICO -->
+                        <div class="deck-card" data-card-index="0" onclick="handleCardClick(0)">
+                            <div>
+                                <div class="price-tier-label">NÍVEL 01 // ESSENCIAL</div>
+                                <h3 class="price-tier-title">CRIVOS TÁTICO</h3>
+                                <div class="price-value-box">
+                                    <div class="price-amount"><small>R$</small> 67</div>
+                                    <div class="price-payment-note">PAGAMENTO ÚNICO // ENTREGA EM ATÉ 24H</div>
                                 </div>
+                                <ul class="price-features">
+                                    <li><span class="check-sq">[✓]</span> <span><strong>Raio-X Estatístico do Edital</strong> com matriz de pesos</span></li>
+                                    <li><span class="check-sq">[✓]</span> <span><strong>Cronograma Diário Elástico</strong> até o dia da prova</span></li>
+                                    <li><span class="check-sq">[✓]</span> <span><strong>Guia de Estudos em PDF A4</strong> definitivo</span></li>
+                                    <li><span class="check-sq">[✓]</span> <span><strong>Timer Pomodoro Integrado</strong> e rastreador de progresso</span></li>
+                                    <li><span class="check-sq">[✓]</span> <span><strong>Garantia de 7 Dias Grátis</strong> de calibração de rota</span></li>
+                                </ul>
                             </div>
-
-                            <!-- SLIDE 2: ARSENAL -->
-                            <div class="pricing-slide-item">
-                                <div class="price-card featured">
-                                    <div class="featured-ribbon">MAIS ESCOLHIDO</div>
-                                    <div>
-                                        <div class="price-tier-label">NÍVEL 02 // RETENÇÃO ATIVA</div>
-                                        <h3 class="price-tier-title">CRIVOS ARSENAL</h3>
-                                        <div class="price-value-box">
-                                            <div class="price-amount"><small>R$</small> 124</div>
-                                            <div class="price-payment-note">BASE TÁTICO + R$ 57 // ENTREGA EM ATÉ 24H</div>
-                                        </div>
-                                        <ul class="price-features">
-                                            <li><span class="check-sq">[✓]</span> <span><strong>Tudo do Nível Tático</strong> (Cronograma + Raio-X + Guia PDF)</span></li>
-                                            <li><span class="check-sq">[+]</span> <span><strong>Decks de Flashcards SM-2</strong> com pico na véspera</span></li>
-                                            <li><span class="check-sq">[+]</span> <span><strong>Resumos Direcionados</strong> integrados ao painel</span></li>
-                                            <li><span class="check-sq">[+]</span> <span><strong>Caderno de Erros Inteligente</strong> para pontos cegos</span></li>
-                                            <li><span class="check-sq">[+]</span> <span><strong>Simulados Diagnósticos</strong> no padrão da banca</span></li>
-                                        </ul>
-                                    </div>
-                                    <a href="/payment.html?produto=arsenal" class="btn btn-primary" style="width: 100%;">Escolher Nível Arsenal →</a>
-                                </div>
-                            </div>
-
-                            <!-- SLIDE 3: ELITE -->
-                            <div class="pricing-slide-item">
-                                <div class="price-card">
-                                    <div>
-                                        <div class="price-tier-label">NÍVEL 03 // PREPARAÇÃO TOTAL</div>
-                                        <h3 class="price-tier-title">CRIVOS ELITE</h3>
-                                        <div class="price-value-box">
-                                            <div class="price-amount"><small>R$</small> 221</div>
-                                            <div class="price-payment-note">ARSENAL + R$ 97 // ENTREGA EXPRESSA EM ATÉ 6H</div>
-                                        </div>
-                                        <ul class="price-features">
-                                            <li><span class="check-sq">[✓]</span> <span><strong>Tudo dos Níveis Tático e Arsenal</strong></span></li>
-                                            <li><span class="check-sq">[+]</span> <span><strong>Fila de Prioridade Máxima:</strong> entrega expressa em até 6h</span></li>
-                                            <li><span class="check-sq">[+]</span> <span><strong>Módulo de Discursivas e Redação</strong> com esqueletos</span></li>
-                                            <li><span class="check-sq">[+]</span> <span><strong>1 Recalibração Extra de Rota</strong> gratuita</span></li>
-                                            <li><span class="check-sq">[+]</span> <span><strong>Mapeamento de Tópicos Polêmicos</strong> da banca</span></li>
-                                        </ul>
-                                    </div>
-                                    <a href="/payment.html?produto=elite" class="btn btn-dark" style="width: 100%;">Escolher Nível Elite →</a>
-                                </div>
-                            </div>
-
-                            <!-- SLIDE 4: PRIME -->
-                            <div class="pricing-slide-item">
-                                <div class="price-card" style="border-color: #111111;">
-                                    <div>
-                                        <div class="price-tier-label" style="color: var(--accent-red);">NÍVEL 04 // MÁXIMA PERSONALIZAÇÃO</div>
-                                        <h3 class="price-tier-title">CRIVOS PRIME</h3>
-                                        <div class="price-value-box">
-                                            <div class="price-amount"><small>R$</small> 288</div>
-                                            <div class="price-payment-note">ELITE + INTEGRAÇÃO DOS SEUS MATERIAIS</div>
-                                        </div>
-                                        <ul class="price-features">
-                                            <li><span class="check-sq">[✓]</span> <span><strong>Tudo do Nível Elite</strong> (Discursivas, Fila 6h, SM-2)</span></li>
-                                            <li><span class="check-sq">[+]</span> <span><strong>Integração de Materiais:</strong> envie seus próprios PDFs no painel</span></li>
-                                            <li><span class="check-sq">[+]</span> <span><strong>Cronograma 100% Ancorado:</strong> metas citando suas apostilas</span></li>
-                                            <li><span class="check-sq">[+]</span> <span><strong>Suporte Individual Direto</strong> para acompanhamento</span></li>
-                                        </ul>
-                                    </div>
-                                    <a href="/payment.html?produto=prime" class="btn btn-primary" style="width: 100%; background: #111111; color: #FFFFFF; border: 2px solid #111111;">Escolher Nível Prime →</a>
-                                </div>
-                            </div>
-
+                            <a href="/payment.html?produto=tatico" class="btn btn-secondary" style="width: 100%;">Escolher Nível Tático →</a>
                         </div>
-                    </div>
 
-                    <!-- Indicadores Táticos Sutis (Dots) -->
-                    <div style="display:flex;justify-content:center;align-items:center;gap:8px;margin-top:1.25rem;">
-                        <span class="pricing-dot" onclick="setPlanSlide(0)"></span>
-                        <span class="pricing-dot active" onclick="setPlanSlide(1)"></span>
-                        <span class="pricing-dot" onclick="setPlanSlide(2)"></span>
-                        <span class="pricing-dot" onclick="setPlanSlide(3)"></span>
+                        <!-- CARTA 2: ARSENAL -->
+                        <div class="deck-card featured" data-card-index="1" onclick="handleCardClick(1)">
+                            <div class="featured-ribbon">MAIS ESCOLHIDO</div>
+                            <div>
+                                <div class="price-tier-label">NÍVEL 02 // RETENÇÃO ATIVA</div>
+                                <h3 class="price-tier-title">CRIVOS ARSENAL</h3>
+                                <div class="price-value-box">
+                                    <div class="price-amount"><small>R$</small> 124</div>
+                                    <div class="price-payment-note">BASE TÁTICO + R$ 57 // ENTREGA EM ATÉ 24H</div>
+                                </div>
+                                <ul class="price-features">
+                                    <li><span class="check-sq">[✓]</span> <span><strong>Tudo do Nível Tático</strong> (Cronograma + Raio-X + Guia PDF)</span></li>
+                                    <li><span class="check-sq">[+]</span> <span><strong>Decks de Flashcards SM-2</strong> com pico na véspera</span></li>
+                                    <li><span class="check-sq">[+]</span> <span><strong>Resumos Direcionados</strong> integrados ao painel</span></li>
+                                    <li><span class="check-sq">[+]</span> <span><strong>Caderno de Erros Inteligente</strong> para pontos cegos</span></li>
+                                    <li><span class="check-sq">[+]</span> <span><strong>Simulados Diagnósticos</strong> no padrão da banca</span></li>
+                                </ul>
+                            </div>
+                            <a href="/payment.html?produto=arsenal" class="btn btn-primary" style="width: 100%;">Escolher Nível Arsenal →</a>
+                        </div>
+
+                        <!-- CARTA 3: ELITE -->
+                        <div class="deck-card" data-card-index="2" onclick="handleCardClick(2)">
+                            <div>
+                                <div class="price-tier-label">NÍVEL 03 // PREPARAÇÃO TOTAL</div>
+                                <h3 class="price-tier-title">CRIVOS ELITE</h3>
+                                <div class="price-value-box">
+                                    <div class="price-amount"><small>R$</small> 221</div>
+                                    <div class="price-payment-note">ARSENAL + R$ 97 // ENTREGA EXPRESSA EM ATÉ 6H</div>
+                                </div>
+                                <ul class="price-features">
+                                    <li><span class="check-sq">[✓]</span> <span><strong>Tudo dos Níveis Tático e Arsenal</strong></span></li>
+                                    <li><span class="check-sq">[+]</span> <span><strong>Fila de Prioridade Máxima:</strong> entrega expressa em até 6h</span></li>
+                                    <li><span class="check-sq">[+]</span> <span><strong>Módulo de Discursivas e Redação</strong> com esqueletos</span></li>
+                                    <li><span class="check-sq">[+]</span> <span><strong>1 Recalibração Extra de Rota</strong> gratuita</span></li>
+                                    <li><span class="check-sq">[+]</span> <span><strong>Mapeamento de Tópicos Polêmicos</strong> da banca</span></li>
+                                </ul>
+                            </div>
+                            <a href="/payment.html?produto=elite" class="btn btn-dark" style="width: 100%;">Escolher Nível Elite →</a>
+                        </div>
+
+                        <!-- CARTA 4: PRIME -->
+                        <div class="deck-card" data-card-index="3" style="border-color: #111111;" onclick="handleCardClick(3)">
+                            <div>
+                                <div class="price-tier-label" style="color: var(--accent-red);">NÍVEL 04 // MÁXIMA PERSONALIZAÇÃO</div>
+                                <h3 class="price-tier-title">CRIVOS PRIME</h3>
+                                <div class="price-value-box">
+                                    <div class="price-amount"><small>R$</small> 288</div>
+                                    <div class="price-payment-note">ELITE + INTEGRAÇÃO DOS SEUS MATERIAIS</div>
+                                </div>
+                                <ul class="price-features">
+                                    <li><span class="check-sq">[✓]</span> <span><strong>Tudo do Nível Elite</strong> (Discursivas, Fila 6h, SM-2)</span></li>
+                                    <li><span class="check-sq">[+]</span> <span><strong>Integração de Materiais:</strong> envie seus próprios PDFs no painel</span></li>
+                                    <li><span class="check-sq">[+]</span> <span><strong>Cronograma 100% Ancorado:</strong> metas citando suas apostilas</span></li>
+                                    <li><span class="check-sq">[+]</span> <span><strong>Suporte Individual Direto</strong> para acompanhamento</span></li>
+                                </ul>
+                            </div>
+                            <a href="/payment.html?produto=prime" class="btn btn-primary" style="width: 100%; background: #111111; color: #FFFFFF; border: 2px solid #111111;">Escolher Nível Prime →</a>
+                        </div>
+
                     </div>
                 </div>
-            </div>
+                <div class="deck-hint">
+                    [ CLIQUE OU ARRASTE A CARTA PARA PASSAR O PLANO ]
+                </div>
+
             </div>
         </section>
 
@@ -3412,113 +3387,93 @@ setTimeout(() => {
 
         
         
-        // Slider de Planos Oficial CRIVOS (Touch & Mouse Drag Habilitados)
-        let currentPlanSlide = 1; // Padrão: Arsenal (Destaque)
+        
+        // Sistema de Baralho de Cartas (Card Stack) CRIVOS
+        let activeCardIdx = 1; // Inicia no Arsenal (Destaque)
+        const totalCards = 4;
 
-        function setPlanSlide(idx) {
-            if (idx < 0) idx = 0;
-            if (idx > 3) idx = 3;
-            currentPlanSlide = idx;
+        function updateDeckView() {
+            const cards = document.querySelectorAll('.deck-card');
+            cards.forEach((card) => {
+                const idx = parseInt(card.getAttribute('data-card-index'), 10);
+                card.className = card.className
+                    .replace(/\b(is-active|is-next-1|is-next-2|is-next-3|is-swiping-out)\b/g, '')
+                    .trim();
 
-            const track = document.getElementById('pricing-track');
-            if (track) {
-                track.style.transition = 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)';
-                track.style.transform = 'translateX(-' + (idx * 25) + '%)';
-            }
-
-            const btns = document.querySelectorAll('.pricing-switch-btn');
-            btns.forEach((b, i) => {
-                if (i === idx) b.classList.add('active');
-                else b.classList.remove('active');
-            });
-
-            const dots = document.querySelectorAll('.pricing-dot');
-            dots.forEach((d, i) => {
-                if (i === idx) d.classList.add('active');
-                else d.classList.remove('active');
+                const diff = (idx - activeCardIdx + totalCards) % totalCards;
+                if (diff === 0) {
+                    card.classList.add('is-active');
+                } else if (diff === 1) {
+                    card.classList.add('is-next-1');
+                } else if (diff === 2) {
+                    card.classList.add('is-next-2');
+                } else {
+                    card.classList.add('is-next-3');
+                }
             });
         }
 
-        // Habilita Gestos de Arrasto no Mouse e no Touch
-        document.addEventListener('DOMContentLoaded', () => {
-            setPlanSlide(1);
+        function cycleNextCard() {
+            const currentCard = document.querySelector('.deck-card.is-active');
+            if (currentCard) {
+                currentCard.classList.add('is-swiping-out');
+                setTimeout(() => {
+                    activeCardIdx = (activeCardIdx + 1) % totalCards;
+                    updateDeckView();
+                }, 220);
+            } else {
+                activeCardIdx = (activeCardIdx + 1) % totalCards;
+                updateDeckView();
+            }
+        }
 
-            const viewport = document.querySelector('.pricing-viewport');
-            const track = document.getElementById('pricing-track');
-            if (!viewport || !track) return;
+        function handleCardClick(clickedIdx) {
+            // Se clicou na carta ativa, não faz nada (permite clicar no botão de compra)
+            if (clickedIdx === activeCardIdx) return;
+            activeCardIdx = clickedIdx;
+            updateDeckView();
+        }
+
+        // Suporte a Swipe no Mobile e Mouse Drag no Desktop
+        document.addEventListener('DOMContentLoaded', () => {
+            updateDeckView();
+
+            const stage = document.getElementById('deck-stage');
+            if (!stage) return;
 
             let startX = 0;
-            let currentX = 0;
             let isDragging = false;
-            let startTranslate = 0;
 
-            function getTranslateX() {
-                return -(currentPlanSlide * 25);
-            }
-
-            // Touch events
-            viewport.addEventListener('touchstart', (e) => {
-                isDragging = true;
+            // Touch
+            stage.addEventListener('touchstart', (e) => {
                 startX = e.touches[0].clientX;
-                currentX = startX;
-                track.style.transition = 'none';
+                isDragging = true;
             }, { passive: true });
 
-            viewport.addEventListener('touchmove', (e) => {
-                if (!isDragging) return;
-                currentX = e.touches[0].clientX;
-                const diffX = currentX - startX;
-                const percentDiff = (diffX / viewport.clientWidth) * 25;
-                const newTranslate = getTranslateX() + percentDiff;
-                track.style.transform = 'translateX(' + newTranslate + '%)';
-            }, { passive: true });
-
-            viewport.addEventListener('touchend', () => {
+            stage.addEventListener('touchend', (e) => {
                 if (!isDragging) return;
                 isDragging = false;
-                const diffX = currentX - startX;
-                if (diffX < -50 && currentPlanSlide < 3) {
-                    setPlanSlide(currentPlanSlide + 1);
-                } else if (diffX > 50 && currentPlanSlide > 0) {
-                    setPlanSlide(currentPlanSlide - 1);
-                } else {
-                    setPlanSlide(currentPlanSlide);
+                const endX = e.changedTouches[0].clientX;
+                const diff = endX - startX;
+                if (Math.abs(diff) > 40) {
+                    cycleNextCard();
                 }
             });
 
-            // Mouse Drag events
-            viewport.style.cursor = 'grab';
-
-            viewport.addEventListener('mousedown', (e) => {
-                // Não inicia drag se clicou no botão de compra dentro do card
+            // Mouse Click & Drag na carta do topo
+            stage.addEventListener('mousedown', (e) => {
                 if (e.target.closest('a') || e.target.closest('button')) return;
-                isDragging = true;
-                viewport.style.cursor = 'grabbing';
                 startX = e.clientX;
-                currentX = startX;
-                track.style.transition = 'none';
+                isDragging = true;
             });
 
-            window.addEventListener('mousemove', (e) => {
-                if (!isDragging) return;
-                currentX = e.clientX;
-                const diffX = currentX - startX;
-                const percentDiff = (diffX / viewport.clientWidth) * 25;
-                const newTranslate = getTranslateX() + percentDiff;
-                track.style.transform = 'translateX(' + newTranslate + '%)';
-            });
-
-            window.addEventListener('mouseup', () => {
+            window.addEventListener('mouseup', (e) => {
                 if (!isDragging) return;
                 isDragging = false;
-                viewport.style.cursor = 'grab';
-                const diffX = currentX - startX;
-                if (diffX < -60 && currentPlanSlide < 3) {
-                    setPlanSlide(currentPlanSlide + 1);
-                } else if (diffX > 60 && currentPlanSlide > 0) {
-                    setPlanSlide(currentPlanSlide - 1);
-                } else {
-                    setPlanSlide(currentPlanSlide);
+                const endX = e.clientX;
+                const diff = endX - startX;
+                if (Math.abs(diff) > 40) {
+                    cycleNextCard();
                 }
             });
         });
