@@ -727,7 +727,7 @@
 
         .hero-metrics-bar {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             border: 2px solid var(--border-color);
             background: var(--bg-surface);
             box-shadow: var(--shadow-hard);
@@ -1626,6 +1626,17 @@
             gap: 1.85rem;
             align-items: stretch;
         }
+        @media (max-width: 1100px) {
+            .pricing-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 640px) {
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
 
         .price-card {
             background-color: var(--bg-surface);
@@ -2615,6 +2626,26 @@
                                 <div class="price-amount"><small>R$</small> 221</div>
                                 <div class="price-payment-note">ARSENAL + R$ 97 // ENTREGA EXPRESSA EM ATÉ 6H</div>
                             </div>
+
+                    <!-- NÍVEL 4: PRIME -->
+                    <div class="price-card reveal-card" style="border-color: #111111; background: var(--bg-surface);">
+                        <div>
+                            <div class="price-tier-label" style="color: var(--accent-red);">NÍVEL 04 // MÁXIMA PERSONALIZAÇÃO</div>
+                            <h3 class="price-tier-title">CRIVOS PRIME</h3>
+                            <div class="price-value-box">
+                                <div class="price-amount"><small>R$</small> 288</div>
+                                <div class="price-payment-note">ELITE + INTEGRAÇÃO DOS SEUS MATERIAIS</div>
+                            </div>
+                            <ul class="price-features">
+                                <li><span class="check-sq">[✓]</span> <span><strong>Tudo do Nível Elite</strong> (Discursivas, Fila 6h, SM-2)</span></li>
+                                <li><span class="check-sq">[+]</span> <span><strong>Integração de Materiais Pessoais:</strong> envie suas apostilas, PDFs ou resumos pelo painel</span></li>
+                                <li><span class="check-sq">[+]</span> <span><strong>Cronograma 100% Ancorado:</strong> nossa engenharia cita as páginas e capítulos do seu material</span></li>
+                                <li><span class="check-sq">[+]</span> <span><strong>Suporte Individual Direto</strong> para acompanhamento de rotina</span></li>
+                            </ul>
+                        </div>
+                        <a href="/payment.html?produto=prime" class="btn btn-primary" style="width: 100%; background: #111111; color: #FFFFFF; border: 2px solid #111111;">Escolher Nível Prime →</a>
+                    </div>
+
                             <ul class="price-features">
                                 <li><span class="check-sq">[✓]</span> <span><strong>Tudo dos Níveis Tático e Arsenal</strong></span></li>
                                 <li><span class="check-sq">[+]</span> <span><strong>Fila de Prioridade Máxima:</strong> entrega expressa em até 6 horas</span></li>

@@ -227,7 +227,25 @@ export function generateTacticalPassword() {
 }
 
 // Template HTML Editorial Suíço para E-mail #1: Credenciais & Status de Calibração
-export function renderEmailCredentials({ email, password, planTitle, concurso, cargo, panelUrl = 'https://app.crivos.me' }) {
+export function renderEmailCredentials({ email, password, planTitle, planTier, concurso, cargo, panelUrl = 'https://app.crivos.me' }) {
+  const isPrime = (planTier === 'prime' || String(planTitle || '').toLowerCase().includes('prime'));
+  const primeBlock = isPrime ? `
+        <!-- Bloco Exclusivo: CRIVOS PRIME // Upload de Materiais -->
+        <div style="background:#FEF2F2;border:2px solid #D92B2B;padding:16px;margin-bottom:24px;box-shadow:3px 3px 0px #D92B2B;">
+          <div style="font-family:'Courier New',Courier,monospace;font-size:12px;font-weight:900;color:#D92B2B;margin-bottom:8px;text-transform:uppercase;">
+            ■ PASSO OBRIGATÓRIO // UPLOAD DOS SEUS MATERIAIS PESSOAIS
+          </div>
+          <p style="font-size:12px;line-height:1.6;color:#111111;margin:0 0 10px 0;">
+            Como membro do <strong>CRIVOS PRIME</strong>, nossa engenharia vai ancorar seu cronograma e fichas diretamente nos seus próprios materiais.
+          </p>
+          <div style="font-family:'Courier New',Courier,monospace;font-size:11px;color:#222222;line-height:1.7;background:#FFFFFF;padding:10px;border:1px solid #D92B2B;">
+            1. Acesse seu painel abaixo com sua senha temporária.<br>
+            2. Entre na aba <strong>[09 · ARQUIVOS]</strong> no menu lateral.<br>
+            3. Faça o upload dos seus PDFs, apostilas ou resumos.<br>
+            <em>*Arquivos pesados acima de 25MB ou pastas inteiras do Google Drive? Acione nosso suporte prioritário na aba 11.</em>
+          </div>
+        </div>
+  ` : '';
   return `
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -256,6 +274,7 @@ export function renderEmailCredentials({ email, password, planTitle, concurso, c
           Seu pedido foi registrado com sucesso. Nossa equipe de engenharia tática já recebeu seu concurso, cargo e declaração de rotina para calibrar seu Sistema Operacional.
         </p>
 
+        ${primeBlock}
         <!-- Caixa de Credenciais -->
         <div style="background:#F4F4F0;border:1px solid #111111;border-left:4px solid #D92B2B;padding:16px;margin-bottom:24px;font-family:'Courier New',Courier,monospace;font-size:13px;line-height:1.8;">
           <div><strong>PLANO:</strong> ${planTitle}</div>

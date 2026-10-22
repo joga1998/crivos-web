@@ -46,6 +46,16 @@ export function getModulesByTier(planTier) {
     };
   }
 
+  if (tier === 'prime') {
+    return {
+      ...baseTatico,
+      cards: 'enabled',
+      mapa: 'enabled',
+      sim: 'enabled',
+      arg: 'enabled',
+    };
+  }
+
   return baseTatico;
 }
 
@@ -149,6 +159,7 @@ export async function provisionUserOrder(env, { orderId, mpPaymentId, paymentMet
     tatico: 'Nível 1 · Tático',
     arsenal: 'Nível 2 · Arsenal (SM-2)',
     elite: 'Nível 3 · Elite (Completo)',
+    prime: 'Nível 4 · Prime (Completo + Materiais Pessoais)',
   };
   const planTitle = planTitles[order.plan_tier] || 'Plano Tático';
 
@@ -225,6 +236,7 @@ export async function provisionUserOrder(env, { orderId, mpPaymentId, paymentMet
       email,
       password: tempPassword,
       planTitle,
+      planTier: order.plan_tier,
       concurso: concursoNome,
       cargo: cargoNome,
       panelUrl: targetPanelUrl,
@@ -247,10 +259,11 @@ export async function provisionUserOrder(env, { orderId, mpPaymentId, paymentMet
       tatico: '67,00',
       arsenal: '124,00',
       elite: '221,00',
+      prime: '288,00',
     };
     const formattedPrice = planPrices[order.plan_tier] || (order.amount_cents ? (order.amount_cents / 100).toFixed(2).replace('.', ',') : '0,00');
 
-        const hasOrderBump = !!(parsedNotes.order_bump || (order.amount_cents && [9400, 15100, 24800].includes(order.amount_cents)));
+        const hasOrderBump = !!(parsedNotes.order_bump || (order.amount_cents && [9400, 15100, 24800, 31500].includes(order.amount_cents)));
     const bumpTitle = hasOrderBump ? (parsedNotes.order_bump_title || 'Dossiê de Véspera D-7 & Pegadinhas da Banca (+ R$ 27,00)') : 'Nenhum';
 
     await sendAdminSaleNotification(env, {

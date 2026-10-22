@@ -26,7 +26,9 @@ async function handleRecovery(context) {
     tatico: { title: 'Nível 1 · Tático', formatted: '67,00' },
     arsenal: { title: 'Nível 2 · Arsenal (SM-2)', formatted: '124,00' },
     elite: { title: 'Nível 3 · Elite (Completo)', formatted: '221,00' },
-  };
+  
+    prime: { title: 'Nível 4 · Prime (Completo + Materiais)', formatted: '288,00' },
+};
 
   const results = {
     pixRecovered: 0,
