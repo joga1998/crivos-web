@@ -246,6 +246,24 @@ export function renderEmailCredentials({ email, password, planTitle, planTier, c
           </div>
         </div>
   ` : '';
+
+  const statusCardHtml = isPrime ? `
+        <!-- Alerta de Status Específico: CRIVOS PRIME -->
+        <div style="border:2px solid #D92B2B;background:#FFFDFD;padding:16px;margin-bottom:24px;font-size:12px;line-height:1.6;">
+          <strong style="color:#D92B2B;font-family:'Courier New',Courier,monospace;display:block;margin-bottom:6px;font-size:12px;">
+            [ STATUS ATUAL: AGUARDANDO UPLOAD DE ARQUIVOS PARA CALIBRAÇÃO ]
+          </strong>
+          Seu painel já está aberto e com a aba <strong>[09 · ARQUIVOS]</strong> liberada. A calibração sob medida do seu cronograma e das suas metas se inicia imediatamente após você anexar seus materiais no painel. Assim que o upload for feito e o sistema concluído pela engenharia, você receberá a confirmação de liberação definitiva.
+        </div>
+  ` : `
+        <!-- Alerta de Prazo de Calibração Padrão -->
+        <div style="border:1px solid #111111;padding:16px;margin-bottom:24px;font-size:12px;line-height:1.6;">
+          <strong style="color:#D92B2B;font-family:'Courier New',Courier,monospace;display:block;margin-bottom:6px;">
+            [ STATUS ATUAL: EM CALIBRAÇÃO TÁTICA // PRAZO ATÉ 24H ]
+          </strong>
+          Você já pode acessar o painel agora para conferir o status da engenharia e personalizar seu perfil (nome, foto e nova senha definitiva). Assim que os arquivos e o cronograma estiverem 100% montados, você receberá um segundo e-mail de liberação.
+        </div>
+  `;
   return `
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -286,13 +304,7 @@ export function renderEmailCredentials({ email, password, planTitle, planTier, c
           </div>
         </div>
 
-        <!-- Alerta de Prazo de Calibração -->
-        <div style="border:1px solid #111111;padding:16px;margin-bottom:24px;font-size:12px;line-height:1.6;">
-          <strong style="color:#D92B2B;font-family:'Courier New',Courier,monospace;display:block;margin-bottom:6px;">
-            [ STATUS ATUAL: EM CALIBRAÇÃO TÁTICA // PRAZO ATÉ 48H ]
-          </strong>
-          Você já pode acessar o painel agora para conferir o status da engenharia e personalizar seu perfil (nome, foto e nova senha definitiva). Assim que os arquivos e o cronograma estiverem 100% montados, você receberá um segundo e-mail de liberação.
-        </div>
+        ${statusCardHtml}
 
         <!-- Botão CTA -->
         <div style="text-align:center;margin-bottom:24px;">
