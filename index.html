@@ -2576,85 +2576,102 @@
                 </div>
 
                 
-                <div class="pricing-grid">
-                    <!-- NÍVEL 1: TÁTICO -->
-                    <div class="price-card reveal-card">
-                        <div>
-                            <div class="price-tier-label">NÍVEL 01 // ESSENCIAL</div>
-                            <h3 class="price-tier-title">CRIVOS TÁTICO</h3>
-                            <div class="price-value-box">
-                                <div class="price-amount"><small>R$</small> 67</div>
-                                <div class="price-payment-note">PAGAMENTO ÚNICO // ENTREGA EM ATÉ 24H</div>
-                            </div>
-                            <ul class="price-features">
-                                <li><span class="check-sq">[✓]</span> <span><strong>Raio-X Estatístico do Edital</strong> com matriz de pesos e prioridades</span></li>
-                                <li><span class="check-sq">[✓]</span> <span><strong>Cronograma Diário Elástico</strong> calculado até o dia da sua prova</span></li>
-                                <li><span class="check-sq">[✓]</span> <span><strong>Guia de Estudos em PDF A4</strong> definitivo para leitura e impressão</span></li>
-                                <li><span class="check-sq">[✓]</span> <span><strong>Timer Pomodoro Integrado</strong> e rastreador de progresso por tópico</span></li>
-                                <li><span class="check-sq">[✓]</span> <span><strong>Garantia de 7 Dias Grátis</strong> de calibração e ajuste de carga</span></li>
-                            </ul>
-                        </div>
-                        <a href="/payment.html?produto=tatico" class="btn btn-secondary" style="width: 100%;">Escolher Nível Tático →</a>
+                
+                <div class="pricing-slider-wrapper">
+                    <!-- Seletor Tático de Abas de Planos -->
+                    <div class="pricing-nav-bar" id="pricing-nav">
+                        <button type="button" class="pricing-tab-btn" onclick="goToPlan(0)">[ 01 · TÁTICO ]</button>
+                        <button type="button" class="pricing-tab-btn active" onclick="goToPlan(1)">[ 02 · ARSENAL ★ ]</button>
+                        <button type="button" class="pricing-tab-btn" onclick="goToPlan(2)">[ 03 · ELITE ]</button>
+                        <button type="button" class="pricing-tab-btn" onclick="goToPlan(3)">[ 04 · PRIME ]</button>
                     </div>
 
-                    <!-- NÍVEL 2: ARSENAL (DESTAQUE) -->
-                    <div class="price-card featured reveal-card">
-                        <div class="featured-ribbon">MAIS ESCOLHIDO</div>
-                        <div>
-                            <div class="price-tier-label">NÍVEL 02 // RETENÇÃO ATIVA</div>
-                            <h3 class="price-tier-title">CRIVOS ARSENAL</h3>
-                            <div class="price-value-box">
-                                <div class="price-amount"><small>R$</small> 124</div>
-                                <div class="price-payment-note">BASE TÁTICO + R$ 57 // ENTREGA EM ATÉ 24H</div>
-                            </div>
-                            <ul class="price-features">
-                                <li><span class="check-sq">[✓]</span> <span><strong>Tudo do Nível Tático</strong> (Cronograma + Raio-X + Guia PDF)</span></li>
-                                <li><span class="check-sq">[+]</span> <span><strong>Decks de Flashcards SM-2</strong> pré-carregados com pico de retenção na véspera</span></li>
-                                <li><span class="check-sq">[+]</span> <span><strong>Resumos Direcionados de Alta Incidência</strong> integrados ao painel</span></li>
-                                <li><span class="check-sq">[+]</span> <span><strong>Caderno de Erros Inteligente</strong> para auditoria de pontos cegos</span></li>
-                                <li><span class="check-sq">[+]</span> <span><strong>Simulados Diagnósticos</strong> calibrados no padrão da sua banca</span></li>
-                            </ul>
-                        </div>
-                        <a href="/payment.html?produto=arsenal" class="btn btn-primary" style="width: 100%;">Escolher Nível Arsenal →</a>
-                    </div>
+                    <!-- Botões de Navegação Lateral -->
+                    <button type="button" class="slider-arrow-btn prev" aria-label="Plano Anterior" onclick="slidePlans(-1)">‹</button>
+                    <button type="button" class="slider-arrow-btn next" aria-label="Próximo Plano" onclick="slidePlans(1)">›</button>
 
-                    <!-- NÍVEL 3: ELITE -->
-                    <div class="price-card reveal-card">
-                        <div>
-                            <div class="price-tier-label">NÍVEL 03 // PREPARAÇÃO TOTAL</div>
-                            <h3 class="price-tier-title">CRIVOS ELITE</h3>
-                            <div class="price-value-box">
-                                <div class="price-amount"><small>R$</small> 221</div>
-                                <div class="price-payment-note">ARSENAL + R$ 97 // ENTREGA EXPRESSA EM ATÉ 6H</div>
+                    <div class="pricing-track-container" id="pricing-track">
+                        <div class="pricing-grid">
+                            <!-- NÍVEL 1: TÁTICO -->
+                            <div class="price-card reveal-card" data-plan-index="0">
+                                <div>
+                                    <div class="price-tier-label">NÍVEL 01 // ESSENCIAL</div>
+                                    <h3 class="price-tier-title">CRIVOS TÁTICO</h3>
+                                    <div class="price-value-box">
+                                        <div class="price-amount"><small>R$</small> 67</div>
+                                        <div class="price-payment-note">PAGAMENTO ÚNICO // ENTREGA EM ATÉ 24H</div>
+                                    </div>
+                                    <ul class="price-features">
+                                        <li><span class="check-sq">[✓]</span> <span><strong>Raio-X Estatístico do Edital</strong> com matriz de pesos e prioridades</span></li>
+                                        <li><span class="check-sq">[✓]</span> <span><strong>Cronograma Diário Elástico</strong> calculado até o dia da sua prova</span></li>
+                                        <li><span class="check-sq">[✓]</span> <span><strong>Guia de Estudos em PDF A4</strong> definitivo para leitura e impressão</span></li>
+                                        <li><span class="check-sq">[✓]</span> <span><strong>Timer Pomodoro Integrado</strong> e rastreador de progresso por tópico</span></li>
+                                        <li><span class="check-sq">[✓]</span> <span><strong>Garantia de 7 Dias Grátis</strong> de calibração e ajuste de carga</span></li>
+                                    </ul>
+                                </div>
+                                <a href="/payment.html?produto=tatico" class="btn btn-secondary" style="width: 100%;">Escolher Nível Tático →</a>
                             </div>
-                            <ul class="price-features">
-                                <li><span class="check-sq">[✓]</span> <span><strong>Tudo dos Níveis Tático e Arsenal</strong></span></li>
-                                <li><span class="check-sq">[+]</span> <span><strong>Fila de Prioridade Máxima:</strong> entrega expressa em até 6 horas</span></li>
-                                <li><span class="check-sq">[+]</span> <span><strong>Módulo de Discursivas e Redação</strong> com repertório e esqueletos de resposta</span></li>
-                                <li><span class="check-sq">[+]</span> <span><strong>1 Recalibração Extra de Rota</strong> gratuita a qualquer momento até a prova</span></li>
-                                <li><span class="check-sq">[+]</span> <span><strong>Mapeamento de Tópicos Polêmicos</strong> e jurisprudência da banca</span></li>
-                            </ul>
-                        </div>
-                        <a href="/payment.html?produto=elite" class="btn btn-dark" style="width: 100%;">Escolher Nível Elite →</a>
-                    </div>
 
-                    <!-- NÍVEL 4: PRIME -->
-                    <div class="price-card reveal-card" style="border-color: #111111; background: var(--bg-surface);">
-                        <div>
-                            <div class="price-tier-label" style="color: var(--accent-red);">NÍVEL 04 // MÁXIMA PERSONALIZAÇÃO</div>
-                            <h3 class="price-tier-title">CRIVOS PRIME</h3>
-                            <div class="price-value-box">
-                                <div class="price-amount"><small>R$</small> 288</div>
-                                <div class="price-payment-note">ELITE + INTEGRAÇÃO DOS SEUS MATERIAIS</div>
+                            <!-- NÍVEL 2: ARSENAL (DESTAQUE) -->
+                            <div class="price-card featured reveal-card" data-plan-index="1">
+                                <div class="featured-ribbon">MAIS ESCOLHIDO</div>
+                                <div>
+                                    <div class="price-tier-label">NÍVEL 02 // RETENÇÃO ATIVA</div>
+                                    <h3 class="price-tier-title">CRIVOS ARSENAL</h3>
+                                    <div class="price-value-box">
+                                        <div class="price-amount"><small>R$</small> 124</div>
+                                        <div class="price-payment-note">BASE TÁTICO + R$ 57 // ENTREGA EM ATÉ 24H</div>
+                                    </div>
+                                    <ul class="price-features">
+                                        <li><span class="check-sq">[✓]</span> <span><strong>Tudo do Nível Tático</strong> (Cronograma + Raio-X + Guia PDF)</span></li>
+                                        <li><span class="check-sq">[+]</span> <span><strong>Decks de Flashcards SM-2</strong> pré-carregados com pico de retenção na véspera</span></li>
+                                        <li><span class="check-sq">[+]</span> <span><strong>Resumos Direcionados de Alta Incidência</strong> integrados ao painel</span></li>
+                                        <li><span class="check-sq">[+]</span> <span><strong>Caderno de Erros Inteligente</strong> para auditoria de pontos cegos</span></li>
+                                        <li><span class="check-sq">[+]</span> <span><strong>Simulados Diagnósticos</strong> calibrados no padrão da sua banca</span></li>
+                                    </ul>
+                                </div>
+                                <a href="/payment.html?produto=arsenal" class="btn btn-primary" style="width: 100%;">Escolher Nível Arsenal →</a>
                             </div>
-                            <ul class="price-features">
-                                <li><span class="check-sq">[✓]</span> <span><strong>Tudo do Nível Elite</strong> (Discursivas, Fila 6h, SM-2)</span></li>
-                                <li><span class="check-sq">[+]</span> <span><strong>Integração de Materiais Pessoais:</strong> envie suas apostilas, PDFs ou resumos pelo painel</span></li>
-                                <li><span class="check-sq">[+]</span> <span><strong>Cronograma 100% Ancorado:</strong> nossa engenharia cita as páginas e capítulos do seu material</span></li>
-                                <li><span class="check-sq">[+]</span> <span><strong>Suporte Individual Direto</strong> para acompanhamento de rotina</span></li>
-                            </ul>
+
+                            <!-- NÍVEL 3: ELITE -->
+                            <div class="price-card reveal-card" data-plan-index="2">
+                                <div>
+                                    <div class="price-tier-label">NÍVEL 03 // PREPARAÇÃO TOTAL</div>
+                                    <h3 class="price-tier-title">CRIVOS ELITE</h3>
+                                    <div class="price-value-box">
+                                        <div class="price-amount"><small>R$</small> 221</div>
+                                        <div class="price-payment-note">ARSENAL + R$ 97 // ENTREGA EXPRESSA EM ATÉ 6H</div>
+                                    </div>
+                                    <ul class="price-features">
+                                        <li><span class="check-sq">[✓]</span> <span><strong>Tudo dos Níveis Tático e Arsenal</strong></span></li>
+                                        <li><span class="check-sq">[+]</span> <span><strong>Fila de Prioridade Máxima:</strong> entrega expressa em até 6 horas</span></li>
+                                        <li><span class="check-sq">[+]</span> <span><strong>Módulo de Discursivas e Redação</strong> com repertório e esqueletos de resposta</span></li>
+                                        <li><span class="check-sq">[+]</span> <span><strong>1 Recalibração Extra de Rota</strong> gratuita a qualquer momento até a prova</span></li>
+                                        <li><span class="check-sq">[+]</span> <span><strong>Mapeamento de Tópicos Polêmicos</strong> e jurisprudência da banca</span></li>
+                                    </ul>
+                                </div>
+                                <a href="/payment.html?produto=elite" class="btn btn-dark" style="width: 100%;">Escolher Nível Elite →</a>
+                            </div>
+
+                            <!-- NÍVEL 4: PRIME -->
+                            <div class="price-card reveal-card" data-plan-index="3" style="border-color: #111111; background: var(--bg-surface);">
+                                <div>
+                                    <div class="price-tier-label" style="color: var(--accent-red);">NÍVEL 04 // MÁXIMA PERSONALIZAÇÃO</div>
+                                    <h3 class="price-tier-title">CRIVOS PRIME</h3>
+                                    <div class="price-value-box">
+                                        <div class="price-amount"><small>R$</small> 288</div>
+                                        <div class="price-payment-note">ELITE + INTEGRAÇÃO DOS SEUS MATERIAIS</div>
+                                    </div>
+                                    <ul class="price-features">
+                                        <li><span class="check-sq">[✓]</span> <span><strong>Tudo do Nível Elite</strong> (Discursivas, Fila 6h, SM-2)</span></li>
+                                        <li><span class="check-sq">[+]</span> <span><strong>Integração de Materiais Pessoais:</strong> envie suas apostilas, PDFs ou resumos pelo painel</span></li>
+                                        <li><span class="check-sq">[+]</span> <span><strong>Cronograma 100% Ancorado:</strong> nossa engenharia cita as páginas e capítulos do seu material</span></li>
+                                        <li><span class="check-sq">[+]</span> <span><strong>Suporte Individual Direto</strong> para acompanhamento de rotina</span></li>
+                                    </ul>
+                                </div>
+                                <a href="/payment.html?produto=prime" class="btn btn-primary" style="width: 100%; background: #111111; color: #FFFFFF; border: 2px solid #111111;">Escolher Nível Prime →</a>
+                            </div>
                         </div>
-                        <a href="/payment.html?produto=prime" class="btn btn-primary" style="width: 100%; background: #111111; color: #FFFFFF; border: 2px solid #111111;">Escolher Nível Prime →</a>
                     </div>
                 </div>
 
