@@ -70,14 +70,26 @@ export async function onRequestPost(context) {
     const cleanPlan = (plan || 'tatico').toLowerCase();
     const amount = planPrices[cleanPlan] || 67.00;
 
-    // 0. Extração de Parâmetros de Rastreamento (UTMs e Click IDs)
-    const utmSource = (contentType.includes('application/json') ? body.utm_source : formData.get('utm_source')) || '';
-    const utmMedium = (contentType.includes('application/json') ? body.utm_medium : formData.get('utm_medium')) || '';
-    const utmCampaign = (contentType.includes('application/json') ? body.utm_campaign : formData.get('utm_campaign')) || '';
-    const utmContent = (contentType.includes('application/json') ? body.utm_content : formData.get('utm_content')) || '';
-    const utmTerm = (contentType.includes('application/json') ? body.utm_term : formData.get('utm_term')) || '';
-    const fbclid = (contentType.includes('application/json') ? body.fbclid : formData.get('fbclid')) || '';
-    const gclid = (contentType.includes('application/json') ? body.gclid : formData.get('gclid')) || '';
+    const isJson = contentType.includes('application/json');
+    let utmSource = '', utmMedium = '', utmCampaign = '', utmContent = '', utmTerm = '', fbclid = '', gclid = '';
+
+    if (isJson && typeof body === 'object' && body !== null) {
+      utmSource = body.utm_source || '';
+      utmMedium = body.utm_medium || '';
+      utmCampaign = body.utm_campaign || '';
+      utmContent = body.utm_content || '';
+      utmTerm = body.utm_term || '';
+      fbclid = body.fbclid || '';
+      gclid = body.gclid || '';
+    } else if (typeof formData !== 'undefined' && formData !== null) {
+      utmSource = formData.get('utm_source') || '';
+      utmMedium = formData.get('utm_medium') || '';
+      utmCampaign = formData.get('utm_campaign') || '';
+      utmContent = formData.get('utm_content') || '';
+      utmTerm = formData.get('utm_term') || '';
+      fbclid = formData.get('fbclid') || '';
+      gclid = formData.get('gclid') || '';
+    }
 
     // 1. Cria o registro inicial em `orders` com status `pending`
     const generatedOrderId = `ORD-${Date.now()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
