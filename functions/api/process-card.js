@@ -47,6 +47,7 @@ export async function onRequestPost(context) {
       docType,
       docNumber,
       orderId,
+      orderBump,
     } = body;
 
     const planPrices = {
@@ -62,6 +63,10 @@ export async function onRequestPost(context) {
         headers: corsHeaders,
       });
     }
+
+    const orderBumpPrice = 27.00;
+    const finalAmount = orderBump ? (selected.amount + orderBumpPrice) : selected.amount;
+    const finalDesc = orderBump ? `${selected.title} + Dossiê D-7` : selected.title;
 
     if (!token || typeof token !== 'string' || token.length < 10) {
       return new Response(JSON.stringify({ error: 'Token de cartão inválido ou ausente.', user_message: 'Por favor, revise os dados do cartão de crédito.' }), {
