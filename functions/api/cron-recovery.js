@@ -122,7 +122,8 @@ async function handleRecovery(context) {
         });
 
         try {
-          await sendResendEmail(env, {
+          results.pixAttempted = (results.pixAttempted || 0) + 1;
+          const emailRes = await sendResendEmail(env, {
             to: email,
             subject: `CRIVOS // Chave Pix Gerada — Seu Slot Está Reservado em ${concurso}`,
             html,
@@ -132,6 +133,7 @@ async function handleRecovery(context) {
           // Marca nos notes para evitar disparos repetidos
           notes.pix_recovery_email_sent = true;
           notes.pix_recovery_sent_at = new Date().toISOString();
+          notes.pix_recovery_resend_id = emailRes?.id;
 
           await supabaseRest(env, `/orders?id=eq.${encodeURIComponent(order.id)}`, {
             method: 'PATCH',
@@ -141,7 +143,7 @@ async function handleRecovery(context) {
           results.pixRecovered++;
         } catch (sendErr) {
           console.error(`[recovery] Falha ao enviar email pix para ${email}:`, sendErr.message);
-          results.errors.push({ orderId: order.id, type: 'pix', error: sendErr.message });
+          results.errors.push({ orderId: order.id, type: 'pix', error: sendErr.message, stack: sendErr.stack });
         }
       }
     }
