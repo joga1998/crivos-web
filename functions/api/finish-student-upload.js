@@ -194,3 +194,10 @@ export async function onRequestPost(context) {
     );
   }
 }
+
+export async function onRequestOptions(context) {
+  return new Response(null, {
+    status: 204,
+    headers: getCorsHeaders(context.request),
+  });
+}

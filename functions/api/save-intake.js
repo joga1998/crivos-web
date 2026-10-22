@@ -65,6 +65,7 @@ export async function onRequestPost(context) {
       tatico: 67.00,
       arsenal: 124.00,
       elite: 221.00,
+      prime: 288.00,
     };
 
     const cleanPlan = (plan || 'tatico').toLowerCase();
