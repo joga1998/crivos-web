@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23D92B2B'/></svg>">
   <title>CRIVOS // Dossiê & Sistema Tático Pós-Edital TJSP (Escrevente)</title>
   <meta name="description" content="Engenharia reversa do edital TJSP 2026/2027 para Escrevente Técnico Judiciário (Banca VUNESP). Cronograma tático dia a dia, repetição espaçada SM-2 e inteligência estatística.">
   
@@ -105,16 +106,44 @@
     .brand-logo {
       display: flex;
       align-items: center;
-      gap: 0.6rem;
-      font-family: var(--font-mono);
-      font-weight: 900;
-      font-size: 1.05rem;
-      letter-spacing: -0.5px;
-      text-transform: uppercase;
+      gap: 0.65rem;
+      text-decoration: none;
     }
-    .brand-logo span.concurso-name {
-      color: var(--accent-red);
+    .brand-sq {
+      width: 12px;
+      height: 12px;
+      background: var(--accent-red);
+      flex-shrink: 0;
+    }
+    .brand-name {
+      font-family: var(--font-sans);
+      font-weight: 900;
+      font-size: 1.18rem;
+      letter-spacing: -0.5px;
+      color: var(--text-primary);
+    }
+    .brand-concurso {
       font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 0.88rem;
+      color: var(--accent-red);
+      letter-spacing: -0.3px;
+    }
+    .header-nav {
+      display: flex;
+      gap: 1.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .header-nav a {
+      color: var(--text-primary);
+      transition: color 0.15s ease;
+    }
+    .header-nav a:hover {
+      color: var(--accent-red);
     }
     .mobile-menu-btn {
       display: none;
@@ -466,13 +495,14 @@
     <div class="container header-flex">
       <a href="/" class="brand-logo">
         <span class="brand-sq"></span>
-        <span>CRIVOS // <span class="concurso-name">TJSP 2026/2027</span></span>
+        <span class="brand-name">CRIVOS</span>
+        <span class="brand-concurso">// TJSP 2026/2027</span>
       </a>
       <nav class="header-nav">
-        <a href="#dossie">01. Raio-X Edital</a>
-        <a href="#pareto">02. Matriz de Pareto</a>
-        <a href="#planos">03. Planos & Checkout</a>
-        <a href="/login.html" style="color:var(--accent-red);">Área do Aluno ↗</a>
+        <a href="#dossie">01. RAIO-X DO EDITAL</a>
+        <a href="#pareto">02. MATRIZ DE PARETO</a>
+        <a href="#planos">03. PLANOS &amp; CHECKOUT</a>
+        <a href="/login.html" style="color:var(--accent-red);">04. ÁREA DO ALUNO ↗</a>
       </nav>
       <button type="button" class="mobile-menu-btn" id="mobile-toggle" onclick="toggleMenu()">[ ☰ MENU ]</button>
     </div>
