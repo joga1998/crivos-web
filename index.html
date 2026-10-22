@@ -2990,6 +2990,302 @@
     }
 </style>
 
+<!-- ==========================================
+     06. SEÇÃO DE DÚVIDAS FREQUENTES (FAQ) - LIGHT / DARK MODE
+     Cole logo abaixo do fechamento da #precos e antes do <footer>
+     ========================================== -->
+<style>
+    /* Variáveis Padrão (Modo Claro) */
+    .crivos-faq-section {
+        --faq-bg: var(--bg-primary, var(--bg, #F4F4F0));
+        --faq-surface: var(--bg-secondary, var(--surface, #FFFFFF));
+        --faq-surface-hover: #FAFAFA;
+        --faq-text: var(--text-primary, var(--text, #111111));
+        --faq-text-secondary: var(--text-secondary, #333333);
+        --faq-border: var(--border-color, var(--border, #111111));
+        --faq-divider: #E5E5E0;
+        --faq-shadow: #111111;
+        --faq-accent: #D92B2B;
+        --faq-tag-primary-bg: #111111;
+        --faq-tag-primary-text: #FFFFFF;
+        --faq-tag-secondary-bg: #FFFFFF;
+        --faq-icon-bg: #F4F4F0;
+        --faq-cta-bar-bg: #111111;
+        --faq-cta-bar-text: #FFFFFF;
+        --faq-cta-bar-sub: #CCCCCC;
+
+        background-color: var(--faq-bg);
+        color: var(--faq-text);
+        border-top: 2px solid var(--faq-border);
+        padding: 96px 24px;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    }
+
+    /* Variáveis para Modo Escuro (Compatível com seletores de tema e detecção automática) */
+    html.dark .crivos-faq-section,
+    body.dark .crivos-faq-section,
+    html.dark-mode .crivos-faq-section,
+    body.dark-mode .crivos-faq-section,
+    html[data-theme="dark"] .crivos-faq-section,
+    body[data-theme="dark"] .crivos-faq-section,
+    html[data-mode="dark"] .crivos-faq-section,
+    body[data-mode="dark"] .crivos-faq-section,
+    .crivos-faq-section.is-dark {
+        --faq-bg: var(--bg-primary, var(--bg, #0E0E0E));
+        --faq-surface: var(--bg-secondary, var(--surface, #161616));
+        --faq-surface-hover: #1E1E1E;
+        --faq-text: var(--text-primary, var(--text, #F4F4F0));
+        --faq-text-secondary: var(--text-secondary, #B5B5B0);
+        --faq-border: var(--border-color, var(--border, #333333));
+        --faq-divider: #262626;
+        --faq-shadow: #000000;
+        --faq-accent: #D92B2B;
+        --faq-tag-primary-bg: #F4F4F0;
+        --faq-tag-primary-text: #111111;
+        --faq-tag-secondary-bg: #161616;
+        --faq-icon-bg: #222222;
+        --faq-cta-bar-bg: #161616;
+        --faq-cta-bar-text: #F4F4F0;
+        --faq-cta-bar-sub: #A3A39E;
+    }
+
+    .crivos-faq-section * {
+        border-radius: 0px !important;
+        box-sizing: border-box;
+    }
+
+    .crivos-faq-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .crivos-faq-header {
+        margin-bottom: 56px;
+        border-bottom: 2px solid var(--faq-border);
+        padding-bottom: 32px;
+    }
+
+    .crivos-faq-meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+
+    .crivos-faq-tag-primary {
+        background-color: var(--faq-tag-primary-bg);
+        color: var(--faq-tag-primary-text);
+        padding: 6px 12px;
+        border: 1px solid var(--faq-border);
+    }
+
+    .crivos-faq-tag-secondary {
+        background-color: var(--faq-tag-secondary-bg);
+        color: var(--faq-accent);
+        padding: 6px 12px;
+        border: 1px solid var(--faq-border);
+    }
+
+    .crivos-faq-title {
+        font-size: clamp(28px, 4vw, 48px);
+        font-weight: 900;
+        line-height: 1.05;
+        letter-spacing: -0.04em;
+        text-transform: uppercase;
+        margin: 0 0 16px 0;
+        color: var(--faq-text);
+    }
+
+    .crivos-faq-subtitle {
+        font-size: 17px;
+        line-height: 1.6;
+        color: var(--faq-text-secondary);
+        max-width: 760px;
+        margin: 0;
+    }
+
+    .crivos-faq-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .crivos-faq-item {
+        background-color: var(--faq-surface);
+        border: 2px solid var(--faq-border);
+        box-shadow: 4px 4px 0px var(--faq-shadow);
+        transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .crivos-faq-item.is-active {
+        border-color: var(--faq-accent);
+        box-shadow: 6px 6px 0px var(--faq-accent);
+    }
+
+    .crivos-faq-trigger {
+        width: 100%;
+        background: none;
+        border: none;
+        padding: 24px 28px;
+        text-align: left;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        color: var(--faq-text);
+        font-family: inherit;
+        transition: background-color 0.15s ease;
+    }
+
+    .crivos-faq-trigger:hover {
+        background-color: var(--faq-surface-hover);
+    }
+
+    .crivos-faq-trigger-left {
+        display: flex;
+        align-items: baseline;
+        gap: 16px;
+    }
+
+    .crivos-faq-index {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--faq-accent);
+        flex-shrink: 0;
+    }
+
+    .crivos-faq-question {
+        font-size: clamp(16px, 2vw, 20px);
+        font-weight: 800;
+        line-height: 1.3;
+        letter-spacing: -0.02em;
+        text-transform: uppercase;
+        color: var(--faq-text);
+    }
+
+    .crivos-faq-icon {
+        width: 32px;
+        height: 32px;
+        border: 2px solid var(--faq-border);
+        background-color: var(--faq-icon-bg);
+        color: var(--faq-text);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 18px;
+        font-weight: 700;
+        flex-shrink: 0;
+        transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .crivos-faq-item.is-active .crivos-faq-icon {
+        background-color: var(--faq-accent);
+        border-color: var(--faq-accent);
+        color: #FFFFFF;
+    }
+
+    .crivos-faq-content {
+        display: none;
+        padding: 0 28px 28px 64px;
+        border-top: 1px solid var(--faq-divider);
+    }
+
+    .crivos-faq-item.is-active .crivos-faq-content {
+        display: block;
+    }
+
+    .crivos-faq-answer {
+        padding-top: 20px;
+        font-size: 16px;
+        line-height: 1.65;
+        color: var(--faq-text-secondary);
+        margin: 0;
+    }
+
+    .crivos-faq-answer strong {
+        color: var(--faq-text);
+        font-weight: 700;
+    }
+
+    .crivos-faq-footer-bar {
+        margin-top: 48px;
+        background-color: var(--faq-cta-bar-bg);
+        color: var(--faq-cta-bar-text);
+        border: 2px solid var(--faq-border);
+        box-shadow: 4px 4px 0px var(--faq-accent);
+        padding: 28px 32px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+    }
+
+    .crivos-faq-footer-text strong {
+        display: block;
+        font-size: 18px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: -0.02em;
+        margin-bottom: 4px;
+        color: var(--faq-cta-bar-text);
+    }
+
+    .crivos-faq-footer-text span {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 13px;
+        color: var(--faq-cta-bar-sub);
+    }
+
+    .crivos-faq-cta {
+        display: inline-block;
+        background-color: var(--faq-accent);
+        color: #FFFFFF;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        text-decoration: none;
+        padding: 14px 24px;
+        border: 2px solid #FFFFFF;
+        transition: transform 0.1s ease, background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .crivos-faq-cta:hover {
+        background-color: #FFFFFF;
+        color: #111111;
+    }
+
+    @media (max-width: 640px) {
+        .crivos-faq-section {
+            padding: 64px 16px;
+        }
+        .crivos-faq-trigger {
+            padding: 20px 18px;
+        }
+        .crivos-faq-content {
+            padding: 0 18px 20px 18px;
+        }
+        .crivos-faq-footer-bar {
+            padding: 24px 20px;
+        }
+        .crivos-faq-cta {
+            width: 100%;
+            text-align: center;
+        }
+    }
+</style>
+
 <section id="faq" class="crivos-faq-section" aria-labelledby="faq-heading">
     <div class="crivos-faq-container">
         <div class="crivos-faq-header">
@@ -3115,7 +3411,10 @@
 
 <script>
     (function () {
+        const faqSection = document.getElementById('faq');
         const faqItems = document.querySelectorAll('.crivos-faq-item');
+
+        // 1. Acordeão das perguntas
         faqItems.forEach((item) => {
             const trigger = item.querySelector('.crivos-faq-trigger');
             const icon = item.querySelector('.crivos-faq-icon');
@@ -3123,7 +3422,6 @@
             trigger.addEventListener('click', () => {
                 const isOpen = item.classList.contains('is-active');
 
-                // Fecha os demais itens para manter a leitura limpa
                 faqItems.forEach((otherItem) => {
                     otherItem.classList.remove('is-active');
                     const otherTrigger = otherItem.querySelector('.crivos-faq-trigger');
@@ -3132,7 +3430,6 @@
                     if (otherIcon) otherIcon.textContent = '+';
                 });
 
-                // Alterna o item clicado
                 if (!isOpen) {
                     item.classList.add('is-active');
                     trigger.setAttribute('aria-expanded', 'true');
@@ -3140,6 +3437,47 @@
                 }
             });
         });
+
+        // 2. Sincronização automática de Modo Claro / Escuro com o restante da página
+        function syncFaqTheme() {
+            if (!faqSection) return;
+            const root = document.documentElement;
+            const body = document.body;
+
+            const hasDarkAttr =
+                root.classList.contains('dark') ||
+                body.classList.contains('dark') ||
+                root.classList.contains('dark-mode') ||
+                body.classList.contains('dark-mode') ||
+                root.getAttribute('data-theme') === 'dark' ||
+                body.getAttribute('data-theme') === 'dark' ||
+                root.getAttribute('data-mode') === 'dark' ||
+                body.getAttribute('data-mode') === 'dark';
+
+            // Verifica também a luminância real do background do body caso o tema mude via JS/CSS variável
+            const bgColor = window.getComputedStyle(body).backgroundColor;
+            let isBodyDark = false;
+            const rgbMatch = bgColor.match(/\d+/g);
+            if (rgbMatch && rgbMatch.length >= 3) {
+                const r = parseInt(rgbMatch[0], 10);
+                const g = parseInt(rgbMatch[1], 10);
+                const b = parseInt(rgbMatch[2], 10);
+                const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+                isBodyDark = luminance < 0.35;
+            }
+
+            if (hasDarkAttr || isBodyDark) {
+                faqSection.classList.add('is-dark');
+            } else {
+                faqSection.classList.remove('is-dark');
+            }
+        }
+
+        syncFaqTheme();
+
+        const observer = new MutationObserver(syncFaqTheme);
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class', 'data-theme', 'data-mode', 'style'] });
+        observer.observe(document.body, { attributes: true, attributeFilter: ['class', 'data-theme', 'data-mode', 'style'] });
     })();
 </script>
         <!-- 12. FINAL CONVERSION BANNER -->
