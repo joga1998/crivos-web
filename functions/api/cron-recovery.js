@@ -56,6 +56,7 @@ async function handleRecovery(context) {
     }
 
     if (Array.isArray(pixOrders)) {
+      results.pixOrdersDetail = [];
       for (const order of pixOrders) {
         let notes = {};
         try {
@@ -64,14 +65,33 @@ async function handleRecovery(context) {
           notes = {};
         }
 
+        const debugInfo = {
+          orderId: order.id,
+          sentAlready: !!notes.pix_recovery_email_sent,
+          status: order.status,
+          hasEmail: !!order.email,
+          hasQrCode: !!notes.qr_code,
+          paymentId: order.payment_id
+        };
+        results.pixOrdersDetail.push(debugInfo);
+
         // Se já disparou o e-mail de recuperação de Pix, pula
-        if (notes.pix_recovery_email_sent) continue;
+        if (notes.pix_recovery_email_sent) {
+          debugInfo.skippedReason = 'already_sent';
+          continue;
+        }
 
         // Se a ordem já foi aprovada em outra verificação, pula
-        if (order.status !== 'pending') continue;
+        if (order.status !== 'pending') {
+          debugInfo.skippedReason = 'status_not_pending';
+          continue;
+        }
 
         const email = order.email;
-        if (!email || !email.includes('@')) continue;
+        if (!email || !email.includes('@')) {
+          debugInfo.skippedReason = 'invalid_email';
+          continue;
+        }
 
         const planKey = (order.plan_tier || 'tatico').toLowerCase();
         const planInfo = planTitles[planKey] || planTitles.tatico;
