@@ -828,6 +828,27 @@
     </div>
   </section>
 
+  
+  <!-- SEÇÃO 04: QUER SABER MAIS SOBRE NOSSOS PLANOS? -->
+  <section class="section" style="padding: 4rem 0 5rem; border-top: 2px solid var(--border-color); background: rgba(0,0,0,0.02);">
+    <div class="container" style="text-align: center;">
+      <div class="section-eyebrow" style="margin-bottom: 0.75rem;">■ COMPARAÇÃO COMPLETA & DEMONSTRAÇÃO AO VIVO</div>
+      <h2 class="section-title" style="margin-bottom: 1rem;">QUER CONHECER TODOS OS DETALHES DO ECOSSISTEMA CRIVOS?</h2>
+      <p style="color: var(--text-secondary); max-width: 780px; margin: 0 auto 2.5rem; font-size: 1.05rem; line-height: 1.6;">
+        Explore a anatomia profunda de cada módulo (cronograma dinâmico, motor SM-2, simulador de discursivas e caderno de erros), compare recursos lado a lado e teste o simulador ao vivo na página institucional.
+      </p>
+
+      <div style="display: flex; justify-content: center; gap: 1.25rem; flex-wrap: wrap;">
+        <a href="/#precos" class="btn btn-red" style="max-width: 320px; text-decoration: none;">
+          [ VER TABELA COMPARATIVA NA HOME ] →
+        </a>
+        <a href="/#demonstracao" class="btn btn-dark" style="max-width: 320px; text-decoration: none;">
+          [ TESTAR SIMULADOR AO VIVO ] ↗
+        </a>
+      </div>
+    </div>
+  </section>
+
   <!-- FOOTER -->
   
   <!-- FOOTER -->
@@ -906,45 +927,159 @@
       }
     });
 
-    // 3. CANVAS DE COORDENADAS INTERATIVO
+    // 3. CANVAS DE COORDENADAS INTERATIVO COM NÓS E TELEMETRIA
     const canvas = document.getElementById('coord-canvas');
     if (canvas) {
       const ctx = canvas.getContext('2d');
       let width = window.innerWidth;
       let height = window.innerHeight;
+      let dpr = 1;
+      let pulseAngle = 0;
+      const pointer = { x: 0, y: 0, active: false };
 
-      function resize() {
+      function setCanvasSize() {
         width = window.innerWidth;
         height = window.innerHeight;
-        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
         canvas.width = width * dpr;
         canvas.height = height * dpr;
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       }
-      resize();
-      window.addEventListener('resize', resize);
 
-      const dots = [];
-      const step = 48;
-      for (let x = 24; x < 2400; x += step) {
-        for (let y = 24; y < 1600; y += step) {
-          dots.push({ x, y, baseAlpha: 0.12 });
+      let nodes = [];
+      function initNodes() {
+        setCanvasSize();
+        nodes = [];
+        const isMobile = width < 768;
+        const densityDivisor = isMobile ? 12000 : 16000;
+        const count = Math.max(32, Math.min(85, Math.floor((width * height) / densityDivisor)));
+        const speed = isMobile ? 0.32 : 0.44;
+
+        for (let i = 0; i < count; i++) {
+          const isMajor = Math.random() > 0.8;
+          nodes.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            vx: (Math.random() - 0.5) * speed,
+            vy: (Math.random() - 0.5) * speed,
+            size: isMajor ? 3.5 : 2.2,
+            isMajor: isMajor
+          });
         }
       }
 
-      function draw() {
-        ctx.clearRect(0, 0, width, height);
-        const dark = document.documentElement.getAttribute('data-theme') === 'dark';
-        ctx.fillStyle = dark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.12)';
+      initNodes();
 
-        for (let i = 0; i < dots.length; i++) {
-          const d = dots[i];
-          if (d.x < width && d.y < height) {
-            ctx.fillRect(d.x, d.y, 1.5, 1.5);
+      let resizeTimer = null;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => { initNodes(); }, 120);
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        pointer.x = e.clientX;
+        pointer.y = e.clientY;
+        pointer.active = true;
+      }, { passive: true });
+
+      window.addEventListener('mouseleave', () => { pointer.active = false; }, { passive: true });
+
+      window.addEventListener('touchstart', (e) => {
+        if (e.touches && e.touches[0]) {
+          pointer.x = e.touches[0].clientX;
+          pointer.y = e.touches[0].clientY;
+          pointer.active = true;
+        }
+      }, { passive: true });
+
+      window.addEventListener('touchmove', (e) => {
+        if (e.touches && e.touches[0]) {
+          pointer.x = e.touches[0].clientX;
+          pointer.y = e.touches[0].clientY;
+          pointer.active = true;
+        }
+      }, { passive: true });
+
+      window.addEventListener('touchend', () => { pointer.active = false; }, { passive: true });
+
+      function renderCanvas() {
+        ctx.clearRect(0, 0, width, height);
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const isMobile = width < 768;
+
+        const gridStroke = isDark ? 'rgba(242, 242, 238, 0.065)' : 'rgba(17, 17, 17, 0.085)';
+        const nodeFill = isDark ? 'rgba(242, 242, 238, 0.45)' : 'rgba(17, 17, 17, 0.38)';
+        const majorNodeFill = '#D92B2B';
+
+        // Malha arquitetural
+        const step = isMobile ? 44 : 64;
+        ctx.strokeStyle = gridStroke;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        for (let x = 0; x <= width; x += step) {
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, height);
+        }
+        for (let y = 0; y <= height; y += step) {
+          ctx.moveTo(0, y);
+          ctx.lineTo(width, y);
+        }
+        ctx.stroke();
+
+        // Ponto focal autônomo / radar vermelho
+        pulseAngle += 0.012;
+        const focalX = pointer.active ? pointer.x : width * 0.5 + Math.cos(pulseAngle) * (width * 0.28);
+        const focalY = pointer.active ? pointer.y : height * 0.45 + Math.sin(pulseAngle * 0.8) * (height * 0.25);
+        const connectDist = isMobile ? 125 : 160;
+        const focalDist = isMobile ? 165 : 220;
+
+        for (let i = 0; i < nodes.length; i++) {
+          const n = nodes[i];
+          n.x += n.vx;
+          n.y += n.vy;
+
+          if (n.x < 0 || n.x > width) n.vx *= -1;
+          if (n.y < 0 || n.y > height) n.vy *= -1;
+
+          ctx.fillStyle = n.isMajor ? majorNodeFill : nodeFill;
+          ctx.fillRect(n.x - n.size / 2, n.y - n.size / 2, n.size, n.size);
+
+          // Conecta nós próximos
+          for (let j = i + 1; j < nodes.length; j++) {
+            const n2 = nodes[j];
+            const dx = n.x - n2.x;
+            const dy = n.y - n2.y;
+            const dist = Math.hypot(dx, dy);
+            if (dist < connectDist) {
+              const alpha = (1 - dist / connectDist) * (isDark ? 0.26 : 0.22);
+              ctx.strokeStyle = isDark ? `rgba(242, 242, 238, ${alpha})` : `rgba(17, 17, 17, ${alpha})`;
+              ctx.lineWidth = 1;
+              ctx.beginPath();
+              ctx.moveTo(n.x, n.y);
+              ctx.lineTo(n2.x, n2.y);
+              ctx.stroke();
+            }
+          }
+
+          // Conecta ao cursor ou onda de telemetria vermelha
+          const fdx = n.x - focalX;
+          const fdy = n.y - focalY;
+          const fdist = Math.hypot(fdx, fdy);
+          if (fdist < focalDist) {
+            const fAlpha = (1 - fdist / focalDist) * (pointer.active ? 0.75 : 0.42);
+            ctx.strokeStyle = `rgba(217, 43, 43, ${fAlpha})`;
+            ctx.lineWidth = pointer.active && fdist < (focalDist * 0.45) ? 1.5 : 1;
+            ctx.beginPath();
+            ctx.moveTo(n.x, n.y);
+            ctx.lineTo(focalX, focalY);
+            ctx.stroke();
           }
         }
-        requestAnimationFrame(draw);
+
+        requestAnimationFrame(renderCanvas);
       }
+      requestAnimationFrame(renderCanvas);
+    }
       requestAnimationFrame(draw);
     }
   </script>
