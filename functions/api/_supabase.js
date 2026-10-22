@@ -233,7 +233,7 @@ export function renderEmailCredentials({ email, password, planTitle, planTier, c
         <!-- Bloco Exclusivo: CRIVOS PRIME // Upload de Materiais -->
         <div style="background:#FEF2F2;border:2px solid #D92B2B;padding:16px;margin-bottom:24px;box-shadow:3px 3px 0px #D92B2B;">
           <div style="font-family:'Courier New',Courier,monospace;font-size:12px;font-weight:900;color:#D92B2B;margin-bottom:8px;text-transform:uppercase;">
-            ■ PASSO OBRIGATÓRIO // UPLOAD DOS SEUS MATERIAIS PESSOAIS
+            ■ PASSO OBRIGATÓRIO // UPLOAD DOS SEUS MATERIAIS PESSOAIS (ATÉ 48H)
           </div>
           <p style="font-size:12px;line-height:1.6;color:#111111;margin:0 0 10px 0;">
             Como membro do <strong>CRIVOS PRIME</strong>, nossa engenharia vai ancorar seu cronograma e fichas diretamente nos seus próprios materiais.
@@ -241,7 +241,8 @@ export function renderEmailCredentials({ email, password, planTitle, planTier, c
           <div style="font-family:'Courier New',Courier,monospace;font-size:11px;color:#222222;line-height:1.7;background:#FFFFFF;padding:10px;border:1px solid #D92B2B;">
             1. Acesse seu painel abaixo com sua senha temporária.<br>
             2. Entre na aba <strong>[09 · ARQUIVOS]</strong> no menu lateral.<br>
-            3. Faça o upload dos seus PDFs, apostilas ou resumos.<br>
+            3. Faça o upload dos seus PDFs, apostilas ou resumos (o ideal é enviar tudo em até <strong>48 horas</strong>).<br>
+            4. Ao terminar, clique no botão <strong>[ FINALIZAR ENVIO DE MATERIAIS ]</strong> para acionar nossa equipe.<br>
             <em>*Arquivos pesados acima de 25MB ou pastas inteiras do Google Drive? Acione nosso suporte prioritário na aba 11.</em>
           </div>
         </div>
@@ -253,7 +254,7 @@ export function renderEmailCredentials({ email, password, planTitle, planTier, c
           <strong style="color:#D92B2B;font-family:'Courier New',Courier,monospace;display:block;margin-bottom:6px;font-size:12px;">
             [ STATUS ATUAL: AGUARDANDO UPLOAD DE ARQUIVOS PARA CALIBRAÇÃO ]
           </strong>
-          Seu painel já está aberto e com a aba <strong>[09 · ARQUIVOS]</strong> liberada. A calibração sob medida do seu cronograma e das suas metas se inicia imediatamente após você anexar seus materiais no painel. Assim que o upload for feito e o sistema concluído pela engenharia, você receberá a confirmação de liberação definitiva.
+          Seu painel já está aberto e com a aba <strong>[09 · ARQUIVOS]</strong> liberada. O ideal é subir todos os seus materiais em até <strong>48 horas</strong> pós-compra. Ao concluir seus uploads, clique em <strong>[ FINALIZAR ENVIO DE MATERIAIS ]</strong> para que nossa engenharia inicie a ancoragem sob demanda. Você receberá a confirmação assim que o sistema for liberado.
         </div>
   ` : `
         <!-- Alerta de Prazo de Calibração Padrão -->
