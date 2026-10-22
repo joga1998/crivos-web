@@ -2577,101 +2577,125 @@
 
                 
                 
-                <div class="pricing-slider-wrapper">
-                    <!-- Seletor Tático de Abas de Planos -->
-                    <div class="pricing-nav-bar" id="pricing-nav">
-                        <button type="button" class="pricing-tab-btn" onclick="goToPlan(0)">[ 01 · TÁTICO ]</button>
-                        <button type="button" class="pricing-tab-btn active" onclick="goToPlan(1)">[ 02 · ARSENAL ★ ]</button>
-                        <button type="button" class="pricing-tab-btn" onclick="goToPlan(2)">[ 03 · ELITE ]</button>
-                        <button type="button" class="pricing-tab-btn" onclick="goToPlan(3)">[ 04 · PRIME ]</button>
+                
+                <div class="pricing-slider-container">
+                    <!-- Seletor Tático por Abas -->
+                    <div class="pricing-nav-switcher" id="pricing-switcher">
+                        <button type="button" class="pricing-switch-btn" onclick="setPlanSlide(0)">01 · TÁTICO</button>
+                        <button type="button" class="pricing-switch-btn active" onclick="setPlanSlide(1)">02 · ARSENAL ★</button>
+                        <button type="button" class="pricing-switch-btn" onclick="setPlanSlide(2)">03 · ELITE</button>
+                        <button type="button" class="pricing-switch-btn" onclick="setPlanSlide(3)">04 · PRIME</button>
                     </div>
 
-                    <!-- Botões de Navegação Lateral -->
-                    <button type="button" class="slider-arrow-btn prev" aria-label="Plano Anterior" onclick="slidePlans(-1)">‹</button>
-                    <button type="button" class="slider-arrow-btn next" aria-label="Próximo Plano" onclick="slidePlans(1)">›</button>
-
-                    <div class="pricing-track-container" id="pricing-track">
-                        <div class="pricing-grid">
-                            <!-- NÍVEL 1: TÁTICO -->
-                            <div class="price-card reveal-card" data-plan-index="0">
-                                <div>
-                                    <div class="price-tier-label">NÍVEL 01 // ESSENCIAL</div>
-                                    <h3 class="price-tier-title">CRIVOS TÁTICO</h3>
-                                    <div class="price-value-box">
-                                        <div class="price-amount"><small>R$</small> 67</div>
-                                        <div class="price-payment-note">PAGAMENTO ÚNICO // ENTREGA EM ATÉ 24H</div>
+                    <!-- Janela do Slide -->
+                    <div class="pricing-viewport">
+                        <div class="pricing-slides-track" id="pricing-track">
+                            
+                            <!-- SLIDE 1: TÁTICO -->
+                            <div class="pricing-slide-item">
+                                <div class="price-card">
+                                    <div>
+                                        <div class="price-tier-label">NÍVEL 01 // ESSENCIAL</div>
+                                        <h3 class="price-tier-title">CRIVOS TÁTICO</h3>
+                                        <div class="price-value-box">
+                                            <div class="price-amount"><small>R$</small> 67</div>
+                                            <div class="price-payment-note">PAGAMENTO ÚNICO // ENTREGA EM ATÉ 24H</div>
+                                        </div>
+                                        <ul class="price-features">
+                                            <li><span class="check-sq">[✓]</span> <span><strong>Raio-X Estatístico do Edital</strong> com matriz de pesos</span></li>
+                                            <li><span class="check-sq">[✓]</span> <span><strong>Cronograma Diário Elástico</strong> até o dia da prova</span></li>
+                                            <li><span class="check-sq">[✓]</span> <span><strong>Guia de Estudos em PDF A4</strong> definitivo</span></li>
+                                            <li><span class="check-sq">[✓]</span> <span><strong>Timer Pomodoro Integrado</strong> e rastreador de progresso</span></li>
+                                            <li><span class="check-sq">[✓]</span> <span><strong>Garantia de 7 Dias Grátis</strong> de calibração de rota</span></li>
+                                        </ul>
                                     </div>
-                                    <ul class="price-features">
-                                        <li><span class="check-sq">[✓]</span> <span><strong>Raio-X Estatístico do Edital</strong> com matriz de pesos e prioridades</span></li>
-                                        <li><span class="check-sq">[✓]</span> <span><strong>Cronograma Diário Elástico</strong> calculado até o dia da sua prova</span></li>
-                                        <li><span class="check-sq">[✓]</span> <span><strong>Guia de Estudos em PDF A4</strong> definitivo para leitura e impressão</span></li>
-                                        <li><span class="check-sq">[✓]</span> <span><strong>Timer Pomodoro Integrado</strong> e rastreador de progresso por tópico</span></li>
-                                        <li><span class="check-sq">[✓]</span> <span><strong>Garantia de 7 Dias Grátis</strong> de calibração e ajuste de carga</span></li>
-                                    </ul>
+                                    <a href="/payment.html?produto=tatico" class="btn btn-secondary" style="width: 100%;">Escolher Nível Tático →</a>
                                 </div>
-                                <a href="/payment.html?produto=tatico" class="btn btn-secondary" style="width: 100%;">Escolher Nível Tático →</a>
                             </div>
 
-                            <!-- NÍVEL 2: ARSENAL (DESTAQUE) -->
-                            <div class="price-card featured reveal-card" data-plan-index="1">
-                                <div class="featured-ribbon">MAIS ESCOLHIDO</div>
-                                <div>
-                                    <div class="price-tier-label">NÍVEL 02 // RETENÇÃO ATIVA</div>
-                                    <h3 class="price-tier-title">CRIVOS ARSENAL</h3>
-                                    <div class="price-value-box">
-                                        <div class="price-amount"><small>R$</small> 124</div>
-                                        <div class="price-payment-note">BASE TÁTICO + R$ 57 // ENTREGA EM ATÉ 24H</div>
+                            <!-- SLIDE 2: ARSENAL -->
+                            <div class="pricing-slide-item">
+                                <div class="price-card featured">
+                                    <div class="featured-ribbon">MAIS ESCOLHIDO</div>
+                                    <div>
+                                        <div class="price-tier-label">NÍVEL 02 // RETENÇÃO ATIVA</div>
+                                        <h3 class="price-tier-title">CRIVOS ARSENAL</h3>
+                                        <div class="price-value-box">
+                                            <div class="price-amount"><small>R$</small> 124</div>
+                                            <div class="price-payment-note">BASE TÁTICO + R$ 57 // ENTREGA EM ATÉ 24H</div>
+                                        </div>
+                                        <ul class="price-features">
+                                            <li><span class="check-sq">[✓]</span> <span><strong>Tudo do Nível Tático</strong> (Cronograma + Raio-X + Guia PDF)</span></li>
+                                            <li><span class="check-sq">[+]</span> <span><strong>Decks de Flashcards SM-2</strong> com pico na véspera</span></li>
+                                            <li><span class="check-sq">[+]</span> <span><strong>Resumos Direcionados</strong> integrados ao painel</span></li>
+                                            <li><span class="check-sq">[+]</span> <span><strong>Caderno de Erros Inteligente</strong> para pontos cegos</span></li>
+                                            <li><span class="check-sq">[+]</span> <span><strong>Simulados Diagnósticos</strong> no padrão da banca</span></li>
+                                        </ul>
                                     </div>
-                                    <ul class="price-features">
-                                        <li><span class="check-sq">[✓]</span> <span><strong>Tudo do Nível Tático</strong> (Cronograma + Raio-X + Guia PDF)</span></li>
-                                        <li><span class="check-sq">[+]</span> <span><strong>Decks de Flashcards SM-2</strong> pré-carregados com pico de retenção na véspera</span></li>
-                                        <li><span class="check-sq">[+]</span> <span><strong>Resumos Direcionados de Alta Incidência</strong> integrados ao painel</span></li>
-                                        <li><span class="check-sq">[+]</span> <span><strong>Caderno de Erros Inteligente</strong> para auditoria de pontos cegos</span></li>
-                                        <li><span class="check-sq">[+]</span> <span><strong>Simulados Diagnósticos</strong> calibrados no padrão da sua banca</span></li>
-                                    </ul>
+                                    <a href="/payment.html?produto=arsenal" class="btn btn-primary" style="width: 100%;">Escolher Nível Arsenal →</a>
                                 </div>
-                                <a href="/payment.html?produto=arsenal" class="btn btn-primary" style="width: 100%;">Escolher Nível Arsenal →</a>
                             </div>
 
-                            <!-- NÍVEL 3: ELITE -->
-                            <div class="price-card reveal-card" data-plan-index="2">
-                                <div>
-                                    <div class="price-tier-label">NÍVEL 03 // PREPARAÇÃO TOTAL</div>
-                                    <h3 class="price-tier-title">CRIVOS ELITE</h3>
-                                    <div class="price-value-box">
-                                        <div class="price-amount"><small>R$</small> 221</div>
-                                        <div class="price-payment-note">ARSENAL + R$ 97 // ENTREGA EXPRESSA EM ATÉ 6H</div>
+                            <!-- SLIDE 3: ELITE -->
+                            <div class="pricing-slide-item">
+                                <div class="price-card">
+                                    <div>
+                                        <div class="price-tier-label">NÍVEL 03 // PREPARAÇÃO TOTAL</div>
+                                        <h3 class="price-tier-title">CRIVOS ELITE</h3>
+                                        <div class="price-value-box">
+                                            <div class="price-amount"><small>R$</small> 221</div>
+                                            <div class="price-payment-note">ARSENAL + R$ 97 // ENTREGA EXPRESSA EM ATÉ 6H</div>
+                                        </div>
+                                        <ul class="price-features">
+                                            <li><span class="check-sq">[✓]</span> <span><strong>Tudo dos Níveis Tático e Arsenal</strong></span></li>
+                                            <li><span class="check-sq">[+]</span> <span><strong>Fila de Prioridade Máxima:</strong> entrega expressa em até 6h</span></li>
+                                            <li><span class="check-sq">[+]</span> <span><strong>Módulo de Discursivas e Redação</strong> com esqueletos</span></li>
+                                            <li><span class="check-sq">[+]</span> <span><strong>1 Recalibração Extra de Rota</strong> gratuita</span></li>
+                                            <li><span class="check-sq">[+]</span> <span><strong>Mapeamento de Tópicos Polêmicos</strong> da banca</span></li>
+                                        </ul>
                                     </div>
-                                    <ul class="price-features">
-                                        <li><span class="check-sq">[✓]</span> <span><strong>Tudo dos Níveis Tático e Arsenal</strong></span></li>
-                                        <li><span class="check-sq">[+]</span> <span><strong>Fila de Prioridade Máxima:</strong> entrega expressa em até 6 horas</span></li>
-                                        <li><span class="check-sq">[+]</span> <span><strong>Módulo de Discursivas e Redação</strong> com repertório e esqueletos de resposta</span></li>
-                                        <li><span class="check-sq">[+]</span> <span><strong>1 Recalibração Extra de Rota</strong> gratuita a qualquer momento até a prova</span></li>
-                                        <li><span class="check-sq">[+]</span> <span><strong>Mapeamento de Tópicos Polêmicos</strong> e jurisprudência da banca</span></li>
-                                    </ul>
+                                    <a href="/payment.html?produto=elite" class="btn btn-dark" style="width: 100%;">Escolher Nível Elite →</a>
                                 </div>
-                                <a href="/payment.html?produto=elite" class="btn btn-dark" style="width: 100%;">Escolher Nível Elite →</a>
                             </div>
 
-                            <!-- NÍVEL 4: PRIME -->
-                            <div class="price-card reveal-card" data-plan-index="3" style="border-color: #111111; background: var(--bg-surface);">
-                                <div>
-                                    <div class="price-tier-label" style="color: var(--accent-red);">NÍVEL 04 // MÁXIMA PERSONALIZAÇÃO</div>
-                                    <h3 class="price-tier-title">CRIVOS PRIME</h3>
-                                    <div class="price-value-box">
-                                        <div class="price-amount"><small>R$</small> 288</div>
-                                        <div class="price-payment-note">ELITE + INTEGRAÇÃO DOS SEUS MATERIAIS</div>
+                            <!-- SLIDE 4: PRIME -->
+                            <div class="pricing-slide-item">
+                                <div class="price-card" style="border-color: #111111;">
+                                    <div>
+                                        <div class="price-tier-label" style="color: var(--accent-red);">NÍVEL 04 // MÁXIMA PERSONALIZAÇÃO</div>
+                                        <h3 class="price-tier-title">CRIVOS PRIME</h3>
+                                        <div class="price-value-box">
+                                            <div class="price-amount"><small>R$</small> 288</div>
+                                            <div class="price-payment-note">ELITE + INTEGRAÇÃO DOS SEUS MATERIAIS</div>
+                                        </div>
+                                        <ul class="price-features">
+                                            <li><span class="check-sq">[✓]</span> <span><strong>Tudo do Nível Elite</strong> (Discursivas, Fila 6h, SM-2)</span></li>
+                                            <li><span class="check-sq">[+]</span> <span><strong>Integração de Materiais:</strong> envie seus próprios PDFs no painel</span></li>
+                                            <li><span class="check-sq">[+]</span> <span><strong>Cronograma 100% Ancorado:</strong> metas citando suas apostilas</span></li>
+                                            <li><span class="check-sq">[+]</span> <span><strong>Suporte Individual Direto</strong> para acompanhamento</span></li>
+                                        </ul>
                                     </div>
-                                    <ul class="price-features">
-                                        <li><span class="check-sq">[✓]</span> <span><strong>Tudo do Nível Elite</strong> (Discursivas, Fila 6h, SM-2)</span></li>
-                                        <li><span class="check-sq">[+]</span> <span><strong>Integração de Materiais Pessoais:</strong> envie suas apostilas, PDFs ou resumos pelo painel</span></li>
-                                        <li><span class="check-sq">[+]</span> <span><strong>Cronograma 100% Ancorado:</strong> nossa engenharia cita as páginas e capítulos do seu material</span></li>
-                                        <li><span class="check-sq">[+]</span> <span><strong>Suporte Individual Direto</strong> para acompanhamento de rotina</span></li>
-                                    </ul>
+                                    <a href="/payment.html?produto=prime" class="btn btn-primary" style="width: 100%; background: #111111; color: #FFFFFF; border: 2px solid #111111;">Escolher Nível Prime →</a>
                                 </div>
-                                <a href="/payment.html?produto=prime" class="btn btn-primary" style="width: 100%; background: #111111; color: #FFFFFF; border: 2px solid #111111;">Escolher Nível Prime →</a>
                             </div>
+
                         </div>
+                    </div>
+
+                    <!-- Linha de Controles (Setas e Indicadores) -->
+                    <div class="pricing-controls-row">
+                        <button type="button" class="pricing-arrow-btn" id="btn-prev-plan" onclick="stepPlanSlide(-1)">
+                            ← ANTERIOR
+                        </button>
+                        <div class="pricing-dots" id="pricing-dots">
+                            <span class="pricing-dot" onclick="setPlanSlide(0)"></span>
+                            <span class="pricing-dot active" onclick="setPlanSlide(1)"></span>
+                            <span class="pricing-dot" onclick="setPlanSlide(2)"></span>
+                            <span class="pricing-dot" onclick="setPlanSlide(3)"></span>
+                        </div>
+                        <button type="button" class="pricing-arrow-btn" id="btn-next-plan" onclick="stepPlanSlide(1)">
+                            PRÓXIMO →
+                        </button>
                     </div>
                 </div>
 
@@ -3386,62 +3410,44 @@ setTimeout(() => {
   try { fetch('/api/cron-recovery').catch(() => {}); } catch(e) {}
 }, 3000);
 
-        // Controle de Navegação Tática do Slider de Planos
-        let activePlanIdx = 1; // Default no Arsenal (Destaque)
-        function goToPlan(index) {
-            const track = document.getElementById('pricing-track');
-            const btns = document.querySelectorAll('.pricing-tab-btn');
-            const cards = document.querySelectorAll('.price-card');
-            
-            if (index < 0) index = 0;
-            if (index >= cards.length) index = cards.length - 1;
-            activePlanIdx = index;
+        
+        // Slider de Planos Oficial CRIVOS
+        let currentPlanSlide = 1; // Padrão: Arsenal (Destaque)
 
+        function setPlanSlide(idx) {
+            if (idx < 0) idx = 0;
+            if (idx > 3) idx = 3;
+            currentPlanSlide = idx;
+
+            const track = document.getElementById('pricing-track');
+            if (track) {
+                track.style.transform = 'translateX(-' + (idx * 25) + '%)';
+            }
+
+            const btns = document.querySelectorAll('.pricing-switch-btn');
             btns.forEach((b, i) => {
-                if (i === index) b.classList.add('active');
+                if (i === idx) b.classList.add('active');
                 else b.classList.remove('active');
             });
 
-            if (track && cards[index]) {
-                const targetCard = cards[index];
-                const scrollLeft = targetCard.offsetLeft - track.offsetLeft - (track.clientWidth - targetCard.clientWidth) / 2;
-                track.scrollTo({ left: Math.max(0, scrollLeft), behavior: 'smooth' });
-            }
+            const dots = document.querySelectorAll('.pricing-dot');
+            dots.forEach((d, i) => {
+                if (i === idx) d.classList.add('active');
+                else d.classList.remove('active');
+            });
+
+            const prevBtn = document.getElementById('btn-prev-plan');
+            const nextBtn = document.getElementById('btn-next-plan');
+            if (prevBtn) prevBtn.disabled = (idx === 0);
+            if (nextBtn) nextBtn.disabled = (idx === 3);
         }
 
-        function slidePlans(direction) {
-            goToPlan(activePlanIdx + direction);
+        function stepPlanSlide(step) {
+            setPlanSlide(currentPlanSlide + step);
         }
 
-        // Listener de scroll para atualizar botões de abas no swipe móvel
         document.addEventListener('DOMContentLoaded', () => {
-            const track = document.getElementById('pricing-track');
-            if (track) {
-                let scrollTimeout;
-                track.addEventListener('scroll', () => {
-                    clearTimeout(scrollTimeout);
-                    scrollTimeout = setTimeout(() => {
-                        const cards = document.querySelectorAll('.price-card');
-                        const center = track.scrollLeft + track.clientWidth / 2;
-                        let closestIdx = 0;
-                        let minDiff = Infinity;
-                        cards.forEach((card, idx) => {
-                            const cardCenter = card.offsetLeft + card.clientWidth / 2;
-                            const diff = Math.abs(center - cardCenter);
-                            if (diff < minDiff) {
-                                minDiff = diff;
-                                closestIdx = idx;
-                            }
-                        });
-                        const btns = document.querySelectorAll('.pricing-tab-btn');
-                        btns.forEach((b, i) => {
-                            if (i === closestIdx) b.classList.add('active');
-                            else b.classList.remove('active');
-                        });
-                        activePlanIdx = closestIdx;
-                    }, 50);
-                });
-            }
+            setPlanSlide(1);
         });
 
     </script>
