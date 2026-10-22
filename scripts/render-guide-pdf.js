@@ -384,7 +384,7 @@ async function renderPdf(inputPath, outputPdfPath, customTitle) {
         const weekday = m[2].trim();
         const load = m[3].trim();
         const desc = m[4].replace(/\r?\n\s*/g, ' ').replace(/\|/g, '-').trim();
-        table += `| **${date}** | ${weekday} | `${load}` | ${desc} |\n`;
+        table += '| **' + date + '** | ' + weekday + ' | ' + load + ' | ' + desc + ' |\n';
       }
       return table + '\n';
     });

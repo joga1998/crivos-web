@@ -212,10 +212,18 @@ async function main() {
 
           // Inferir categoria básica
           let category = 'material';
+          let priority = 'ESSENCIAL';
           const lower = filename.toLowerCase();
-          if (lower.includes('edital')) category = 'edital';
-          else if (lower.includes('simulado') || lower.includes('prova')) category = 'simulado';
-          else if (lower.includes('bibliografia') || lower.includes('texto')) category = 'bibliografia';
+          if (lower.includes('dossie') || lower.includes('dossiê') || lower.includes('d-7') || lower.includes('pegadinha')) {
+            category = 'material';
+            priority = 'CRÍTICO';
+          } else if (lower.includes('edital')) {
+            category = 'edital';
+          } else if (lower.includes('simulado') || lower.includes('prova')) {
+            category = 'simulado';
+          } else if (lower.includes('bibliografia') || lower.includes('texto')) {
+            category = 'bibliografia';
+          }
 
           uploadedFiles.push({
             filename: filename,
@@ -223,6 +231,7 @@ async function main() {
             storage_path: `user-materials/${storagePath}`,
             storage_url: publicUrl,
             category: category,
+            priority: priority,
             file_size_bytes: stat.size
           });
           console.log(`    ✓ Upload concluído: ${publicUrl}`);
