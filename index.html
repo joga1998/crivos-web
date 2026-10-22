@@ -1617,24 +1617,136 @@
             line-height: 1.65;
         }
 
+        
         /* ==========================================================================
-           12. TABELA DE PLANOS E INVESTIMENTO (#precos)
+           12. TABELA DE PLANOS // SLIDER BRUTALISTA (#precos)
            ========================================================================== */
-        .pricing-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.85rem;
-            align-items: stretch;
+        .pricing-slider-container {
+            max-width: 560px !important;
+            margin: 0 auto !important;
+            position: relative !important;
+            width: 100% !important;
         }
-        @media (max-width: 1100px) {
-            .pricing-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
+
+        .pricing-nav-switcher {
+            display: grid !important;
+            grid-template-columns: repeat(4, 1fr) !important;
+            gap: 6px !important;
+            margin-bottom: 1.5rem !important;
+            background: var(--bg-surface) !important;
+            padding: 6px !important;
+            border: 2px solid var(--border-color) !important;
+            box-shadow: 4px 4px 0px var(--border-color) !important;
         }
-        @media (max-width: 640px) {
-            .pricing-grid {
-                grid-template-columns: 1fr;
-            }
+
+        .pricing-switch-btn {
+            background: transparent !important;
+            border: 1px solid transparent !important;
+            color: var(--text-secondary) !important;
+            font-family: var(--font-mono) !important;
+            font-size: 0.75rem !important;
+            font-weight: 800 !important;
+            padding: 10px 4px !important;
+            cursor: pointer !important;
+            text-align: center !important;
+            transition: all 0.15s ease !important;
+            text-transform: uppercase !important;
+        }
+
+        .pricing-switch-btn:hover {
+            color: var(--text-primary) !important;
+            background: rgba(0, 0, 0, 0.05) !important;
+        }
+
+        .pricing-switch-btn.active {
+            background: #111111 !important;
+            color: #FFFFFF !important;
+            border: 1px solid #111111 !important;
+            box-shadow: 2px 2px 0px var(--accent-red) !important;
+        }
+
+        .pricing-viewport {
+            overflow: hidden !important;
+            width: 100% !important;
+            position: relative !important;
+            padding: 8px 4px 16px 4px !important;
+            box-sizing: border-box !important;
+        }
+
+        .pricing-slides-track {
+            display: flex !important;
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            width: 400% !important;
+            will-change: transform !important;
+        }
+
+        .pricing-slide-item {
+            width: 25% !important;
+            padding: 0 4px !important;
+            box-sizing: border-box !important;
+            flex-shrink: 0 !important;
+        }
+
+        .pricing-controls-row {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            margin-top: 1.25rem !important;
+            gap: 12px !important;
+        }
+
+        .pricing-arrow-btn {
+            background: #111111 !important;
+            color: #FFFFFF !important;
+            border: 2px solid #111111 !important;
+            font-family: var(--font-mono) !important;
+            font-size: 0.82rem !important;
+            font-weight: 900 !important;
+            padding: 10px 16px !important;
+            cursor: pointer !important;
+            box-shadow: 3px 3px 0px var(--accent-red) !important;
+            transition: all 0.15s ease !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            text-transform: uppercase !important;
+        }
+
+        .pricing-arrow-btn:hover {
+            transform: translate(-1px, -1px) !important;
+            box-shadow: 4px 4px 0px #111111 !important;
+            background: var(--accent-red) !important;
+            border-color: var(--accent-red) !important;
+        }
+
+        .pricing-arrow-btn:disabled {
+            opacity: 0.35 !important;
+            cursor: not-allowed !important;
+            transform: none !important;
+            box-shadow: none !important;
+            background: #777777 !important;
+            border-color: #777777 !important;
+        }
+
+        .pricing-dots {
+            display: flex !important;
+            gap: 8px !important;
+            align-items: center !important;
+        }
+
+        .pricing-dot {
+            width: 10px !important;
+            height: 10px !important;
+            background: #CCCCCC !important;
+            border: 1px solid #111111 !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            display: inline-block !important;
+        }
+
+        .pricing-dot.active {
+            background: var(--accent-red) !important;
+            width: 26px !important;
         }
 
 
