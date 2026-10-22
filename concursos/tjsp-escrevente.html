@@ -578,9 +578,12 @@
       color: #FFFFFF;
       font-family: var(--font-mono);
       font-size: 0.75rem;
-      padding: 0.65rem 0;
+      padding: 0.75rem 0;
       border-bottom: 2px solid #111111;
       font-weight: 700;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
     .topbar-flex {
       display: flex;
@@ -628,31 +631,9 @@
       </div>
     </aside>
 
-    <!-- HEADER -->
-  <header class="header">
-    <div class="container header-flex">
-      <a href="/" class="brand-logo">
-        <span class="brand-sq"></span>
-        <span class="brand-name">CRIVOS</span>
-        <span class="brand-concurso">// TJSP 2026/2027</span>
-      </a>
-      <nav class="header-nav">
-        <a href="#dossie">01. RAIO-X DO EDITAL</a>
-        <a href="#pareto">02. MATRIZ DE PARETO</a>
-        <a href="#planos">03. PLANOS &amp; CHECKOUT</a>
-        <a href="/login.html" style="color:var(--accent-red);">04. ÁREA DO ALUNO ↗</a>
-      </nav>
-      <button type="button" class="mobile-menu-btn" id="mobile-toggle" onclick="toggleMenu()">[ ☰ MENU ]</button>
-    </div>
-  </header>
+    
 
-  <!-- MOBILE DRAWER -->
-  <nav id="mobile-drawer" class="mobile-drawer">
-    <a href="#dossie" onclick="toggleMenu()">01. Raio-X do Edital VUNESP</a>
-    <a href="#pareto" onclick="toggleMenu()">02. Matriz de Pareto da Prova</a>
-    <a href="#planos" onclick="toggleMenu()">03. Planos & Inscrição</a>
-    <a href="/login.html">04. Área do Aluno CRIVOS ↗</a>
-  </nav>
+  
 
   <!-- HERO -->
   <section class="hero">
