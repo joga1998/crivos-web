@@ -1862,27 +1862,33 @@
                       docType: cardFormData.payer?.identification?.type,
                       docNumber: cardFormData.payer?.identification?.number,
                       orderId: userOrderData.orderId || undefined,
-            orderBump: orderBumpActive,
-                    }),
-                  });
+                    orderBump: orderBumpActive,
+                  }),
+                });
 
-                  const result = await response.json();
+                let result;
+                try {
+                  result = await response.json();
+                } catch (parseErr) {
+                  result = { error: 'Falha na resposta do servidor (' + response.status + ')' };
+                }
 
-                  if (response.ok && result.status === 'approved') {
-                    window.location.href = `/sucesso.html?id=${result.id}`;
-                    resolve();
-                  } else if (result.status === 'in_process') {
-                    window.location.href = `/sucesso.html?id=${result.id}&status=in_process`;
-                    resolve();
-                  } else {
-                    const friendlyError = result.user_message || result.error || 'O pagamento não foi aprovado pelo emissor do cartão.';
-                    showError(friendlyError, true);
-                    reject();
-                  }
-                } catch (err) {
-                  showError(err.message || 'Instabilidade de conexão ao comunicar com o servidor. Por favor, tente novamente.', true);
+                if (response.ok && result.status === 'approved') {
+                  window.location.href = `/sucesso.html?id=${result.id}`;
+                  resolve();
+                } else if (response.ok && result.status === 'in_process') {
+                  window.location.href = `/sucesso.html?id=${result.id}&status=in_process`;
+                  resolve();
+                } else {
+                  const friendlyError = result.user_message || result.error || 'O pagamento não foi aprovado pelo emissor do cartão.';
+                  showError(friendlyError, true);
                   reject();
                 }
+              } catch (err) {
+                console.error("[CRIVOS] Erro ao submeter pagamento via cartão:", err);
+                showError(err.message || 'Instabilidade de conexão ao comunicar com o servidor. Por favor, tente novamente.', true);
+                reject();
+              }
               });
             },
             onError: (error) => {
