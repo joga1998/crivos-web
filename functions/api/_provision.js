@@ -163,8 +163,10 @@ export async function provisionUserOrder(env, { orderId, mpPaymentId, paymentMet
   };
   const planTitle = planTitles[order.plan_tier] || 'Plano Tático';
 
-  // Prazo de 48 horas úteis (estimativa de 2 dias corridos)
-  const deadline = new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
+  // Prazo de calibração alinhado à oferta (Elite/Prime: 6h; Tático/Arsenal: 24h)
+  const tierLower = (order.plan_tier || '').toLowerCase();
+  const deliveryHours = (tierLower === 'elite' || tierLower === 'prime') ? 6 : 24;
+  const deadline = new Date(Date.now() + deliveryHours * 60 * 60 * 1000).toISOString();
 
   // Verifica se já existe painel para esta ordem
   const existingPanels = await supabaseRest(env, `/user_panels?order_id=eq.${encodeURIComponent(order.id)}`);
