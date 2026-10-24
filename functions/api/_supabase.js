@@ -228,7 +228,9 @@ export function generateTacticalPassword() {
 }
 
 // Template HTML Editorial Suíço para E-mail #1: Credenciais & Status de Calibração
-export function renderEmailCredentials({ email, password, planTitle, planTier, concurso, cargo, panelUrl = 'https://app.crivos.me' }) {
+export function renderEmailCredentials({ email, password, candidateName, planTitle, planTier, concurso, cargo, panelUrl = 'https://app.crivos.me' }) {
+  const firstName = (candidateName || '').trim().split(' ')[0] || '';
+  const greeting = firstName ? `Olá, <strong>${firstName}</strong>!` : 'Olá!';
   const isPrime = (planTier === 'prime' || String(planTitle || '').toLowerCase().includes('prime'));
   const primeBlock = isPrime ? `
         <!-- Bloco Exclusivo: CRIVOS PRIME // Upload de Materiais -->
@@ -291,7 +293,7 @@ export function renderEmailCredentials({ email, password, planTitle, planTier, c
         </h1>
 
         <p style="font-size:13px;line-height:1.6;color:#444444;margin:0 0 20px 0;">
-          Seu pedido foi registrado com sucesso. Nossa equipe de engenharia tática já recebeu seu concurso, cargo e declaração de rotina para calibrar seu Sistema Operacional.
+          ${greeting} Seu pedido foi registrado com sucesso. Nossa equipe de engenharia tática já recebeu seu concurso, cargo e declaração de rotina para calibrar seu Sistema Operacional.
         </p>
 
         ${primeBlock}
@@ -333,7 +335,9 @@ export function renderEmailCredentials({ email, password, planTitle, planTier, c
 }
 
 // Template HTML Editorial Suíço para E-mail #2: Liberação do Painel Pronto
-export function renderEmailPanelReady({ email, planTitle, concurso, cargo, panelUrl = 'https://app.crivos.me' }) {
+export function renderEmailPanelReady({ email, candidateName, planTitle, concurso, cargo, panelUrl = 'https://app.crivos.me' }) {
+  const firstName = (candidateName || '').trim().split(' ')[0] || '';
+  const greeting = firstName ? `Olá, <strong>${firstName}</strong>!` : 'Olá!';
   return `
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -359,7 +363,7 @@ export function renderEmailPanelReady({ email, planTitle, concurso, cargo, panel
         </h1>
 
         <p style="font-size:13px;line-height:1.6;color:#444444;margin:0 0 20px 0;">
-          A engenharia tática do seu concurso (<strong>${concurso} — ${cargo}</strong>) foi concluída. Seu cronograma diário elástico, banco de matérias e arquivos já estão carregados no seu painel.
+          ${greeting} A engenharia tática do seu concurso (<strong>${concurso} — ${cargo}</strong>) foi concluída. Seu cronograma diário elástico, banco de matérias e arquivos já estão carregados no seu painel.
         </p>
 
         <div style="background:#F4F4F0;border:1px solid #111111;border-left:4px solid #15803d;padding:16px;margin-bottom:24px;font-family:'Courier New',Courier,monospace;font-size:12px;line-height:1.6;">

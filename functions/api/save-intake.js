@@ -7,10 +7,11 @@ export async function onRequestPost(context) {
 
   try {
     const contentType = request.headers.get('content-type') || '';
-    let email, concurso, cargo, availability, plan, editalBase64, editalFileName, editalMimeType;
+    let name, email, concurso, cargo, availability, plan, editalBase64, editalFileName, editalMimeType;
 
     if (contentType.includes('application/json')) {
       const body = await request.json();
+      name = body.name || body.fullName;
       email = body.email;
       concurso = body.concurso;
       cargo = body.cargo;
@@ -21,6 +22,7 @@ export async function onRequestPost(context) {
       editalMimeType = body.editalMimeType;
     } else if (contentType.includes('multipart/form-data')) {
       const formData = await request.formData();
+      name = formData.get('name') || formData.get('fullName');
       email = formData.get('email');
       concurso = formData.get('concurso');
       cargo = formData.get('cargo');
@@ -117,6 +119,7 @@ export async function onRequestPost(context) {
       amount_cents: Math.round(amount * 100),
       status: 'pending',
       notes: JSON.stringify({
+        full_name: String(name || '').trim() || undefined,
         availability: String(availability || '').trim(),
         utm_source: utmSource || undefined,
         utm_medium: utmMedium || undefined,

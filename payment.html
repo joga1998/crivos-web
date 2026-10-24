@@ -1047,6 +1047,15 @@
         </p>
 
         <form id="form-stage-1" onsubmit="goToStage2(event)">
+          <!-- Nome do Candidato -->
+          <div class="form-group">
+            <label for="user-name">NOME COMPLETO DO CANDIDATO <span class="req">*</span></label>
+            <input type="text" id="user-name" placeholder="Ex: Carlos Eduardo da Silva" required autocomplete="name" />
+            <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-top:4px;">
+              Utilizado na emissão da sua credencial individual, fichas táticas e calibração do painel.
+            </div>
+          </div>
+
           <!-- E-mail de Acesso -->
           <div class="form-group">
             <label for="user-email">E-MAIL DO CANDIDATO <span class="req">*</span></label>
@@ -1201,7 +1210,7 @@
 
         <!-- Resumo dos Dados Preenchidos na Etapa 1 -->
         <div class="summary-badge" id="order-summary-box">
-          <div><strong>CANDIDATO:</strong> <span id="sum-email">...</span></div>
+          <div><strong>CANDIDATO:</strong> <span id="sum-name">...</span> (<span id="sum-email">...</span>)</div>
           <div><strong>EDITAL ALVO:</strong> <span id="sum-concurso">...</span> (<span id="sum-cargo">...</span>)</div>
           <div><strong>DISPONIBILIDADE:</strong> <span id="sum-rotina">...</span></div>
           <div><strong>EDITAL:</strong> <span id="sum-edital">...</span></div>
@@ -1519,6 +1528,7 @@
       const submitBtn = e.target.querySelector('button[type="submit"]');
       const originalBtnText = submitBtn ? submitBtn.innerHTML : '';
 
+      const name = (document.getElementById('user-name')?.value || '').trim();
       const email = document.getElementById('user-email').value.trim();
       const concurso = document.getElementById('user-concurso').value.trim();
       const cargo = document.getElementById('user-cargo').value.trim();
@@ -1527,6 +1537,11 @@
       const fileInput = document.getElementById('edital-file');
       const file = fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
       const fileName = file ? file.name : null;
+
+      if (!name) {
+        showError('Por favor, informe seu nome completo.');
+        return;
+      }
 
       if (!email || !concurso || !cargo) {
         showError('Por favor, informe seu e-mail, concurso e cargo pretendido.');
@@ -1538,6 +1553,12 @@
         return;
       }
 
+      // Pré-preenche o nome no campo Pix da Etapa 2
+      const pixNameInput = document.getElementById('pix-name');
+      if (pixNameInput && !pixNameInput.value) {
+        pixNameInput.value = name;
+      }
+
       if (submitBtn) {
         submitBtn.disabled = true;
         submitBtn.textContent = 'REGISTRANDO ESPECIFICAÇÃO DE ENGENHARIA...';
@@ -1545,6 +1566,7 @@
 
       try {
         const formData = new FormData();
+        formData.append('name', name);
         formData.append('email', email);
         formData.append('concurso', concurso);
         formData.append('cargo', cargo);
@@ -1566,6 +1588,7 @@
 
         userOrderData = {
           orderId,
+          name,
           email,
           concurso,
           cargo,
@@ -1575,6 +1598,8 @@
         };
 
         // Atualiza o resumo da Etapa 2
+        const sumName = document.getElementById('sum-name');
+        if (sumName) sumName.textContent = name;
         document.getElementById('sum-email').textContent = email;
         document.getElementById('sum-concurso').textContent = `${concurso} (${cargo})`;
         document.getElementById('sum-rotina').textContent = availability.length > 70 ? availability.substring(0, 70) + '...' : availability;
@@ -1594,6 +1619,7 @@
         console.warn('Aviso no intake:', err);
         // Mesmo em falha transitória do intake, permite seguir
         userOrderData = {
+          name,
           email,
           concurso,
           cargo,
@@ -1601,6 +1627,8 @@
           fileName,
           planKey,
         };
+        const sumName = document.getElementById('sum-name');
+        if (sumName) sumName.textContent = name;
         document.getElementById('stage-1').style.display = 'none';
         document.getElementById('stage-2').style.display = 'block';
         document.getElementById('step-nav-1').classList.remove('active');
@@ -1855,6 +1883,7 @@
                 try {
                   const selectedPlan = productSelect.value;
                   const candidateEmail = userOrderData.email || document.getElementById('user-email').value;
+                  const candidateName = userOrderData.name || (document.getElementById('user-name')?.value || '').trim();
 
                   const response = await fetch('/api/process-card', {
                     method: 'POST',
@@ -1866,11 +1895,12 @@
                       installments: cardFormData.installments,
                       plan: selectedPlan,
                       email: candidateEmail,
+                      fullName: candidateName,
                       docType: cardFormData.payer?.identification?.type,
                       docNumber: cardFormData.payer?.identification?.number,
                       orderId: userOrderData.orderId || undefined,
-                    orderBump: orderBumpActive,
-                  }),
+                      orderBump: orderBumpActive,
+                    }),
                 });
 
                 let result;

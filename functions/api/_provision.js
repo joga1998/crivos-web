@@ -237,6 +237,7 @@ export async function provisionUserOrder(env, { orderId, mpPaymentId, paymentMet
     const htmlEmail = renderEmailCredentials({
       email,
       password: tempPassword,
+      candidateName,
       planTitle,
       planTier: order.plan_tier,
       concurso: concursoNome,

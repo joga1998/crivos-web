@@ -44,6 +44,8 @@ export async function onRequestPost(context) {
       installments,
       plan,
       email,
+      fullName,
+      name,
       docType,
       docNumber,
       orderId,
@@ -232,8 +234,11 @@ export async function onRequestPost(context) {
           }
         } catch (readNotesErr) {}
 
+        const candidateFullName = (fullName || name || '').trim() || undefined;
+
         const mergedNotes = {
           ...existingNotes,
+          full_name: candidateFullName || existingNotes.full_name,
           cpf: cleanDocNumber || existingNotes.cpf,
           order_bump: !!orderBump,
           order_bump_title: orderBump ? 'Dossiê de Véspera D-7 & Pegadinhas da Banca' : null,
