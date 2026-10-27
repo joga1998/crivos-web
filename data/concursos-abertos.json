@@ -1,5 +1,19 @@
 [
   {
+    "id": "pm_sc_soldado",
+    "nome": "PM SC — Polícia Militar de Santa Catarina",
+    "banca": "Instituto AOCP",
+    "orgao": "Polícia Militar do Estado de Santa Catarina",
+    "cargos": [
+      "Soldado do Quadro de Praças (QPPM)"
+    ],
+    "escolaridade": "Superior",
+    "esfera": "Estadual (Militar)",
+    "status": "Inscrições Abertas",
+    "salario_max": "R$ 8.505,00",
+    "popular": true
+  },
+  {
     "id": "carreiras_militares_geral",
     "nome": "Carreiras Militares (Forças Armadas / PM / CBM)",
     "banca": "Exército / Marinha / FAB / FGV / VUNESP",
