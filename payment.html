@@ -27,7 +27,7 @@
   </script>
 
     <!-- Base Oficial de Concursos para Autocomplete -->
-  <script src="data/concursos-abertos.js?v=20261021_abertos"></script>
+  <script src="data/concursos-abertos.js?v=20261028_abertos"></script>
   <!-- SDK Oficial do Mercado Pago V2 -->
   <script src="https://sdk.mercadopago.com/js/v2"></script>
 
@@ -1991,16 +1991,17 @@
 (function initInteractivePlanning() {
   // 1. Dados de Concursos
   const concursosList = window.CRIVOS_CONCURSOS_DATA || [
+    { nome: "PM SC — Polícia Militar de Santa Catarina", banca: "Instituto AOCP", cargos: ["Soldado do Quadro de Praças Policial Militar (QPPM)"] },
+    { nome: "TJSP — Tribunal de Justiça de São Paulo", banca: "VUNESP", cargos: ["Oficial de Justiça Avaliador", "Escrevente Técnico Judiciário", "Psicólogo Judiciário", "Assistente Social Judiciário"] },
+    { nome: "PC PE — Polícia Civil de Pernambuco", banca: "CEBRASPE", cargos: ["Agente de Polícia", "Escrivão de Polícia", "Delegado de Polícia"] },
+    { nome: "PM PE e CBM PE — Forças de Segurança de Pernambuco", banca: "Instituto AOCP", cargos: ["Soldado PM (Quadro de Praças)", "Oficial PM (2º Tenente Combatente)", "Soldado Bombeiro Militar", "Oficial Bombeiro Militar"] },
+    { nome: "TRT-RS (TRT 4ª Região) — Tribunal Regional do Trabalho", banca: "FCC", cargos: ["Técnico Judiciário — Área Administrativa", "Técnico Judiciário — Agente da Polícia Judicial", "Analista Judiciário — Área Judiciária", "Analista Judiciário — Oficial de Justiça Avaliador Federal"] },
+    { nome: "TRT 8ª Região (TRT-PA/AP) — Tribunal Regional do Trabalho", banca: "FCC", cargos: ["Analista Judiciário — Área Judiciária", "Analista Judiciário — Oficial de Justiça Avaliador Federal", "Técnico Judiciário — Área Administrativa"] },
     { nome: "CGU — Controladoria-Geral da União", banca: "CEBRASPE", cargos: ["Auditor Federal de Finanças e Controle (AFFC) — Auditoria e Fiscalização", "Auditor Federal de Finanças e Controle (AFFC) — TI"] },
-    { nome: "Câmara dos Deputados", banca: "CEBRASPE", cargos: ["Analista Legislativo — Consultoria Legislativa", "Analista Legislativo — Informática Legislativa", "Policial Legislativo"] },
-    { nome: "TJSP — Tribunal de Justiça de São Paulo", banca: "VUNESP", cargos: ["Escrevente Técnico Judiciário", "Oficial de Justiça Avaliador"] },
-    { nome: "ABDI — Agência Brasileira de Desenvolvimento Industrial", banca: "FGV", cargos: ["Analista I — Políticas Públicas de Inovação", "Especialista em Gestão"] },
-    { nome: "TSE / TREs — Concurso Unificado da Justiça Eleitoral", banca: "CEBRASPE", cargos: ["Analista Judiciário — Área Judiciária", "Técnico Judiciário — Área Administrativa"] },
-    { nome: "Marinha do Brasil — Quadros de Oficiais", banca: "Comando da Marinha (DEnsM)", cargos: ["Oficial Superior do Quadro Complementar", "Quadro de Apoio à Saúde"] },
-    { nome: "ALEPA — Assembleia Legislativa do Pará", banca: "CEBRASPE / IDECAN", cargos: ["Analista Legislativo — Área Jurídica", "Técnico Legislativo"] },
-    { nome: "PMESP — Polícia Militar do Estado de São Paulo", banca: "FGV / VUNESP", cargos: ["Soldado PM de 2ª Classe", "Aluno-Oficial PM (Barro Branco)"] },
-    { nome: "PPGHS / UERJ — Mestrado em História Social", banca: "Banca Própria / UERJ", cargos: ["Aluno Regular de Mestrado Acadêmico (PPGHS 2027)"] },
-    { nome: "OAB — Exame de Ordem Unificado", banca: "FGV", cargos: ["Advogado / Habilitação Profissional — 1ª Fase Objetiva", "2ª Fase Prático-Profissional"] }  ];
+    { nome: "Câmara dos Deputados", banca: "CEBRASPE", cargos: ["Analista Legislativo — Consultoria Legislativa", "Analista Legislativo — Técnica Legislativa", "Policial Legislativo"] },
+    { nome: "DPE-SP — Defensoria Pública do Estado de São Paulo", banca: "FCC", cargos: ["Defensor Público do Estado — Nível Inicial"] },
+    { nome: "SEFAZ-SP — Secretaria da Fazenda e Planejamento de SP", banca: "FCC", cargos: ["Analista em Planejamento, Orçamento e Finanças Públicas (APOFP) — Orçamento e Finanças", "Analista em Planejamento, Orçamento e Finanças Públicas (APOFP) — Contabilidade Pública"] }
+  ];
 
   const concursoInput = document.getElementById('user-concurso');
   const cargoInput = document.getElementById('user-cargo');
