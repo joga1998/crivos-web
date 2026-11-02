@@ -251,7 +251,6 @@ export async function onRequestPost(context) {
           body: {
             payment_id: String(mpData.id),
             payment_method: 'credit_card',
-            status: isApproved ? 'approved' : 'pending',
             notes: JSON.stringify(mergedNotes),
             updated_at: new Date().toISOString(),
           },
@@ -268,6 +267,7 @@ export async function onRequestPost(context) {
           orderId: orderId || null,
           mpPaymentId: String(mpData.id),
           paymentMethod: 'credit_card',
+          waitUntil: context.waitUntil ? context.waitUntil.bind(context) : null,
         });
       } catch (provErr) {
         console.warn('[process-card] Falha no provisionamento imediato:', provErr.message);

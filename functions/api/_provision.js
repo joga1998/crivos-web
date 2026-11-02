@@ -7,6 +7,7 @@ import {
   renderEmailCredentials,
   sendAdminSaleNotification,
 } from './_supabase.js';
+import { runCalibrationEngine } from './engine/calibrate.js';
 
 export function getModulesByTier(planTier) {
   const tier = (planTier || 'tatico').toLowerCase();
@@ -59,7 +60,7 @@ export function getModulesByTier(planTier) {
   return baseTatico;
 }
 
-export async function provisionUserOrder(env, { orderId, mpPaymentId, paymentMethod }) {
+export async function provisionUserOrder(env, { orderId, mpPaymentId, paymentMethod, waitUntil }) {
   if (!orderId && !mpPaymentId) {
     throw new Error('Identificador de pedido ou pagamento ausente para provisionamento.');
   }
@@ -341,32 +342,30 @@ export async function provisionUserOrder(env, { orderId, mpPaymentId, paymentMet
   if (!isPrime && panel?.id) {
     try {
       console.log(`[Provision Autônomo] Iniciando calibração instantânea via IA para ordem ${order.id}...`);
-      
-      // Chamada assíncrona/edge para o motor de calibração autônomo
+
       const calibratePayload = {
         orderId: order.id,
         userId,
+        panelId: panel.id,
         concurso: concursoNome,
         cargo: cargoNome,
         planTier: order.plan_tier,
-        availabilityHours: (parsedNotes.availability && parseInt(parsedNotes.availability)) || 4,
+        availabilityHours: (parsedNotes.availability && parseInt(parsedNotes.availability, 10)) || 4,
       };
 
-      // Dispara a calibração diretamente usando o endpoint interno
-      const protocol = (env?.CRIVOS_API_URL || 'https://crivos.me').startsWith('https') ? 'https' : 'http';
-      const baseUrl = env?.CRIVOS_API_URL || 'https://crivos.me';
-      
-      // Fetch não bloqueante para responder o webhook rápido se necessário, ou aguarda com timeout
-      fetch(`${baseUrl}/api/engine/calibrate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(calibratePayload),
-      }).then(res => res.json()).then(calibResult => {
-        console.log(`[Provision Autônomo] Calibração concluída para ordem ${order.id}:`, calibResult.success);
-      }).catch(calibErr => {
-        console.warn(`[Provision Autônomo] Falha na calibração autônoma para ${order.id}:`, calibErr.message);
-      });
+      const calibPromise = runCalibrationEngine(env, calibratePayload)
+        .then((calibResult) => {
+          console.log(`[Provision Autônomo] Calibração concluída para ordem ${order.id}:`, calibResult?.success);
+        })
+        .catch((calibErr) => {
+          console.warn(`[Provision Autônomo] Falha na calibração autônoma para ${order.id}:`, calibErr?.message);
+        });
 
+      if (typeof waitUntil === 'function') {
+        waitUntil(calibPromise);
+      } else {
+        await calibPromise;
+      }
     } catch (autoErr) {
       console.warn(`[Provision Autônomo] Falha ao disparar calibração autônoma para ${order.id}:`, autoErr.message);
     }

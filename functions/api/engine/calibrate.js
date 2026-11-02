@@ -45,12 +45,14 @@ function decodePdfLiteralString(str) {
 
 function extractTextFromPdfStringChunk(chunk) {
   const out = [];
+  // Operadores (texto) Tj
   const tjRegex = /\(([^()\\]*(?:\\.[^()\\]*)*)\)\s*Tj/g;
   let m;
   while ((m = tjRegex.exec(chunk)) !== null) {
     const s = decodePdfLiteralString(m[1]).trim();
     if (s) out.push(s);
   }
+  // Operadores [(texto) -12 (texto)] TJ
   const tjArrRegex = /\[([^\]]+)\]\s*TJ/g;
   while ((m = tjArrRegex.exec(chunk)) !== null) {
     const inner = m[1];
@@ -71,17 +73,20 @@ async function extractTextFromPdfBuffer(uint8Array) {
     const decoder = new TextDecoder('latin1');
     const raw = decoder.decode(uint8Array);
 
+    // Se não for PDF binário (%PDF), trata como texto UTF-8 direto
     if (!raw.startsWith('%PDF')) {
       return new TextDecoder('utf-8', { fatal: false }).decode(uint8Array).trim();
     }
 
     const extractedChunks = [];
 
+    // 1. Extrai texto de streams não comprimidos
     const plainText = extractTextFromPdfStringChunk(raw);
     if (plainText && plainText.length > 80) {
       extractedChunks.push(plainText);
     }
 
+    // 2. Descomprime streams FlateDecode usando Web Streams API (nativo no Cloudflare Workers / Node 20+)
     if (typeof DecompressionStream !== 'undefined') {
       const streamRegex = /stream\r?\n([\s\S]*?)\r?\nendstream/g;
       let match;
@@ -109,7 +114,9 @@ async function extractTextFromPdfBuffer(uint8Array) {
               extractedChunks.push(txt.trim());
             }
             break;
-          } catch (_) {}
+          } catch (_) {
+            // Ignora streams que não são deflate puro (ex: imagens DCTDecode)
+          }
         }
       }
     }
@@ -122,6 +129,7 @@ async function extractTextFromPdfBuffer(uint8Array) {
   }
 }
 
+// Filtra e organiza os trechos de maior sinal do edital (Cronograma/Datas, Quadro de Provas/Pesos e Conteúdo Programático do Cargo)
 export function extractHighSignalEditalSections(rawText, cargo = '') {
   if (!rawText || typeof rawText !== 'string') return '';
   const cleaned = rawText.replace(/\r\n/g, '\n').replace(/[ \t]{2,}/g, ' ').trim();
@@ -133,6 +141,7 @@ export function extractHighSignalEditalSections(rawText, cargo = '') {
     .split(/[^a-z0-9]+/)
     .filter(w => w.length >= 4 && !['para', 'area', 'cargo', 'nivel', 'linha', 'especialidade'].includes(w));
 
+  // Divide o edital em blocos de ~1800 caracteres
   const chunkSize = 1800;
   const chunks = [];
   for (let i = 0; i < cleaned.length; i += chunkSize) {
@@ -173,6 +182,7 @@ export function extractHighSignalEditalSections(rawText, cargo = '') {
   syllabusBuckets.sort((a, b) => b.score - a.score || a.index - b.index);
 
   const selected = new Map();
+  // Sempre inclui o início do edital (cabeçalho, banca, disposições iniciais)
   if (chunks[0]) selected.set(chunks[0].index, chunks[0].text);
   if (chunks[1]) selected.set(chunks[1].index, chunks[1].text);
 
@@ -187,12 +197,14 @@ export function extractHighSignalEditalSections(rawText, cargo = '') {
   return ordered.join('\n\n--- [TRECHO DO EDITAL] ---\n\n').slice(0, 30000);
 }
 
+// Busca textos de edital no Supabase Storage (intake-editais ou user-materials) se disponível
 async function fetchEditalTextFromStorage(env, order, userPanel, userId) {
   const { url, serviceKey } = getSupabaseConfig(env);
   if (!url || !serviceKey) return '';
 
   const extractedParts = [];
 
+  // 1. Verifica se há texto salvo em order.notes
   if (order?.notes) {
     try {
       const notesObj = typeof order.notes === 'string' ? JSON.parse(order.notes) : order.notes;
@@ -202,6 +214,7 @@ async function fetchEditalTextFromStorage(env, order, userPanel, userId) {
     } catch (_) {}
   }
 
+  // 2. Verifica se há arquivo binário salvo em intake-editais (order.edital_file_url)
   if (extractedParts.length === 0 && order?.edital_file_url) {
     try {
       const cleanPath = String(order.edital_file_url).replace(/^intake-editais\//, '');
@@ -223,6 +236,7 @@ async function fetchEditalTextFromStorage(env, order, userPanel, userId) {
     }
   }
 
+  // 3. Verifica arquivos enviados pelo aluno em `user_files` (Editais ou Apostilas)
   try {
     let files = [];
     if (userPanel?.id && userPanel.id !== 'default-panel') {
@@ -238,6 +252,7 @@ async function fetchEditalTextFromStorage(env, order, userPanel, userId) {
       const fileTitles = files.map(f => `[${(f.category || 'material').toUpperCase()}] ${f.title || f.filename}`).join(' | ');
       extractedParts.push(`ARQUIVOS ANEXADOS PELO CANDIDATO: ${fileTitles}`);
 
+      // Tenta extrair texto do arquivo de edital ou primeiro PDF menor que 6MB
       for (const f of files.slice(0, 2)) {
         if (f.storage_url && (!f.file_size_bytes || f.file_size_bytes < 6 * 1024 * 1024)) {
           try {
@@ -263,6 +278,16 @@ function generateTacticalSchedule(unidades, availabilityHours = 4, startDate = n
   let currentDate = new Date(startDate);
   const hours = Number(availabilityHours) > 0 ? Number(availabilityHours) : 4;
 
+  // Calcula horizonte do ciclo pós-edital (~90 dias / 12 semanas por padrão, ou até a data da prova se informada)
+  let targetDays = 78; // ~12 semanas (66 dias ativos + descansos)
+  if (examDateStr && /^\d{4}-\d{2}-\d{2}$/.test(String(examDateStr).trim())) {
+    const examDt = new Date(String(examDateStr).trim() + 'T12:00:00Z');
+    const diffDays = Math.round((examDt.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24));
+    if (diffDays >= 21 && diffDays <= 150) {
+      targetDays = diffDays;
+    }
+  }
+
   const d0Str = currentDate.toISOString().slice(0, 10);
   sched.push({
     d: d0Str,
@@ -273,23 +298,82 @@ function generateTacticalSchedule(unidades, availabilityHours = 4, startDate = n
     t: '<span class="tag adm">ADM</span> Leitura estratégica do Edital, verificação dos marcos temporais e auditoria da matriz de pesos por disciplina.'
   });
 
-  const studyDates = [];
-  const list = Array.isArray(unidades) && unidades.length > 0 ? unidades : [];
+  const list = Array.isArray(unidades) && unidades.length > 0 ? unidades : [
+    { titulo: 'Núcleo Fundamental do Edital', materia: 'Conhecimentos Gerais', topicos: ['Tópicos essenciais e estrutura da prova'] }
+  ];
 
-  list.forEach((u, i) => {
+  const studyDates = [];
+  let activeStep = 0;
+  const totalActiveSteps = Math.max(list.length * 4, Math.min(72, Math.floor(targetDays * 0.85)));
+
+  const cycleConfigs = [
+    {
+      name: 'Ciclo I · Base Teórica & Mapeamento',
+      tag: 'ar',
+      tagLabel: 'TEORIA',
+      actionPrefix: 'Estudo dirigido da teoria, legislação/bibliografia base e conceitos estruturantes do edital',
+      obsPrefix: 'Ciclo 1 (Base): assimilação teórica + fichamento estratégico'
+    },
+    {
+      name: 'Ciclo II · Aprofundamento & Bateria da Banca',
+      tag: 'ar',
+      tagLabel: 'PRÁTICA',
+      actionPrefix: 'Aprofundamento nos pontos críticos, exceções e resolução de bateria comentada de questões da banca',
+      obsPrefix: 'Ciclo 2 (Aprofundamento): engenharia reversa da banca + mapeamento de pegadinhas'
+    },
+    {
+      name: 'Ciclo III · Consolidação & Reciclagem Ativa',
+      tag: 'rev',
+      tagLabel: 'CONSOLIDAÇÃO',
+      actionPrefix: 'Revisão ativa sem consulta (Active Recall), bateria intensiva de questões difíceis e atualização do caderno de erros',
+      obsPrefix: 'Ciclo 3 (Consolidação): retenção de longo prazo + blindagem de lacunas'
+    },
+    {
+      name: 'Ciclo IV · Reta Final 80/20 & Blindagem de Prova',
+      tag: 'rev',
+      tagLabel: 'RETA FINAL',
+      actionPrefix: 'Revisão cirúrgica 80/20 dos pontos de maior peso, leitura seca/teses-chave e treino de velocidade de prova',
+      obsPrefix: 'Ciclo 4 (Reta Final): foco exclusivo em alta incidência e memória de curto prazo'
+    }
+  ];
+
+  while (activeStep < totalActiveSteps) {
     currentDate.setDate(currentDate.getDate() + 1);
     const dStr = currentDate.toISOString().slice(0, 10);
-    const weekNum = String(Math.floor((i + 1) / 5) + 1).padStart(2, '0');
-    studyDates.push({ date: dStr, unit: u.titulo, materia: u.materia, index: i + 1 });
+    const weekIdx = Math.floor((sched.length) / 6) + 1;
+    const weekNum = String(weekIdx).padStart(2, '0');
+
+    // A cada 6 sessões de estudo, insere 1 dia de Simulado Tático / Revisão Semanal
+    if ((activeStep + 1) % 5 === 0) {
+      const uRef = list[activeStep % list.length];
+      const simNumber = Math.ceil((activeStep + 1) / 5);
+      sched.push({
+        d: dStr,
+        h: hours,
+        f: `SEMANA ${weekNum}`,
+        a: `Simulado Tático & Diagnóstico #${String(simNumber).padStart(2, '0')} (${uRef.materia})`,
+        obs: 'Bateria cronometrada sem consulta + diagnóstico de lacunas e alimentação de Flashcards SM-2.',
+        t: `<span class="tag esc">ESCRITA</span> <b>Simulado Tático #${String(simNumber).padStart(2, '0')}</b>: Resolução cronometrada sem consulta cobrindo os blocos da semana. Correção com espelho oficial da banca e criação de novos Flashcards SM-2 para cada erro.`
+      });
+      activeStep++;
+      continue;
+    }
+
+    const u = list[activeStep % list.length];
+    const passIndex = Math.min(3, Math.floor(activeStep / list.length));
+    const cycle = cycleConfigs[passIndex];
+
+    studyDates.push({ date: dStr, unit: u.titulo, materia: u.materia, index: activeStep + 1 });
 
     const topicosList = Array.isArray(u.topicos) && u.topicos.length > 0 ? u.topicos.join(' · ') : '';
-    let taskHtml = `<span class="tag ar">ÁREA</span> <b>${u.titulo}</b> (${u.materia}): Estudo dirigido da teoria e conceitos essenciais do edital${topicosList ? ` (${topicosList})` : ''}. Resolução de bateria de questões da banca.`;
-    if (i > 0) {
-      const prev = studyDates[i - 1];
-      taskHtml += ` <span class="tag rev">REV</span> Revisão ativa D+1: ${prev.unit} (15 min).`;
+    let taskHtml = `<span class="tag ${cycle.tag}">${cycle.tagLabel}</span> <b>${u.titulo}</b> (${u.materia} — <i>${cycle.name}</i>): ${cycle.actionPrefix}${topicosList ? ` (${topicosList})` : ''}.`;
+
+    if (studyDates.length > 1) {
+      const prev = studyDates[studyDates.length - 2];
+      taskHtml += ` <span class="tag rev">REV</span> Revisão D+1: ${prev.unit} (15 min).`;
     }
-    if (i >= 3) {
-      const prev3 = studyDates[i - 3];
+    if (studyDates.length >= 4) {
+      const prev3 = studyDates[studyDates.length - 4];
       taskHtml += ` <span class="tag sm">FLASH</span> Reciclagem SM-2: ${prev3.materia} (15 min).`;
     }
 
@@ -297,26 +381,15 @@ function generateTacticalSchedule(unidades, availabilityHours = 4, startDate = n
       d: dStr,
       h: hours,
       f: `SEMANA ${weekNum}`,
-      a: `${u.materia} — ${u.titulo}`,
-      obs: topicosList ? `Subtópicos do edital: ${topicosList}` : 'Estudo teórico + bateria de questões comentadas da banca.',
+      a: `${u.materia} — ${u.titulo}${passIndex > 0 ? ` (Ciclo ${passIndex + 1})` : ''}`,
+      obs: topicosList ? `${cycle.obsPrefix} · Tópicos: ${topicosList}` : cycle.obsPrefix,
       t: taskHtml
     });
 
-    if ((i + 1) % 3 === 0) {
-      currentDate.setDate(currentDate.getDate() + 1);
-      const simDateStr = currentDate.toISOString().slice(0, 10);
-      const simWeekNum = String(Math.floor((sched.length) / 6) + 1).padStart(2, '0');
-      sched.push({
-        d: simDateStr,
-        h: hours,
-        f: `SEMANA ${simWeekNum}`,
-        a: `Simulado Tático de Bloco #${Math.ceil((i + 1) / 3)} (${u.materia})`,
-        obs: 'Bateria cronometrada sem consulta + diagnóstico de lacunas e caderno de erros.',
-        t: `<span class="tag esc">ESCRITA</span> <b>Simulado Tático de Bloco #${Math.ceil((i + 1) / 3)}</b>: Resolução cronometrada sem consulta cobrindo os blocos estudados. Correção com espelho oficial da banca e criação de novos Flashcards SM-2 para cada erro.`
-      });
-    }
-  });
+    activeStep++;
+  }
 
+  // Adiciona protocolo final de Véspera D-7 / D-1
   currentDate.setDate(currentDate.getDate() + 1);
   const revDateStr = currentDate.toISOString().slice(0, 10);
   const finalWeekNum = String(Math.floor(sched.length / 6) + 1).padStart(2, '0');
@@ -332,92 +405,90 @@ function generateTacticalSchedule(unidades, availabilityHours = 4, startDate = n
   return sched;
 }
 
-export async function onRequestPost(context) {
-  const { request, env } = context;
-  const corsHeaders = getCorsHeaders(request);
+export async function runCalibrationEngine(env, body = {}) {
+  const {
+    orderId,
+    userId,
+    panelId,
+    concurso,
+    cargo,
+    banca,
+    planTier,
+    availabilityHours = 4,
+    routineText = '',
+    examDate = '',
+    editalText = ''
+  } = body;
 
+  if (!orderId && !userId) {
+    const err = new Error('orderId ou userId obrigatório para calibração.');
+    err.statusCode = 400;
+    throw err;
+  }
+
+  // 1. Localiza a ordem e o painel correspondente no Supabase
+  let order = null;
+  let panel = null;
   try {
-    const body = await request.json();
-    const {
-      orderId,
-      userId,
-      panelId,
-      concurso,
-      cargo,
-      banca,
-      planTier,
-      availabilityHours = 4,
-      routineText = '',
-      examDate = '',
-      editalText = ''
-    } = body;
-
-    if (!orderId && !userId) {
-      return new Response(JSON.stringify({ error: 'orderId ou userId obrigatório para calibração.' }), {
-        status: 400,
-        headers: corsHeaders,
-      });
+    if (orderId) {
+      const orders = await supabaseRest(env, `/orders?id=eq.${encodeURIComponent(orderId)}`);
+      order = Array.isArray(orders) && orders.length > 0 ? orders[0] : null;
+    } else if (userId && userId !== 'default-user') {
+      const orders = await supabaseRest(env, `/orders?user_id=eq.${encodeURIComponent(userId)}&order=created_at.desc&limit=1`);
+      order = Array.isArray(orders) && orders.length > 0 ? orders[0] : null;
     }
 
-    let order = null;
-    let panel = null;
+    if (panelId && panelId !== 'default-panel') {
+      const panels = await supabaseRest(env, `/user_panels?id=eq.${encodeURIComponent(panelId)}`);
+      panel = Array.isArray(panels) && panels.length > 0 ? panels[0] : null;
+    }
+    if (!panel && orderId) {
+      const panels = await supabaseRest(env, `/user_panels?order_id=eq.${encodeURIComponent(orderId)}`);
+      panel = Array.isArray(panels) && panels.length > 0 ? panels[0] : null;
+    }
+    if (!panel && userId && userId !== 'default-user') {
+      const panels = await supabaseRest(env, `/user_panels?user_id=eq.${encodeURIComponent(userId)}&order=created_at.desc&limit=1`);
+      panel = Array.isArray(panels) && panels.length > 0 ? panels[0] : null;
+    }
+  } catch (dbErr) {
+    console.warn('[calibrate] Aviso ao consultar Supabase:', dbErr.message);
+  }
+
+  const targetUserId = panel?.user_id || userId;
+  const finalConcurso = (concurso || panel?.concurso || order?.concurso_nome || 'Concurso Público').trim();
+  const finalCargo = (cargo || panel?.cargo || order?.cargo || 'Cargo Pretendido').trim();
+  const finalTier = (planTier || panel?.plan_tier || order?.plan_tier || 'tatico').toLowerCase();
+  const finalBanca = (banca || panel?.header_config?.banca || '').trim();
+
+  // Extrai rotina detalhada das notas da ordem se disponível
+  let orderAvailabilityText = routineText || '';
+  let effectiveHours = Number(availabilityHours) || 4;
+  if (order?.notes) {
     try {
-      if (orderId) {
-        const orders = await supabaseRest(env, `/orders?id=eq.${encodeURIComponent(orderId)}`);
-        order = Array.isArray(orders) && orders.length > 0 ? orders[0] : null;
-      } else if (userId && userId !== 'default-user') {
-        const orders = await supabaseRest(env, `/orders?user_id=eq.${encodeURIComponent(userId)}&order=created_at.desc&limit=1`);
-        order = Array.isArray(orders) && orders.length > 0 ? orders[0] : null;
+      const notesObj = typeof order.notes === 'string' ? JSON.parse(order.notes) : order.notes;
+      if (!orderAvailabilityText && notesObj?.availability) {
+        orderAvailabilityText = notesObj.availability;
       }
-
-      if (panelId && panelId !== 'default-panel') {
-        const panels = await supabaseRest(env, `/user_panels?id=eq.${encodeURIComponent(panelId)}`);
-        panel = Array.isArray(panels) && panels.length > 0 ? panels[0] : null;
+      const dailyMatch = String(orderAvailabilityText).match(/Meta Di[áa]ria:\s*([\d.]+)/i);
+      if (dailyMatch && dailyMatch[1]) {
+        effectiveHours = parseFloat(dailyMatch[1]) || effectiveHours;
       }
-      if (!panel && orderId) {
-        const panels = await supabaseRest(env, `/user_panels?order_id=eq.${encodeURIComponent(orderId)}`);
-        panel = Array.isArray(panels) && panels.length > 0 ? panels[0] : null;
-      }
-      if (!panel && userId && userId !== 'default-user') {
-        const panels = await supabaseRest(env, `/user_panels?user_id=eq.${encodeURIComponent(userId)}&order=created_at.desc&limit=1`);
-        panel = Array.isArray(panels) && panels.length > 0 ? panels[0] : null;
-      }
-    } catch (dbErr) {
-      console.warn('[calibrate] Aviso ao consultar Supabase:', dbErr.message);
-    }
+    } catch (_) {}
+  }
 
-    const targetUserId = panel?.user_id || userId;
-    const finalConcurso = (concurso || panel?.concurso || order?.concurso_nome || 'Concurso Público').trim();
-    const finalCargo = (cargo || panel?.cargo || order?.cargo || 'Cargo Pretendido').trim();
-    const finalTier = (planTier || panel?.plan_tier || order?.plan_tier || 'tatico').toLowerCase();
-    const finalBanca = (banca || panel?.header_config?.banca || '').trim();
+  // 2. Extrai o conteúdo real do Edital (do body.editalText, order.notes, intake-editais ou user_files)
+  let rawEditalContent = String(editalText || '').trim();
+  if (!rawEditalContent) {
+    rawEditalContent = await fetchEditalTextFromStorage(env, order, panel, targetUserId);
+  }
+  const filteredEditalContent = rawEditalContent
+    ? extractHighSignalEditalSections(rawEditalContent, finalCargo)
+    : '';
 
-    let orderAvailabilityText = routineText || '';
-    let effectiveHours = Number(availabilityHours) || 4;
-    if (order?.notes) {
-      try {
-        const notesObj = typeof order.notes === 'string' ? JSON.parse(order.notes) : order.notes;
-        if (!orderAvailabilityText && notesObj?.availability) {
-          orderAvailabilityText = notesObj.availability;
-        }
-        const dailyMatch = String(orderAvailabilityText).match(/Meta Di[áa]ria:\s*([\d.]+)/i);
-        if (dailyMatch && dailyMatch[1]) {
-          effectiveHours = parseFloat(dailyMatch[1]) || effectiveHours;
-        }
-      } catch (_) {}
-    }
+  const hasSubmittedEdital = filteredEditalContent.length > 60;
 
-    let rawEditalContent = String(editalText || '').trim();
-    if (!rawEditalContent) {
-      rawEditalContent = await fetchEditalTextFromStorage(env, order, panel, targetUserId);
-    }
-    const filteredEditalContent = rawEditalContent
-      ? extractHighSignalEditalSections(rawEditalContent, finalCargo)
-      : '';
-
-    const hasSubmittedEdital = filteredEditalContent.length > 60;
-
-    const systemPrompt = `Você é o Engenheiro Pedagógico Chefe da CRIVOS.
+  // 3. Prompt Estruturado com Fidelidade Estrita ao Edital Submetido
+  const systemPrompt = `Você é o Engenheiro Pedagógico Chefe da CRIVOS.
 Sua missão é extrair os dados reais do edital submetido (ou da estrutura oficial do certame informado) e calibrar integralmente TODAS AS 12 ABAS do Sistema Operacional de Estudos CRIVOS para o candidato.
 
 REGRAS DE FIDELIDADE AO EDITAL:
@@ -527,7 +598,7 @@ REGRAS DE FIDELIDADE AO EDITAL:
   "escrita": "Guia prático de estruturação discursiva / resolução de prova calibrado para a banca deste edital."
 }`;
 
-    const userPrompt = `CALIBRAÇÃO INTEGRAL DO SISTEMA PELO EDITAL:
+  const userPrompt = `CALIBRAÇÃO INTEGRAL DO SISTEMA PELO EDITAL:
 - Concurso / Exame: ${finalConcurso}
 - Cargo / Linha / Especialidade Alvo: ${finalCargo}
 - Banca Informada: ${finalBanca || 'Identificar no edital / certame'}
@@ -556,166 +627,178 @@ Dimensione o retorno JSON com:
 - 1 quadro comparativo completo em "tabs";
 - 8 itens em "checklist" + textos densos em "vespera" e "escrita".`;
 
-    const aiResponse = await callExperientialAI(env, {
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt }
-      ],
-      temperature: 0.2,
-      maxTokens: 12000,
-      responseFormat: { type: 'json_object' }
-    });
+  const aiResponse = await callExperientialAI(env, {
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt }
+    ],
+    temperature: 0.2,
+    maxTokens: 7500,
+    responseFormat: { type: 'json_object' }
+  });
 
-    const aiData = extractJson(aiResponse);
-    if (!aiData) {
-      throw new Error('Falha ao decodificar matriz JSON gerada pelo motor de IA.');
-    }
+  const aiData = extractJson(aiResponse);
+  if (!aiData) {
+    throw new Error('Falha ao decodificar matriz JSON gerada pelo motor de IA.');
+  }
 
-    const detectedBanca = aiData.banca_identificada || finalBanca || 'Banca Oficial';
-    const marcos = Array.isArray(aiData.marcos_temporais) && aiData.marcos_temporais.length > 0
-      ? aiData.marcos_temporais
-      : (examDate ? [['PROVA OFICIAL', examDate]] : []);
+  const detectedBanca = aiData.banca_identificada || finalBanca || 'Banca Oficial';
+  const marcos = Array.isArray(aiData.marcos_temporais) && aiData.marcos_temporais.length > 0
+    ? aiData.marcos_temporais
+    : (examDate ? [['PROVA OFICIAL', examDate]] : []);
 
-    const detectedExamMarco = marcos.find(([label]) => /prova|exame|objetiva|escrita/i.test(String(label || '')));
-    const resolvedExamDate = examDate || (detectedExamMarco ? detectedExamMarco[1] : null);
+  // Descobre a data da prova a partir dos marcos extraídos do edital, se houver
+  const detectedExamMarco = marcos.find(([label]) => /prova|exame|objetiva|escrita/i.test(String(label || '')));
+  const resolvedExamDate = examDate || (detectedExamMarco ? detectedExamMarco[1] : null);
 
-    const sched = generateTacticalSchedule(aiData.unidades || [], effectiveHours, new Date(), resolvedExamDate);
+  // 4. Monta cronograma tático determinístico (~3 meses / 10–12 semanas) e estrutura do cabeçalho
+  const sched = generateTacticalSchedule(aiData.unidades || [], effectiveHours, new Date(), resolvedExamDate);
 
-    const headerConfig = {
-      title: finalConcurso.toUpperCase(),
-      subtitle: `${finalCargo.toUpperCase()} · ${detectedBanca.toUpperCase()}`,
-      badge: `// ${finalTier.toUpperCase()}`,
+  const headerConfig = {
+    title: finalConcurso.toUpperCase(),
+    subtitle: `${finalCargo.toUpperCase()} · ${detectedBanca.toUpperCase()}`,
+    badge: `// ${finalTier.toUpperCase()}`,
+    banca: detectedBanca,
+    edital_extracted: hasSubmittedEdital,
+    edital_audit_summary: aiData.resumo_auditoria_edital || '',
+    dates: marcos.length > 0 ? marcos : undefined
+  };
+
+  const contentData = {
+    meta: {
+      concurso: finalConcurso,
+      cargo: finalCargo,
       banca: detectedBanca,
-      edital_extracted: hasSubmittedEdital,
-      edital_audit_summary: aiData.resumo_auditoria_edital || '',
-      dates: marcos.length > 0 ? marcos : undefined
-    };
+      tier: finalTier,
+      hoursPerDay: effectiveHours,
+      editalExtracted: hasSubmittedEdital,
+      auditSummary: aiData.resumo_auditoria_edital || '',
+      calibratedAt: new Date().toISOString()
+    },
+    sched,
+    dates: headerConfig.dates,
+    assuntos: aiData.assuntos || [],
+    texts: aiData.textos || [],
+    textos: aiData.textos || [],
+    cards: aiData.cards || [],
+    sim: aiData.sim || [],
+    rubric: aiData.rubric || [],
+    arg: aiData.arg || [],
+    mapa: aiData.mapa || { nodes: [], edges: [] },
+    tabs: aiData.tabs || [],
+    checklist: aiData.checklist || [],
+    vespera: aiData.vespera || '',
+    escrita: aiData.escrita || ''
+  };
 
-    const contentData = {
-      meta: {
+  // 5. Persiste a calibração em `public.user_panels` (atualiza existente ou cria novo se usuário autenticado)
+  let savedPanelId = panel?.id || null;
+  if (panel && panel.id && panel.id !== 'default-panel') {
+    await supabaseRest(env, `/user_panels?id=eq.${encodeURIComponent(panel.id)}`, {
+      method: 'PATCH',
+      body: {
+        status: 'ready',
         concurso: finalConcurso,
         cargo: finalCargo,
-        banca: detectedBanca,
-        tier: finalTier,
-        hoursPerDay: effectiveHours,
-        editalExtracted: hasSubmittedEdital,
-        auditSummary: aiData.resumo_auditoria_edital || '',
-        calibratedAt: new Date().toISOString()
+        header_config: headerConfig,
+        content_data: contentData,
+        updated_at: new Date().toISOString(),
       },
-      sched,
-      dates: headerConfig.dates,
-      assuntos: aiData.assuntos || [],
-      texts: aiData.textos || [],
-      textos: aiData.textos || [],
-      cards: aiData.cards || [],
-      sim: aiData.sim || [],
-      rubric: aiData.rubric || [],
-      arg: aiData.arg || [],
-      mapa: aiData.mapa || { nodes: [], edges: [] },
-      tabs: aiData.tabs || [],
-      checklist: aiData.checklist || [],
-      vespera: aiData.vespera || '',
-      escrita: aiData.escrita || ''
-    };
-
-    let savedPanelId = panel?.id || null;
-    if (panel && panel.id && panel.id !== 'default-panel') {
-      await supabaseRest(env, `/user_panels?id=eq.${encodeURIComponent(panel.id)}`, {
-        method: 'PATCH',
+    });
+  } else if (targetUserId && targetUserId !== 'default-user') {
+    try {
+      const createdPanels = await supabaseRest(env, '/user_panels', {
+        method: 'POST',
         body: {
+          user_id: targetUserId,
+          order_id: order?.id || null,
           status: 'ready',
+          plan_tier: finalTier,
           concurso: finalConcurso,
           cargo: finalCargo,
+          enabled_modules: getModulesByTier(finalTier),
           header_config: headerConfig,
           content_data: contentData,
+        },
+        prefer: 'return=representation',
+      });
+      const created = Array.isArray(createdPanels) ? createdPanels[0] : createdPanels;
+      if (created?.id) savedPanelId = created.id;
+    } catch (createErr) {
+      console.warn('[calibrate] Aviso ao criar user_panel:', createErr.message);
+    }
+  }
+
+  if (panel?.order_id || order?.id) {
+    const targetOrdId = panel?.order_id || order?.id;
+    try {
+      await supabaseRest(env, `/orders?id=eq.${encodeURIComponent(targetOrdId)}`, {
+        method: 'PATCH',
+        body: {
+          status: 'delivered',
           updated_at: new Date().toISOString(),
         },
       });
-    } else if (targetUserId && targetUserId !== 'default-user') {
-      try {
-        const createdPanels = await supabaseRest(env, '/user_panels', {
-          method: 'POST',
-          body: {
-            user_id: targetUserId,
-            order_id: order?.id || null,
-            status: 'ready',
-            plan_tier: finalTier,
-            concurso: finalConcurso,
-            cargo: finalCargo,
-            enabled_modules: getModulesByTier(finalTier),
-            header_config: headerConfig,
-            content_data: contentData,
-          },
-          prefer: 'return=representation',
+    } catch (_) {}
+  }
+
+  if (targetUserId && targetUserId !== 'default-user') {
+    try {
+      const profiles = await supabaseRest(env, `/profiles?id=eq.${encodeURIComponent(targetUserId)}`);
+      const profile = Array.isArray(profiles) && profiles.length > 0 ? profiles[0] : null;
+      const email = profile?.email || order?.email;
+
+      if (email) {
+        const htmlEmail = renderEmailPanelReady({
+          email,
+          concurso: finalConcurso,
+          cargo: finalCargo,
+          planTitle: finalTier.toUpperCase(),
+          panelUrl: env?.PANEL_URL || 'https://app.crivos.me',
         });
-        const created = Array.isArray(createdPanels) ? createdPanels[0] : createdPanels;
-        if (created?.id) savedPanelId = created.id;
-      } catch (createErr) {
-        console.warn('[calibrate] Aviso ao criar user_panel:', createErr.message);
-      }
-    }
-
-    if (panel?.order_id || order?.id) {
-      const targetOrdId = panel?.order_id || order?.id;
-      try {
-        await supabaseRest(env, `/orders?id=eq.${encodeURIComponent(targetOrdId)}`, {
-          method: 'PATCH',
-          body: {
-            status: 'delivered',
-            updated_at: new Date().toISOString(),
-          },
+        await sendResendEmail(env, {
+          to: email,
+          subject: `Painel Liberado e Calibrado // ${finalConcurso} - ${finalCargo}`,
+          html: htmlEmail,
         });
-      } catch (_) {}
-    }
-
-    if (targetUserId && targetUserId !== 'default-user') {
-      try {
-        const profiles = await supabaseRest(env, `/profiles?id=eq.${encodeURIComponent(targetUserId)}`);
-        const profile = Array.isArray(profiles) && profiles.length > 0 ? profiles[0] : null;
-        const email = profile?.email || order?.email;
-
-        if (email) {
-          const htmlEmail = renderEmailPanelReady({
-            email,
-            concurso: finalConcurso,
-            cargo: finalCargo,
-            planTitle: finalTier.toUpperCase(),
-            panelUrl: env?.PANEL_URL || 'https://app.crivos.me',
-          });
-          await sendResendEmail(env, {
-            to: email,
-            subject: `Painel Liberado e Calibrado // ${finalConcurso} - ${finalCargo}`,
-            html: htmlEmail,
-          });
-        }
-      } catch (emailErr) {
-        console.warn('[calibrate] Falha no disparo do e-mail:', emailErr.message);
       }
+    } catch (emailErr) {
+      console.warn('[calibrate] Falha no disparo do e-mail:', emailErr.message);
     }
+  }
 
-    return new Response(JSON.stringify({
-      success: true,
-      panelId: savedPanelId || 'calibrated-local',
-      status: 'ready',
-      editalExtracted: hasSubmittedEdital,
-      auditSummary: aiData.resumo_auditoria_edital || '',
-      headerConfig,
-      contentData,
-      message: hasSubmittedEdital
-        ? 'Edital dissecado e painel calibrado integralmente em todas as abas!'
-        : 'Painel calibrado integralmente em todas as abas!'
-    }), {
+  return {
+    success: true,
+    panelId: savedPanelId || 'calibrated-local',
+    status: 'ready',
+    editalExtracted: hasSubmittedEdital,
+    auditSummary: aiData.resumo_auditoria_edital || '',
+    headerConfig,
+    contentData,
+    message: hasSubmittedEdital
+      ? 'Edital dissecado e painel calibrado integralmente em todas as abas!'
+      : 'Painel calibrado integralmente em todas as abas!'
+  };
+}
+
+export async function onRequestPost(context) {
+  const { request, env } = context;
+  const corsHeaders = getCorsHeaders(request);
+
+  try {
+    const body = await request.json();
+    const result = await runCalibrationEngine(env, body);
+    return new Response(JSON.stringify(result), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
-
   } catch (err) {
     console.error('[engine/calibrate] Erro fatal:', err);
     return new Response(JSON.stringify({
-      error: 'Erro durante a calibração autônoma do painel.',
+      error: err.statusCode === 400 ? err.message : 'Erro durante a calibração autônoma do painel.',
       details: err.message
     }), {
-      status: 500,
+      status: err.statusCode || 500,
       headers: corsHeaders,
     });
   }

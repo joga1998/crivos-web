@@ -79,6 +79,7 @@ export async function onRequestPost(context) {
         orderId: orderId || null,
         mpPaymentId: String(paymentId),
         paymentMethod,
+        waitUntil: context.waitUntil ? context.waitUntil.bind(context) : null,
       });
 
       console.log(`[Webhook MP] Resultado do provisionamento:`, provisionResult);

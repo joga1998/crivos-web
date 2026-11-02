@@ -89,6 +89,9 @@ export async function onRequestPost(context) {
 
     // Chave única de idempotência para evitar cobranças duplicadas em requisições repetidas
     const idempotencyKey = `pix-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+    const orderBumpPrice = 27.00;
+    const finalAmount = orderBump ? Number((selected.amount + orderBumpPrice).toFixed(2)) : selected.amount;
+    const finalDesc = orderBump ? `${selected.title} + Dossiê D-7` : selected.title;
 
     const mpPayload = {
       transaction_amount: finalAmount,
