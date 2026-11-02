@@ -504,8 +504,22 @@
           <strong style="color:var(--accent-green);">APROVADO E VINCULADO</strong>
         </div>
         <div class="order-row">
-          <span>PRAZO DE CALIBRAÇÃO:</span>
-          <strong>ATÉ 48 HORAS ÚTEIS</strong>
+          <span>SITUAÇÃO DO PAINEL:</span>
+          <strong id="calibration-status-label" style="color:var(--accent-blue);">CALIBRAÇÃO AUTÔNOMA EM ANDAMENTO</strong>
+        </div>
+      </div>
+
+      <!-- BARRA DE PROGRESSO DE CALIBRAÇÃO IMEDIATA -->
+      <div id="calibration-progress-box" style="padding:16px;background:var(--bg-elevated);border:2px solid var(--border-color);margin-bottom:24px;text-align:left;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <span style="font-family:var(--font-mono);font-size:11px;font-weight:900;text-transform:uppercase;">// STATUS DA ENGENHARIA TÁTICA (IA)</span>
+          <span id="calibration-percentage" style="font-family:var(--font-mono);font-size:11px;font-weight:900;">25%</span>
+        </div>
+        <div style="width:100%;height:10px;background:var(--bg-surface);border:1.5px solid var(--border-color);overflow:hidden;margin-bottom:8px;">
+          <div id="calibration-progress-bar" style="width:25%;height:100%;background:var(--accent-red);transition:width 0.8s ease;"></div>
+        </div>
+        <div id="calibration-log" style="font-family:var(--font-mono);font-size:11px;color:var(--text-secondary);">
+          ■ Auditando edital e histórico de recorrência da banca...
         </div>
       </div>
 
@@ -569,6 +583,38 @@
       const id = urlParams.get('id') || urlParams.get('payment_id') || 'CRV-' + Math.floor(100000 + Math.random() * 900000);
       const txEl = document.getElementById('tx-id');
       if (txEl) txEl.textContent = '#' + id;
+
+      // Animação progressiva de calibração autônoma
+      let prog = 25;
+      const bar = document.getElementById('calibration-progress-bar');
+      const pct = document.getElementById('calibration-percentage');
+      const log = document.getElementById('calibration-log');
+      const statusLabel = document.getElementById('calibration-status-label');
+
+      const steps = [
+        { p: 45, text: '■ Estruturando matriz de peso das disciplinas e matérias prioritárias...' },
+        { p: 70, text: '■ Calibrando cronograma diário com ciclos SM-2 (D+1, D+7, D+30)...' },
+        { p: 90, text: '■ Gerando resumos conceituais e banco de simulados da banca...' },
+        { p: 100, text: '✓ Painel 100% Calibrado e Liberado na sua conta exclusiva!' }
+      ];
+
+      let stepIdx = 0;
+      const timer = setInterval(() => {
+        if (stepIdx < steps.length) {
+          const s = steps[stepIdx];
+          if (bar) bar.style.width = s.p + '%';
+          if (pct) pct.textContent = s.p + '%';
+          if (log) log.textContent = s.text;
+          if (s.p === 100) {
+            clearInterval(timer);
+            if (statusLabel) {
+              statusLabel.textContent = 'PAINEL LIBERADO E DISPONÍVEL';
+              statusLabel.style.color = 'var(--accent-green)';
+            }
+          }
+          stepIdx++;
+        }
+      }, 4000);
 
       // Disparo de garantia: consulta a API para assegurar que a ordem foi provisionada
       if (id && /^\d+$/.test(id)) {

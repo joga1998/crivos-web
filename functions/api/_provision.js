@@ -334,6 +334,44 @@ export async function provisionUserOrder(env, { orderId, mpPaymentId, paymentMet
     console.warn("[Provision CAPI] Excecao no disparo Meta CAPI:", capiError.message);
   }
 
+
+  // 11. AUTOMAÇÃO DE CALIBRAÇÃO IMEDIATA (TÁTICO, ARSENAL, ELITE)
+  // Planos sem upload de materiais pessoais são calibrados instantaneamente via IA
+  const isPrime = tierLower === 'prime';
+  if (!isPrime && panel?.id) {
+    try {
+      console.log(`[Provision Autônomo] Iniciando calibração instantânea via IA para ordem ${order.id}...`);
+      
+      // Chamada assíncrona/edge para o motor de calibração autônomo
+      const calibratePayload = {
+        orderId: order.id,
+        userId,
+        concurso: concursoNome,
+        cargo: cargoNome,
+        planTier: order.plan_tier,
+        availabilityHours: (parsedNotes.availability && parseInt(parsedNotes.availability)) || 4,
+      };
+
+      // Dispara a calibração diretamente usando o endpoint interno
+      const protocol = (env?.CRIVOS_API_URL || 'https://crivos.me').startsWith('https') ? 'https' : 'http';
+      const baseUrl = env?.CRIVOS_API_URL || 'https://crivos.me';
+      
+      // Fetch não bloqueante para responder o webhook rápido se necessário, ou aguarda com timeout
+      fetch(`${baseUrl}/api/engine/calibrate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(calibratePayload),
+      }).then(res => res.json()).then(calibResult => {
+        console.log(`[Provision Autônomo] Calibração concluída para ordem ${order.id}:`, calibResult.success);
+      }).catch(calibErr => {
+        console.warn(`[Provision Autônomo] Falha na calibração autônoma para ${order.id}:`, calibErr.message);
+      });
+
+    } catch (autoErr) {
+      console.warn(`[Provision Autônomo] Falha ao disparar calibração autônoma para ${order.id}:`, autoErr.message);
+    }
+  }
+
   return {
     success: true,
     userId,
