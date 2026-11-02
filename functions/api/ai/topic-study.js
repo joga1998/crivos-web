@@ -34,7 +34,7 @@ export async function onRequestPost(context) {
 
   try {
     const body = await request.json();
-    const { concurso, cargo, banca = 'AOCP', materia, topico } = body;
+    const { concurso, cargo, banca = 'Banca Examinadora', materia, topico } = body;
 
     if (!materia || !topico) {
       return new Response(JSON.stringify({ error: 'Materia e Topico são obrigatórios.' }), {

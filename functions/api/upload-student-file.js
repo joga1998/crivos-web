@@ -73,7 +73,7 @@ export async function onRequestPost(context) {
       category: category,
       title: title || filename.replace(/\.[^/.]+$/, '').replace(/_/g, ' '),
       filename: filename,
-      storage_path: `user-materials/${storagePath}`,
+      storage_path: storagePath,
       storage_url: publicUrl,
       priority: 'ESSENCIAL',
       file_size_bytes: file.size || buffer.byteLength || 0,

@@ -1,10 +1,10 @@
 // Helper de comunicação direta com a API da OpenRouter
-// Motor oficial de calibração e estudo tático CRIVOS: DeepSeek V4.1 Flash -> DeepSeek V3 (deepseek/deepseek-chat)
-// Fallback estritamente DeepSeek V3 conforme diretriz da arquitetura pedagógica.
+// Motor oficial de calibração e estudo tático CRIVOS: DeepSeek V3 (deepseek/deepseek-chat)
+// Otimizado para zero retentativas fantasma, controle de tokens por plano e baixa latência em Cloudflare Workers.
 
-export const OPENROUTER_DEFAULT_MODEL = 'deepseek/deepseek-v4.1-flash';
-export const OPENROUTER_FALLBACK_MODEL = 'deepseek/deepseek-chat'; // DeepSeek V3 oficial no OpenRouter
-export const OPENROUTER_TERTIARY_MODEL = 'deepseek/deepseek-chat-v3.1'; // Snapshot / variante DeepSeek V3
+export const OPENROUTER_DEFAULT_MODEL = 'deepseek/deepseek-chat'; // DeepSeek V3 oficial no OpenRouter
+export const OPENROUTER_FALLBACK_MODEL = 'deepseek/deepseek-chat-v3-0324'; // Snapshot estável DeepSeek V3
+export const OPENROUTER_TERTIARY_MODEL = 'google/gemini-2.5-flash'; // Contingência rápida de alta disponibilidade
 
 const _K_PARTS = ['sk-or-v1-', '8c4f3615d9b26cce4aceef46573c8af2', '6d657bd945b0a024154397b7f7d374ab'];
 const DEFAULT_OR_KEY = _K_PARTS.join('');
@@ -14,7 +14,7 @@ export async function callExperientialAI(env, {
   model = OPENROUTER_DEFAULT_MODEL,
   temperature = 0.2,
   responseFormat = null,
-  maxTokens = 4000
+  maxTokens = 3800
 }) {
   const openRouterKey = env?.OPENROUTER_API_KEY || DEFAULT_OR_KEY;
   const modelsQueue = [model];
@@ -26,14 +26,17 @@ export async function callExperientialAI(env, {
   for (const currentModel of modelsQueue) {
     // Modelos DeepSeek Chat / V3 possuem teto de 8192 tokens de saída na API
     const safeMaxTokens = (currentModel.includes('deepseek-chat') || currentModel.includes('deepseek-v3'))
-      ? Math.min(maxTokens, 7800)
-      : Math.min(maxTokens, 12000);
+      ? Math.min(maxTokens, 6500)
+      : Math.min(maxTokens, 8000);
 
     const payload = {
       model: currentModel,
       messages,
       temperature,
       max_tokens: safeMaxTokens,
+      provider: {
+        sort: 'throughput'
+      }
     };
 
     if (responseFormat) {
@@ -60,6 +63,9 @@ export async function callExperientialAI(env, {
       }
 
       const data = await res.json();
+      if (data?.usage) {
+        console.log(`[CrivosAI] ${currentModel} usage: prompt=${data.usage.prompt_tokens}, completion=${data.usage.completion_tokens}, total=${data.usage.total_tokens}`);
+      }
       const content = data?.choices?.[0]?.message?.content;
       if (!content) {
         lastError = new Error(`Crivos AI retornou conteúdo vazio no modelo ${currentModel}`);

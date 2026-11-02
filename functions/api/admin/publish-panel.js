@@ -12,7 +12,7 @@ export async function onRequestPost(context) {
 
   try {
     // Verificação de autenticação administrativa
-    const adminKey = env?.ADMIN_API_KEY || (typeof ADMIN_API_KEY !== 'undefined' ? ADMIN_API_KEY : null) || 'crivos_secret_adm_2026_x89p';
+    const adminKey = env?.ADMIN_API_KEY || (typeof ADMIN_API_KEY !== 'undefined' ? ADMIN_API_KEY : null);
     const authHeader = request.headers.get('Authorization') || '';
     const providedKey = authHeader.replace(/^Bearer\s+/i, '').trim() || request.headers.get('x-admin-key');
 
@@ -28,6 +28,13 @@ export async function onRequestPost(context) {
 
     if (!userId && !orderId) {
       return new Response(JSON.stringify({ error: 'É necessário informar userId ou orderId.' }), {
+        status: 400,
+        headers: corsHeaders,
+      });
+    }
+
+    if (contentData && typeof contentData === 'object' && (!Array.isArray(contentData.sched) || contentData.sched.length === 0)) {
+      return new Response(JSON.stringify({ error: 'contentData inválido: é obrigatório conter um cronograma (sched) válido.' }), {
         status: 400,
         headers: corsHeaders,
       });
