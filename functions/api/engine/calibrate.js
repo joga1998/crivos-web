@@ -4,6 +4,49 @@
 import { getCorsHeaders, supabaseRest, sendResendEmail, renderEmailPanelReady } from '../_supabase.js';
 import { callExperientialAI } from '../_ai.js';
 
+function generateTacticalSchedule(unidades, availabilityHours = 4, startDate = new Date()) {
+  const sched = [];
+  let currentDate = new Date(startDate);
+  
+  const d0Str = currentDate.toISOString().slice(0, 10);
+  sched.push({
+    d: d0Str,
+    h: availabilityHours,
+    t: '<span class="tag adm">ADM</span> Leitura do Edital e montagem do caderno de fichas. Organização do ambiente de estudos e auditoria da matriz de pesos.'
+  });
+
+  const studyDates = [];
+
+  unidades.forEach((u, i) => {
+    currentDate.setDate(currentDate.getDate() + 1);
+    const dStr = currentDate.toISOString().slice(0, 10);
+    studyDates.push({ date: dStr, unit: u.titulo, index: i + 1 });
+
+    sched.push({
+      d: dStr,
+      h: availabilityHours,
+      t: `<span class="tag ar">ÁREA</span> <b>${u.titulo}</b> (${u.materia}): Estudo da teoria e conceitos-chave. Resolução de questões de fixação da banca.`
+    });
+
+    if (i > 0) {
+      const prev = studyDates[i - 1];
+      sched[sched.length - 1].t += ` <span class="tag rev">REV</span> ${prev.unit} D+1 (15 min).`;
+    }
+
+    if ((i + 1) % 3 === 0) {
+      currentDate.setDate(currentDate.getDate() + 1);
+      const simDateStr = currentDate.toISOString().slice(0, 10);
+      sched.push({
+        d: simDateStr,
+        h: availabilityHours,
+        t: `<span class="tag esc">ESCRITA</span> <b>Simulado Tático de Bloco #${Math.ceil((i+1)/3)}</b>: Resolução de questões sem consulta. Correção com espelho oficial da banca.`
+      });
+    }
+  });
+
+  return sched;
+}
+
 export async function onRequestPost(context) {
   const { request, env } = context;
   const corsHeaders = getCorsHeaders(request);
@@ -41,95 +84,34 @@ export async function onRequestPost(context) {
     const finalTier = (planTier || panel.plan_tier || order?.plan_tier || 'tatico').toLowerCase();
     const finalBanca = banca || 'VUNESP';
 
-    // 2. Prompt Mestre de Calibração da Engenharia Tática CRIVOS
-    const systemPrompt = `Você é o Engenheiro-Chefe Tático e Editorial do ecossistema CRIVOS.
-Sua missão é gerar a calibração COMPLETA, matematicamente perfeita e metodologicamente blindada do Painel de Estudos Pós-Edital do aluno.
-
-ESTRUTURA RIGOROSA DO JSON DE SAÍDA:
+    // 2. Prompt Estruturado focado em conteúdo pedagógico (sem sobrecarga de datas manuais)
+    const systemPrompt = `Você é o Engenheiro Tático da CRIVOS.
+Gere o conteúdo pedagógico estruturado para o pós-edital do aluno em formato JSON rigoroso:
 {
-  "header_config": {
-    "title": "${finalConcurso}",
-    "subtitle": "${finalCargo}",
-    "badge": "// SISTEMA CRIVOS ${finalTier.toUpperCase()}",
-    "dates": [
-      ["STATUS", "PAINEL CALIBRADO"],
-      ["BANCA", "${finalBanca}"],
-      ["CARGA", "${availabilityHours}H / DIA"]
-    ]
-  },
-  "content_data": {
-    "sched": [
-      {
-        "d": "YYYY-MM-DD",
-        "h": number,
-        "t": "<span class=\\"tag adm\\">ADM</span> Planejamento e organização..."
-      }
-      // Gerar cronograma sequencial de estudo para os primeiros 30 a 60 dias com tags (ADM, REV, ÁREA, ESCRITA) e ciclos SM-2 D+1 e D+7
-    ],
-    "textos": [
-      {
-        "id": "t1",
-        "t": "Nome do Tópico 1",
-        "autor": "${finalBanca} / Legislação",
-        "p": "Conceito essencial e núcleo da tese do tema...",
-        "tese": "Síntese em um parágrafo da posição da banca...",
-        "crivo": "O que você precisa saber no domingo da prova...",
-        "conceitos": [
-          { "termo": "Termo 1", "def": "Definição precisa..." },
-          { "termo": "Termo 2", "def": "Definição precisa..." }
-        ],
-        "conexoes": [
-          ["Tópico Correlato", "Relação lógica..."]
-        ]
-      }
-      // Gerar ao menos 6 a 10 tópicos centrais prioritários do edital
-    ],
-    "cards": [
-      {
-        "id": "c1",
-        "f": "Pergunta do Flashcard SM-2?",
-        "v": "Resposta objetiva e cirúrgica para memorização ativa.",
-        "cat": "Direito / Matéria"
-      }
-      // Gerar ao menos 15 a 20 flashcards de alto impacto
-    ],
-    "sim": [
-      {
-        "id": "sim_1",
-        "titulo": "SIMULADO DISSERTATIVO #01 // ${finalBanca}",
-        "comando": "Comando dissertativo detalhado com situação hipotética...",
-        "eixos": ["Eixo 1", "Eixo 2", "Eixo 3"]
-      }
-    ],
-    "arg": [
-      {
-        "id": "arg_1",
-        "q": "Pergunta de arguição viva-voce sobre ponto nevrálgico do edital?",
-        "alvo": "Foco crítico da resposta",
-        "resp": "Roteiro de defesa recomendado em tópicos...",
-        "cat": "Conhecimentos Específicos"
-      },
-      {
-        "id": "arg_2",
-        "q": "Pergunta de confronto de teses ou jurisprudência da banca?",
-        "alvo": "Diferenciação conceitual",
-        "resp": "Roteiro de defesa recomendado...",
-        "cat": "Legislação Aplicada"
-      }
-    ]
-  }
+  "unidades": [
+    { "titulo": "string", "materia": "string", "topicos": ["topico 1", "topico 2"] }
+  ],
+  "textos": [
+    { "id": "t1", "t": "string", "autor": "string", "p": "string", "tese": "string", "crivo": "string", "conceitos": [{ "termo": "string", "def": "string" }] }
+  ],
+  "cards": [
+    { "id": "c1", "f": "string", "v": "string", "cat": "string" }
+  ],
+  "sim": [
+    { "id": "sim_1", "titulo": "string", "comando": "string", "eixos": ["eixo 1", "eixo 2"] }
+  ],
+  "arg": [
+    { "id": "arg_1", "q": "string", "alvo": "string", "resp": "string", "cat": "string" }
+  ]
 }`;
 
     const userPrompt = `DADOS PARA CALIBRAÇÃO IMEDIATA:
-- Aluno: ${targetUserId}
 - Concurso: ${finalConcurso}
 - Cargo: ${finalCargo}
-- Banca Organizadora: ${finalBanca}
+- Banca: ${finalBanca}
 - Plano: ${finalTier}
-- Carga Horária Disponível: ${availabilityHours} horas líquidas/dia
-- Data Estimada da Prova: ${examDate || '60 dias pós-edital'}
-
-Gere a calibração com rigor editorial suíço, sem floreios, pronta para uso imediato no painel.`;
+- Carga: ${availabilityHours}h/dia
+Gere 6 unidades curriculares prioritárias do edital, 3 textos de aprofundamento, 8 flashcards SM-2 cirúrgicos, 1 simulado discursivo e 2 questões de arguição viva-voce no padrão da banca.`;
 
     const aiResponse = await callExperientialAI(env, {
       messages: [
@@ -137,26 +119,48 @@ Gere a calibração com rigor editorial suíço, sem floreios, pronta para uso i
         { role: 'user', content: userPrompt }
       ],
       temperature: 0.2,
-      maxTokens: 8000,
+      maxTokens: 16000,
       responseFormat: { type: 'json_object' }
     });
 
-    const calibratedData = JSON.parse(aiResponse);
+    const aiData = JSON.parse(aiResponse);
 
-    // 3. Persiste a calibração em `public.user_panels` e muda status para 'ready'
+    // 3. Monta cronograma tático determinístico e estrutura do cabeçalho
+    const sched = generateTacticalSchedule(aiData.unidades || [], availabilityHours, new Date());
+
+    const headerConfig = {
+      title: finalConcurso.toUpperCase(),
+      subtitle: finalCargo.toUpperCase(),
+      badge: `// SISTEMA CRIVOS ${finalTier.toUpperCase()}`,
+      dates: [
+        ['STATUS', 'PAINEL CALIBRADO'],
+        ['BANCA', finalBanca.toUpperCase()],
+        ['CARGA', `${availabilityHours}H / DIA`]
+      ]
+    };
+
+    const contentData = {
+      sched,
+      textos: aiData.textos || [],
+      cards: aiData.cards || [],
+      sim: aiData.sim || [],
+      arg: aiData.arg || []
+    };
+
+    // 4. Persiste a calibração em `public.user_panels` e muda status para 'ready'
     await supabaseRest(env, `/user_panels?id=eq.${panel.id}`, {
       method: 'PATCH',
       body: {
         status: 'ready',
         concurso: finalConcurso,
         cargo: finalCargo,
-        header_config: calibratedData.header_config,
-        content_data: calibratedData.content_data,
+        header_config: headerConfig,
+        content_data: contentData,
         updated_at: new Date().toISOString(),
       },
     });
 
-    // 4. Atualiza a ordem para 'delivered'
+    // 5. Atualiza a ordem para 'delivered'
     if (panel.order_id) {
       await supabaseRest(env, `/orders?id=eq.${encodeURIComponent(panel.order_id)}`, {
         method: 'PATCH',
@@ -167,7 +171,7 @@ Gere a calibração com rigor editorial suíço, sem floreios, pronta para uso i
       });
     }
 
-    // 5. Envia o E-mail #2 avisando que o painel está calibrado e liberado
+    // 6. Envia o E-mail avisando que o painel está calibrado e liberado
     const profiles = await supabaseRest(env, `/profiles?id=eq.${targetUserId}`);
     const profile = Array.isArray(profiles) && profiles.length > 0 ? profiles[0] : null;
     const email = profile?.email || order?.email;
@@ -187,7 +191,7 @@ Gere a calibração com rigor editorial suíço, sem floreios, pronta para uso i
           html: htmlEmail,
         });
       } catch (emailErr) {
-        console.warn('[calibrate] Falha não impeditiva no disparo do e-mail:', emailErr.message);
+        console.warn('[calibrate] Falha no disparo do e-mail:', emailErr.message);
       }
     }
 

@@ -616,11 +616,34 @@
         }
       }, 4000);
 
-      // Disparo de garantia: consulta a API para assegurar que a ordem foi provisionada
+      // Disparo de garantia: consulta a API para assegurar que a ordem foi provisionada e dispara calibração autônoma
       if (id && /^\d+$/.test(id)) {
-        fetch(`/api/check-payment/${id}`).catch(function(e) {
-          console.warn('Garantia check-payment:', e);
-        });
+        fetch(`/api/check-payment/${id}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data?.order?.id) {
+              return fetch('/api/engine/calibrate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ orderId: data.order.id })
+              });
+            }
+          })
+          .then(calibRes => calibRes ? calibRes.json() : null)
+          .then(calibData => {
+            if (calibData && calibData.success) {
+              if (bar) bar.style.width = '100%';
+              if (pct) pct.textContent = '100%';
+              if (log) log.textContent = '✓ Painel 100% Calibrado e Liberado na sua conta exclusiva!';
+              if (statusLabel) {
+                statusLabel.textContent = 'PAINEL LIBERADO E DISPONÍVEL';
+                statusLabel.style.color = 'var(--accent-green)';
+              }
+            }
+          })
+          .catch(function(e) {
+            console.warn('Garantia check-payment/calibração:', e);
+          });
       }
 
       // Theme toggle sincronizado
