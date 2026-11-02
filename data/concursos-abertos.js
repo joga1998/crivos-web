@@ -1,17 +1,36 @@
 // Base estática oficial de concursos abertos para o checkout CRIVOS
 window.CRIVOS_CONCURSOS_DATA = [
   {
-    "id": "pm_sc_soldado",
-    "nome": "PM SC — Polícia Militar de Santa Catarina",
-    "banca": "Instituto AOCP",
-    "orgao": "Polícia Militar do Estado de Santa Catarina",
+    "id": "gcm_sao_goncalo",
+    "nome": "GCM São Gonçalo — Guarda Civil Municipal",
+    "banca": "Instituto Selecon",
+    "orgao": "Prefeitura Municipal de São Gonçalo (RJ)",
     "cargos": [
-      "Soldado do Quadro de Praças Policial Militar (QPPM)"
+      "Guarda Municipal Nível II",
+      "Guarda Municipal — Psicólogo"
+    ],
+    "escolaridade": "Médio e Superior",
+    "esfera": "Municipal (Segurança)",
+    "status": "Inscrições Abertas",
+    "salario_max": "R$ 5.124,00",
+    "popular": true
+  },
+  {
+    "id": "trf3_sp_ms",
+    "nome": "TRF-3 (SP e MS) — Tribunal Regional Federal da 3ª Região",
+    "banca": "VUNESP",
+    "orgao": "Tribunal Regional Federal da 3ª Região",
+    "cargos": [
+      "Analista Judiciário — Área Judiciária",
+      "Analista Judiciário — Oficial de Justiça Avaliador Federal",
+      "Analista Judiciário — Informática / Análise de Sistemas",
+      "Técnico Judiciário — Apoio Especializado / TI",
+      "Técnico Judiciário — Contabilidade"
     ],
     "escolaridade": "Superior",
-    "esfera": "Estadual (Militar)",
+    "esfera": "Federal",
     "status": "Inscrições Abertas",
-    "salario_max": "R$ 8.505,00",
+    "salario_max": "R$ 20.013,11",
     "popular": true
   },
   {
@@ -29,6 +48,71 @@ window.CRIVOS_CONCURSOS_DATA = [
     "esfera": "Estadual",
     "status": "Inscrições Abertas",
     "salario_max": "R$ 9.856,95",
+    "popular": true
+  },
+  {
+    "id": "camara_deputados",
+    "nome": "Câmara dos Deputados",
+    "banca": "CEBRASPE",
+    "orgao": "Congresso Nacional / Poder Legislativo",
+    "cargos": [
+      "Analista Legislativo — Consultoria Legislativa",
+      "Analista Legislativo — Técnica Legislativa",
+      "Analista Legislativo — Informática Legislativa",
+      "Analista Legislativo — Contador",
+      "Policial Legislativo"
+    ],
+    "escolaridade": "Superior",
+    "esfera": "Federal",
+    "status": "Inscrições Abertas",
+    "salario_max": "R$ 34.812,00",
+    "popular": true
+  },
+  {
+    "id": "cgu_auditor",
+    "nome": "CGU — Controladoria-Geral da União",
+    "banca": "CEBRASPE",
+    "orgao": "Controladoria-Geral da União",
+    "cargos": [
+      "Auditor Federal de Finanças e Controle (AFFC) — Auditoria e Fiscalização",
+      "Auditor Federal de Finanças e Controle (AFFC) — Tecnologia da Informação",
+      "Auditor Federal de Finanças e Controle (AFFC) — Correição e Combate à Corrupção"
+    ],
+    "escolaridade": "Superior",
+    "esfera": "Federal",
+    "status": "Inscrições Abertas",
+    "salario_max": "R$ 21.583,00",
+    "popular": true
+  },
+  {
+    "id": "mgs_minas_gerais",
+    "nome": "MGS — Minas Gerais Administração e Serviços S.A.",
+    "banca": "IBFC",
+    "orgao": "Governo do Estado de Minas Gerais / MGS",
+    "cargos": [
+      "Assistente Administrativo",
+      "Técnico em Informática",
+      "Técnico de Segurança do Trabalho",
+      "Agente de Campo / Serviços Gerais"
+    ],
+    "escolaridade": "Fundamental, Médio e Técnico",
+    "esfera": "Estadual",
+    "status": "Inscrições Abertas",
+    "salario_max": "R$ 3.911,17",
+    "popular": true
+  },
+  {
+    "id": "pm_sc_soldado",
+    "nome": "PM SC — Polícia Militar de Santa Catarina",
+    "banca": "Instituto AOCP",
+    "orgao": "Polícia Militar do Estado de Santa Catarina",
+    "cargos": [
+      "Soldado do Quadro de Praças Policial Militar (QPPM)"
+    ],
+    "escolaridade": "Superior",
+    "esfera": "Estadual (Militar)",
+    "status": "Inscrições Abertas",
+    "salario_max": "R$ 8.505,00",
     "popular": true
   },
   {
@@ -100,40 +184,6 @@ window.CRIVOS_CONCURSOS_DATA = [
     "esfera": "Federal",
     "status": "Inscrições Abertas",
     "salario_max": "R$ 18.380,17",
-    "popular": true
-  },
-  {
-    "id": "cgu_auditor",
-    "nome": "CGU — Controladoria-Geral da União",
-    "banca": "CEBRASPE",
-    "orgao": "Controladoria-Geral da União",
-    "cargos": [
-      "Auditor Federal de Finanças e Controle (AFFC) — Auditoria e Fiscalização",
-      "Auditor Federal de Finanças e Controle (AFFC) — Tecnologia da Informação",
-      "Auditor Federal de Finanças e Controle (AFFC) — Correição e Combate à Corrupção"
-    ],
-    "escolaridade": "Superior",
-    "esfera": "Federal",
-    "status": "Inscrições Abertas",
-    "salario_max": "R$ 21.583,00",
-    "popular": true
-  },
-  {
-    "id": "camara_deputados",
-    "nome": "Câmara dos Deputados",
-    "banca": "CEBRASPE",
-    "orgao": "Congresso Nacional / Poder Legislativo",
-    "cargos": [
-      "Analista Legislativo — Consultoria Legislativa",
-      "Analista Legislativo — Técnica Legislativa",
-      "Analista Legislativo — Informática Legislativa",
-      "Analista Legislativo — Contador",
-      "Policial Legislativo"
-    ],
-    "escolaridade": "Superior",
-    "esfera": "Federal",
-    "status": "Inscrições Abertas",
-    "salario_max": "R$ 34.812,00",
     "popular": true
   },
   {
