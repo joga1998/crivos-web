@@ -164,10 +164,13 @@ export async function provisionUserOrder(env, { orderId, mpPaymentId, paymentMet
   };
   const planTitle = planTitles[order.plan_tier] || 'Plano Tático';
 
-  // Prazo de calibração alinhado à oferta (Elite/Prime: 6h; Tático/Arsenal: 24h)
+  // Nova sistemática oficial: Calibração Instantânea nos Planos Tático, Arsenal e Elite / Calibração Personalizada em até 6h no Plano Prime
   const tierLower = (order.plan_tier || '').toLowerCase();
-  const deliveryHours = (tierLower === 'elite' || tierLower === 'prime') ? 6 : 24;
-  const deadline = new Date(Date.now() + deliveryHours * 60 * 60 * 1000).toISOString();
+  const isPrime = (tierLower === 'prime');
+  const deliveryHours = isPrime ? 6 : 0;
+  const deadline = isPrime
+    ? new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString()
+    : new Date().toISOString();
 
   // Verifica se já existe painel para esta ordem
   const existingPanels = await supabaseRest(env, `/user_panels?order_id=eq.${encodeURIComponent(order.id)}`);
@@ -177,7 +180,7 @@ export async function provisionUserOrder(env, { orderId, mpPaymentId, paymentMet
     const panelPayload = {
       user_id: userId,
       order_id: order.id,
-      status: 'calibrating',
+      status: isPrime ? 'calibrating' : 'ready',
       plan_tier: order.plan_tier,
       concurso: concursoNome,
       cargo: cargoNome,
@@ -187,7 +190,7 @@ export async function provisionUserOrder(env, { orderId, mpPaymentId, paymentMet
         subtitle: cargoNome,
         badge: `// SISTEMA ${order.plan_tier.toUpperCase()}`,
         dates: [
-          ['Entrega Prevista', deadline.slice(0, 16).replace('T', ' ')]
+          [isPrime ? 'Curadoria de Materiais' : 'Acesso', isPrime ? deadline.slice(0, 16).replace('T', ' ') : 'Liberado Instantaneamente']
         ],
       },
       content_data: {},
@@ -337,8 +340,7 @@ export async function provisionUserOrder(env, { orderId, mpPaymentId, paymentMet
 
 
   // 11. AUTOMAÇÃO DE CALIBRAÇÃO IMEDIATA (TÁTICO, ARSENAL, ELITE)
-  // Planos sem upload de materiais pessoais são calibrados instantaneamente via IA
-  const isPrime = tierLower === 'prime';
+  // Planos sem upload de materiais pessoais são calibrados instantaneamente via motor CRIVOS
   if (!isPrime && panel?.id) {
     try {
       console.log(`[Provision Autônomo] Iniciando calibração instantânea via IA para ordem ${order.id}...`);

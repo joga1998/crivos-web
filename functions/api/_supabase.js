@@ -255,17 +255,17 @@ export function renderEmailCredentials({ email, password, candidateName, planTit
         <!-- Alerta de Status Específico: CRIVOS PRIME -->
         <div style="border:2px solid #D92B2B;background:#FFFDFD;padding:16px;margin-bottom:24px;font-size:12px;line-height:1.6;">
           <strong style="color:#D92B2B;font-family:'Courier New',Courier,monospace;display:block;margin-bottom:6px;font-size:12px;">
-            [ STATUS ATUAL: AGUARDANDO UPLOAD DE ARQUIVOS PARA CALIBRAÇÃO ]
+            [ STATUS ATUAL: CALIBRAÇÃO PERSONALIZADA EM ATÉ 6H // CRIVOS PRIME ]
           </strong>
-          Seu painel já está aberto e com a aba <strong>[09 · ARQUIVOS]</strong> liberada. O ideal é subir todos os seus materiais em até <strong>48 horas</strong> pós-compra. Ao concluir seus uploads, clique em <strong>[ FINALIZAR ENVIO DE MATERIAIS ]</strong> para que nossa engenharia inicie a ancoragem sob demanda. Você receberá a confirmação assim que o sistema for liberado.
+          Seu painel base já está liberado. Acesse a aba <strong>[03 · ARQUIVOS]</strong> para enviar seus materiais complementares e apostilas. Nossa equipe de engenharia pedagógica fará a curadoria e ancoragem personalizada diretamente nas páginas dos seus arquivos em até <strong>6 horas</strong>.
         </div>
   ` : `
-        <!-- Alerta de Prazo de Calibração Padrão -->
-        <div style="border:1px solid #111111;padding:16px;margin-bottom:24px;font-size:12px;line-height:1.6;">
-          <strong style="color:#D92B2B;font-family:'Courier New',Courier,monospace;display:block;margin-bottom:6px;">
-            [ STATUS ATUAL: EM CALIBRAÇÃO TÁTICA // PRAZO ATÉ 24H ]
+        <!-- Alerta de Status Oficial: Calibração Instantânea (Tático, Arsenal, Elite) -->
+        <div style="border:2px solid #22C55E;background:#F0FDF4;padding:16px;margin-bottom:24px;font-size:12px;line-height:1.6;">
+          <strong style="color:#15803D;font-family:'Courier New',Courier,monospace;display:block;margin-bottom:6px;font-size:12px;">
+            [ STATUS ATUAL: CALIBRAÇÃO LIBERADA INSTANTANEAMENTE ]
           </strong>
-          Você já pode acessar o painel agora para conferir o status da engenharia e personalizar seu perfil (nome, foto e nova senha definitiva). Assim que os arquivos e o cronograma estiverem 100% montados, você receberá um segundo e-mail de liberação.
+          Seu sistema já está 100% calibrado e liberado para estudo imediato! Acesse agora com seu login e senha abaixo para usufruir do seu cronograma de ciclos, fichas táticas, flashcards SM-2, caderno de questões e Guia em PDF.
         </div>
   `;
   return `
