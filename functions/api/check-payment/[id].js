@@ -72,17 +72,21 @@ export async function onRequestGet(context) {
       );
     }
 
+    let provResult = null;
     if (mpData.status === 'approved' || mpData.status === 'in_process') {
       try {
-        await provisionUserOrder(env, {
+        provResult = await provisionUserOrder(env, {
           orderId: mpData.external_reference || null,
           mpPaymentId: String(mpData.id),
           paymentMethod: mpData.payment_type_id === 'credit_card' ? 'credit_card' : 'pix',
+          waitUntil: context.waitUntil ? context.waitUntil.bind(context) : null,
         });
       } catch (provErr) {
         console.warn('[check-payment] Aviso ao provisionar ordem aprovada:', provErr.message);
       }
     }
+
+    const resolvedOrderId = mpData.external_reference || provResult?.orderId || null;
 
     return new Response(
       JSON.stringify({
@@ -93,6 +97,8 @@ export async function onRequestGet(context) {
         payment_type_id: mpData.payment_type_id,
         transaction_amount: mpData.transaction_amount,
         date_approved: mpData.date_approved,
+        orderId: resolvedOrderId,
+        order: resolvedOrderId ? { id: resolvedOrderId } : null,
       }),
       { status: 200, headers: corsHeaders }
     );

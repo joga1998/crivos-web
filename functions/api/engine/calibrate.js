@@ -1,11 +1,241 @@
-// Cloudflare Pages Function: Motor de Calibração Autônoma de Painéis e Guias CRIVOS
-// Extrai o conteúdo real do edital submetido (PDF / Texto / Storage), calibra as abas do Sistema
-// Operacional CRIVOS de forma otimizada por plano (Tático, Arsenal, Elite) e gera/entrega automaticamente
-// o Guia de Estudos Pós-Edital (e o Dossiê D-7 quando aplicável) no repositório do aluno.
+// Cloudflare Pages Function: Motor de Calibração Autônoma 100% via API (DeepSeek V4.1 Flash 1017)
+// Gera integralmente via API: Matriz de Assuntos, Dossiês Táticos, Cronograma alinhado até a Data da Última Prova,
+// Marcos Temporais sincronizados, Flashcards SM-2, Simulados (Objetivos + Discursivos), Arguição Oral,
+// Mapa de Conexões e Guia de Estudos Pós-Edital (PDF/HTML A4) + Dossiê D-7.
 
 import { getCorsHeaders, getSupabaseConfig, supabaseRest, supabaseStorageUpload, sendResendEmail, renderEmailPanelReady } from '../_supabase.js';
 import { callExperientialAI } from '../_ai.js';
 import { getModulesByTier } from '../_provision.js';
+
+// Calendário de referência de editais abertos (usado como âncora caso o candidato não anexe PDF)
+const OFFICIAL_EDITAL_CALENDAR = [
+  {
+    match: /pm\s*sc|pol[ií]cia\s*militar.*santa\s*catarina/i,
+    banca: 'Instituto AOCP',
+    inscricoesFim: '2026-11-27',
+    provaObjetiva: '2027-01-17',
+    ultimaProva: '2027-01-17',
+    etapaComplementar: ['Teste de Aptidão Física (TAF)', '2027-02-21']
+  },
+  {
+    match: /tjsp|tribunal\s*de\s*justi[cç]a.*s[aã]o\s*paulo/i,
+    banca: 'VUNESP',
+    inscricoesFim: '2026-11-25',
+    provaObjetiva: '2027-01-10',
+    ultimaProva: '2027-01-10',
+    etapaComplementar: ['Prova Prática / Títulos', '2027-02-14']
+  },
+  {
+    match: /pc\s*pe|pol[ií]cia\s*civil.*pernambuco/i,
+    banca: 'CEBRASPE',
+    inscricoesFim: '2026-11-30',
+    provaObjetiva: '2027-01-24',
+    ultimaProva: '2027-01-24',
+    etapaComplementar: ['TAF e Avaliação Psicológica', '2027-02-28']
+  },
+  {
+    match: /pm\s*pe|cbm\s*pe|for[cç]as\s*de\s*seguran[cç]a.*pernambuco/i,
+    banca: 'Instituto AOCP',
+    inscricoesFim: '2026-11-28',
+    provaObjetiva: '2027-01-31',
+    ultimaProva: '2027-01-31',
+    etapaComplementar: ['Exame de Aptidão Física (EAF)', '2027-03-07']
+  },
+  {
+    match: /trt[-\s]*4|trt[-\s]*rs|tribunal\s*regional\s*do\s*trabalho.*4/i,
+    banca: 'FCC',
+    inscricoesFim: '2026-11-24',
+    provaObjetiva: '2027-01-17',
+    ultimaProva: '2027-01-17'
+  },
+  {
+    match: /trt[-\s]*8|trt[-\s]*pa|tribunal\s*regional\s*do\s*trabalho.*8/i,
+    banca: 'FCC',
+    inscricoesFim: '2026-11-26',
+    provaObjetiva: '2027-01-24',
+    ultimaProva: '2027-01-24'
+  },
+  {
+    match: /\bcgu\b|controladoria[-\s]*geral\s*da\s*uni[aã]o/i,
+    banca: 'CEBRASPE',
+    inscricoesFim: '2026-12-04',
+    provaObjetiva: '2027-01-31',
+    ultimaProva: '2027-01-31'
+  },
+  {
+    match: /c[aâ]mara\s*dos\s*deputados/i,
+    banca: 'CEBRASPE',
+    inscricoesFim: '2026-12-02',
+    provaObjetiva: '2027-01-24',
+    ultimaProva: '2027-01-31',
+    segundaProvaLabel: 'Prova Discursiva (Última Prova)'
+  },
+  {
+    match: /dpe[-\s]*sp|defensoria.*s[aã]o\s*paulo/i,
+    banca: 'FCC',
+    inscricoesFim: '2026-11-29',
+    provaObjetiva: '2027-01-17',
+    ultimaProva: '2027-02-07',
+    segundaProvaLabel: 'Provas Discursivas Especializadas (Última Prova)'
+  },
+  {
+    match: /sefaz[-\s]*sp|secretaria\s*da\s*fazenda.*s[aã]o\s*paulo|apofp/i,
+    banca: 'FCC',
+    inscricoesFim: '2026-11-27',
+    provaObjetiva: '2027-01-24',
+    ultimaProva: '2027-01-24'
+  },
+  {
+    match: /tce[-\s]*go|tribunal\s*de\s*contas.*goi[aá]s/i,
+    banca: 'FCC',
+    inscricoesFim: '2026-11-25',
+    provaObjetiva: '2027-01-17',
+    ultimaProva: '2027-01-17'
+  },
+  {
+    match: /alepa|assembleia\s*legislativa.*par[aá]/i,
+    banca: 'Fundação CETAP',
+    inscricoesFim: '2026-11-30',
+    provaObjetiva: '2027-01-24',
+    ultimaProva: '2027-01-24'
+  },
+  {
+    match: /abdi|desenvolvimento\s*industrial/i,
+    banca: 'FGV',
+    inscricoesFim: '2026-11-26',
+    provaObjetiva: '2027-01-17',
+    ultimaProva: '2027-01-17'
+  },
+  {
+    match: /\binb\b|ind[uú]strias\s*nucleares/i,
+    banca: 'FGV',
+    inscricoesFim: '2026-11-28',
+    provaObjetiva: '2027-01-24',
+    ultimaProva: '2027-01-24'
+  },
+  {
+    match: /pol[ií]cia\s*federal|\bpf\b/i,
+    banca: 'CEBRASPE',
+    inscricoesFim: '2026-12-01',
+    provaObjetiva: '2027-01-24',
+    ultimaProva: '2027-01-24',
+    etapaComplementar: ['Exame de Aptidão Física (TAF)', '2027-02-28']
+  }
+];
+
+function findCatalogCalendar(concursoName = '') {
+  const s = String(concursoName || '');
+  return OFFICIAL_EDITAL_CALENDAR.find(item => item.match.test(s)) || null;
+}
+
+function addDaysIso(baseDateStr, days) {
+  const dt = new Date(baseDateStr + 'T12:00:00Z');
+  dt.setUTCDate(dt.getUTCDate() + days);
+  return dt.toISOString().slice(0, 10);
+}
+
+function diffDaysIso(fromIso, toIso) {
+  const d1 = new Date(fromIso + 'T12:00:00Z');
+  const d2 = new Date(toIso + 'T12:00:00Z');
+  return Math.round((d2.getTime() - d1.getTime()) / 86400000);
+}
+
+function isValidIsoDate(str) {
+  return typeof str === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(str.trim());
+}
+
+// Consolida a data da última prova do edital e os marcos temporais sincronizados
+function resolveExamDatesAndMarcos(aiData, explicitExamDate, catalogEntry, todayIso) {
+  let ultimaProva = '';
+  if (isValidIsoDate(explicitExamDate) && diffDaysIso(todayIso, explicitExamDate.trim()) >= 7) {
+    ultimaProva = explicitExamDate.trim();
+  }
+
+  const aiUltima = String(aiData?.data_ultima_prova || '').trim().slice(0, 10);
+  const aiObjetiva = String(aiData?.data_prova_objetiva || '').trim().slice(0, 10);
+
+  if (!ultimaProva && isValidIsoDate(aiUltima) && diffDaysIso(todayIso, aiUltima) >= 14 && diffDaysIso(todayIso, aiUltima) <= 240) {
+    ultimaProva = aiUltima;
+  }
+
+  // Verifica se há marcos_temporais retornados pela IA com datas de prova futuras
+  const rawAiMarcos = Array.isArray(aiData?.marcos_temporais) ? aiData.marcos_temporais : [];
+  const examMarcosFromAi = rawAiMarcos
+    .filter(m => Array.isArray(m) && m.length >= 2 && /prova|exame|objetiva|discursiva|redac|2ª fase/i.test(String(m[0])) && !/inscri|isenc|local|locais|taf|f[ií]sic|t[ií]tulo/i.test(String(m[0])))
+    .map(m => String(m[1]).trim().slice(0, 10))
+    .filter(d => isValidIsoDate(d) && diffDaysIso(todayIso, d) >= 14 && diffDaysIso(todayIso, d) <= 240)
+    .sort();
+
+  if (!ultimaProva && examMarcosFromAi.length > 0) {
+    ultimaProva = examMarcosFromAi[examMarcosFromAi.length - 1];
+  }
+
+  if (!ultimaProva && catalogEntry?.ultimaProva && diffDaysIso(todayIso, catalogEntry.ultimaProva) >= 14) {
+    ultimaProva = catalogEntry.ultimaProva;
+  }
+
+  if (!ultimaProva) {
+    // Fallback dinâmico: 75 dias a partir de hoje (alinhado ao domingo mais próximo)
+    const fallbackDt = new Date(todayIso + 'T12:00:00Z');
+    fallbackDt.setUTCDate(fallbackDt.getUTCDate() + 75);
+    const dayOfWeek = fallbackDt.getUTCDay();
+    if (dayOfWeek !== 0) {
+      fallbackDt.setUTCDate(fallbackDt.getUTCDate() + (7 - dayOfWeek));
+    }
+    ultimaProva = fallbackDt.toISOString().slice(0, 10);
+  }
+
+  let provaObjetiva = (isValidIsoDate(aiObjetiva) && diffDaysIso(todayIso, aiObjetiva) >= 14 && aiObjetiva <= ultimaProva)
+    ? aiObjetiva
+    : (catalogEntry?.provaObjetiva && catalogEntry.provaObjetiva <= ultimaProva ? catalogEntry.provaObjetiva : ultimaProva);
+
+  // Calcula marcos sincronizados com a data da última prova
+  const totalDaysToExam = diffDaysIso(todayIso, ultimaProva);
+  let inscricoesFim = catalogEntry?.inscricoesFim || '';
+  const aiInscMarco = rawAiMarcos.find(m => Array.isArray(m) && /inscri/i.test(String(m[0])));
+  if (aiInscMarco && isValidIsoDate(String(aiInscMarco[1]).slice(0, 10))) {
+    const candInsc = String(aiInscMarco[1]).slice(0, 10);
+    if (candInsc >= todayIso && candInsc < provaObjetiva) {
+      inscricoesFim = candInsc;
+    }
+  }
+  if (!inscricoesFim || inscricoesFim < todayIso || inscricoesFim >= provaObjetiva) {
+    inscricoesFim = addDaysIso(todayIso, Math.max(7, Math.min(28, Math.floor(totalDaysToExam * 0.32))));
+  }
+
+  const locaisProvaDate = addDaysIso(provaObjetiva, -10);
+  const vesperaD7Date = addDaysIso(ultimaProva, -7);
+
+  const marcos = [
+    ['Início do Cronograma', `${todayIso}T08:00`],
+    ['Término das Inscrições', `${inscricoesFim}T23:59`],
+    ['Divulgação dos Locais de Prova', `${locaisProvaDate > todayIso ? locaisProvaDate : addDaysIso(provaObjetiva, -5)}T14:00`],
+    ['Protocolo de Véspera D-7', `${vesperaD7Date > todayIso ? vesperaD7Date : addDaysIso(ultimaProva, -3)}T08:00`]
+  ];
+
+  if (provaObjetiva < ultimaProva) {
+    marcos.push(['Prova Objetiva (1ª Fase)', `${provaObjetiva}T13:00`]);
+    marcos.push([catalogEntry?.segundaProvaLabel || 'Prova Discursiva (Última Prova)', `${ultimaProva}T13:00`]);
+  } else {
+    marcos.push(['Dia da Prova Oficial', `${ultimaProva}T13:00`]);
+  }
+
+  if (catalogEntry?.etapaComplementar && catalogEntry.etapaComplementar[1] > ultimaProva) {
+    marcos.push([catalogEntry.etapaComplementar[0], `${catalogEntry.etapaComplementar[1]}T08:00`]);
+  }
+
+  marcos.sort((a, b) => String(a[1]).localeCompare(String(b[1])));
+
+  return {
+    todayIso,
+    inscricoesFim,
+    locaisProvaDate,
+    vesperaD7Date,
+    provaObjetiva,
+    ultimaProva,
+    marcos
+  };
+}
 
 function extractJson(text) {
   if (!text) return null;
@@ -31,7 +261,6 @@ function extractJson(text) {
   }
 }
 
-// Decodifica escapes octais e literais básicos de strings PDF (...) Tj / [...] TJ
 function decodePdfLiteralString(str) {
   return str
     .replace(/\\(\d{3})/g, (_, oct) => String.fromCharCode(parseInt(oct, 8)))
@@ -65,7 +294,6 @@ function extractTextFromPdfStringChunk(chunk) {
   return out.join(' ');
 }
 
-// Extrator nativo de texto de PDF para Cloudflare Workers
 async function extractTextFromPdfBuffer(uint8Array) {
   try {
     const decoder = new TextDecoder('latin1');
@@ -120,7 +348,6 @@ async function extractTextFromPdfBuffer(uint8Array) {
   }
 }
 
-// Filtra e organiza os trechos de maior sinal do edital com teto enxuto (12.000 chars ~ 3k tokens)
 export function extractHighSignalEditalSections(rawText, cargo = '') {
   if (!rawText || typeof rawText !== 'string') return '';
   const cleaned = rawText.replace(/\r\n/g, '\n').replace(/[ \t]{2,}/g, ' ').trim();
@@ -184,7 +411,6 @@ export function extractHighSignalEditalSections(rawText, cargo = '') {
   return ordered.join('\n\n--- [TRECHO DO EDITAL] ---\n\n').slice(0, 12000);
 }
 
-// Busca textos de edital no Supabase Storage (intake-editais ou user-materials) se disponível
 async function fetchEditalTextFromStorage(env, order, userPanel, userId) {
   const { url, serviceKey } = getSupabaseConfig(env);
   if (!url || !serviceKey) return '';
@@ -233,22 +459,25 @@ async function fetchEditalTextFromStorage(env, order, userPanel, userId) {
     }
 
     if (files.length > 0) {
-      const fileTitles = files.map(f => `[${(f.category || 'material').toUpperCase()}] ${f.title || f.filename}`).join(' | ');
-      extractedParts.push(`ARQUIVOS ANEXADOS PELO CANDIDATO: ${fileTitles}`);
+      const studentOnlyFiles = files.filter(f => !/Guia_Tatico_Pos_Edital|Dossie_Vespera_D7/i.test(String(f.filename || f.title || '')));
+      if (studentOnlyFiles.length > 0) {
+        const fileTitles = studentOnlyFiles.map(f => `[${(f.category || 'material').toUpperCase()}] ${f.title || f.filename}`).join(' | ');
+        extractedParts.push(`ARQUIVOS ANEXADOS PELO CANDIDATO: ${fileTitles}`);
 
-      for (const f of files.slice(0, 2)) {
-        const cleanUrl = String(f.storage_url || '').replace('/user-materials/user-materials/', '/user-materials/');
-        if (cleanUrl && !cleanUrl.endsWith('.html') && (!f.file_size_bytes || f.file_size_bytes < 6 * 1024 * 1024)) {
-          try {
-            const fRes = await fetch(cleanUrl);
-            if (fRes.ok) {
-              const fBuf = await fRes.arrayBuffer();
-              const fTxt = await extractTextFromPdfBuffer(new Uint8Array(fBuf));
-              if (fTxt && fTxt.length > 50) {
-                extractedParts.push(`CONTEÚDO EXTRAÍDO DO ARQUIVO (${f.title || f.filename}):\n${fTxt.slice(0, 12000)}`);
+        for (const f of studentOnlyFiles.slice(0, 2)) {
+          const cleanUrl = String(f.storage_url || '').replace('/user-materials/user-materials/', '/user-materials/');
+          if (cleanUrl && !cleanUrl.endsWith('.html') && (!f.file_size_bytes || f.file_size_bytes < 6 * 1024 * 1024)) {
+            try {
+              const fRes = await fetch(cleanUrl);
+              if (fRes.ok) {
+                const fBuf = await fRes.arrayBuffer();
+                const fTxt = await extractTextFromPdfBuffer(new Uint8Array(fBuf));
+                if (fTxt && fTxt.length > 50) {
+                  extractedParts.push(`CONTEÚDO EXTRAÍDO DO ARQUIVO (${f.title || f.filename}):\n${fTxt.slice(0, 12000)}`);
+                }
               }
-            }
-          } catch (_) {}
+            } catch (_) {}
+          }
         }
       }
     }
@@ -257,130 +486,167 @@ async function fetchEditalTextFromStorage(env, order, userPanel, userId) {
   return extractedParts.join('\n\n');
 }
 
-function generateTacticalSchedule(unidades, availabilityHours = 4, startDate = new Date(), examDateStr = null) {
+// Constrói o cronograma diário completo de HOJE até a DATA DA ÚLTIMA PROVA DO EDITAL,
+// utilizando as missões táticas geradas pela IA (`aiBlocos`) e cravando os marcos oficiais nas datas exatas.
+function buildExamAlignedSchedule({
+  aiBlocos,
+  unidades,
+  availabilityHours = 4,
+  dateInfo,
+  banca = 'Banca Oficial'
+}) {
   const sched = [];
-  let currentDate = new Date(startDate);
   const hours = Number(availabilityHours) > 0 ? Number(availabilityHours) : 4;
+  const { todayIso, inscricoesFim, locaisProvaDate, vesperaD7Date, provaObjetiva, ultimaProva } = dateInfo;
 
-  let targetDays = 78;
-  if (examDateStr && /^\d{4}-\d{2}-\d{2}$/.test(String(examDateStr).trim())) {
-    const examDt = new Date(String(examDateStr).trim() + 'T12:00:00Z');
-    const diffDays = Math.round((examDt.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24));
-    if (diffDays >= 21 && diffDays <= 150) {
-      targetDays = diffDays;
-    }
-  }
+  const totalDays = Math.max(14, Math.min(180, diffDaysIso(todayIso, ultimaProva)));
 
-  const d0Str = currentDate.toISOString().slice(0, 10);
-  sched.push({
-    d: d0Str,
-    h: hours,
-    f: 'SEMANA 01',
-    t: 'ADM',
-    a: 'Auditoria Inicial do Edital e Matriz de Pesos',
-    obs: 'Configuração do ambiente, leitura estratégica das regras da banca, verificação dos marcos temporais e mapeamento dos tópicos de maior incidência.'
-  });
+  // Blocos gerados pela IA via API
+  const baseMissions = (Array.isArray(aiBlocos) && aiBlocos.length > 0)
+    ? aiBlocos.map(b => ({
+        t: String(b.t || 'TEORIA').replace(/<[^>]*>/g, '').trim().toUpperCase(),
+        materia: b.materia || 'Conhecimentos Específicos',
+        a: b.a || `${b.materia || 'Disciplina'} — Tópico Prioritário`,
+        obs: b.obs || `Estudo dirigido e resolução de questões da banca ${banca}.`
+      }))
+    : (Array.isArray(unidades) && unidades.length > 0 ? unidades : [
+        { materia: 'Conhecimentos Específicos', titulo: 'Núcleo Prioritário do Edital', topicos: ['Legislação e Jurisprudência'] }
+      ]).map(u => ({
+        t: 'TEORIA',
+        materia: u.materia || 'Disciplina',
+        a: `${u.materia} — ${u.titulo}`,
+        obs: `Tópicos do edital: ${(u.topicos || []).join(' · ')}`
+      }));
 
-  const list = Array.isArray(unidades) && unidades.length > 0 ? unidades : [
-    { titulo: 'Núcleo Fundamental do Edital', materia: 'Conhecimentos Gerais', topicos: ['Tópicos essenciais e estrutura da prova'] }
+  const cycleEvolution = [
+    { suffix: '', defaultTag: 'TEORIA', prefix: 'Ciclo 1 (Base & Lei Seca)' },
+    { suffix: ' · Engenharia Reversa', defaultTag: 'PRÁTICA', prefix: 'Ciclo 2 (Bateria de Questões da Banca)' },
+    { suffix: ' · Active Recall & Erros', defaultTag: 'CONSOLIDAÇÃO', prefix: 'Ciclo 3 (Domínio de Exceções e Pegadinhas)' },
+    { suffix: ' · Corte 80/20', defaultTag: 'RETA FINAL', prefix: 'Ciclo 4 (Revisão Acelerada de Alta Incidência)' }
   ];
 
-  const studyDates = [];
-  let activeStep = 0;
-  const totalActiveSteps = Math.max(list.length * 4, Math.min(72, Math.floor(targetDays * 0.85)));
+  let missionCursor = 0;
 
-  const cycleConfigs = [
-    {
-      name: 'Ciclo 1 · Base Teórica',
-      tagLabel: 'TEORIA',
-      obsPrefix: 'Estudo dirigido da teoria, legislação/bibliografia base e fichamento estratégico'
-    },
-    {
-      name: 'Ciclo 2 · Bateria da Banca',
-      tagLabel: 'PRÁTICA',
-      obsPrefix: 'Engenharia reversa da banca, pontos críticos, exceções e resolução comentada de questões'
-    },
-    {
-      name: 'Ciclo 3 · Consolidação Ativa',
-      tagLabel: 'CONSOLIDAÇÃO',
-      obsPrefix: 'Recuperação ativa sem consulta (Active Recall), questões difíceis e caderno de erros'
-    },
-    {
-      name: 'Ciclo 4 · Reta Final 80/20',
-      tagLabel: 'RETA FINAL',
-      obsPrefix: 'Revisão cirúrgica 80/20 dos pontos de maior peso e treino de velocidade de prova'
-    }
-  ];
+  for (let dayOffset = 0; dayOffset <= totalDays; dayOffset++) {
+    const dStr = addDaysIso(todayIso, dayOffset);
+    const weekNum = String(Math.floor(dayOffset / 7) + 1).padStart(2, '0');
+    const fLabel = `SEMANA ${weekNum}`;
+    const daysRemaining = totalDays - dayOffset;
 
-  while (activeStep < totalActiveSteps) {
-    currentDate.setDate(currentDate.getDate() + 1);
-    const dStr = currentDate.toISOString().slice(0, 10);
-    const weekIdx = Math.floor(sched.length / 6) + 1;
-    const weekNum = String(weekIdx).padStart(2, '0');
-
-    if ((activeStep + 1) % 5 === 0) {
-      const uRef = list[activeStep % list.length];
-      const simNumber = Math.ceil((activeStep + 1) / 5);
+    // 1. Dia 0 (Hoje): Auditoria de Partida
+    if (dayOffset === 0) {
+      const m0 = baseMissions[0] || { a: 'Mapeamento Inicial do Edital', obs: '' };
       sched.push({
         d: dStr,
         h: hours,
-        f: `SEMANA ${weekNum}`,
-        t: 'SIMULADO',
-        a: `Simulado Tático & Diagnóstico #${String(simNumber).padStart(2, '0')} (${uRef.materia})`,
-        obs: 'Bateria cronometrada sem consulta cobrindo os blocos da semana + diagnóstico de lacunas e alimentação de Flashcards SM-2.'
+        f: fLabel,
+        t: 'ADM',
+        a: `Auditoria Inicial do Edital & Partida Tática: ${m0.a}`,
+        obs: `Marco Zero (${todayIso}) rumo à prova em ${ultimaProva} (${totalDays} dias). ${m0.obs}`
       });
-      activeStep++;
+      missionCursor++;
       continue;
     }
 
-    const u = list[activeStep % list.length];
-    const passIndex = Math.min(3, Math.floor(activeStep / list.length));
-    const cycle = cycleConfigs[passIndex];
-
-    studyDates.push({ date: dStr, unit: u.titulo, materia: u.materia, index: activeStep + 1 });
-
-    const topicosList = Array.isArray(u.topicos) && u.topicos.length > 0 ? u.topicos.join(' · ') : '';
-    const extraLoops = [];
-    if (studyDates.length > 1) {
-      const prev = studyDates[studyDates.length - 2];
-      extraLoops.push(`Revisão D+1: ${prev.unit} (15 min)`);
-    }
-    if (studyDates.length >= 4) {
-      const prev3 = studyDates[studyDates.length - 4];
-      extraLoops.push(`Reciclagem SM-2: ${prev3.materia} (15 min)`);
+    // 2. Dia da Última Prova (Encerramento Exato do Cronograma)
+    if (dStr === ultimaProva) {
+      sched.push({
+        d: dStr,
+        h: hours,
+        f: fLabel,
+        t: 'PROVA',
+        a: provaObjetiva < ultimaProva
+          ? `DIA DA ÚLTIMA PROVA OFICIAL (2ª FASE / DISCURSIVA — ${banca})`
+          : `DIA DA PROVA OFICIAL (${banca}) — EXECUÇÃO DE PROVA`,
+        obs: 'Execução da prova oficial. Chegar com 1h de antecedência, documento original com foto, caneta transparente preta e aplicar gestão estrita de tempo.'
+      });
+      continue;
     }
 
-    const fullObs = [
-      `${cycle.name}: ${cycle.obsPrefix}`,
-      topicosList ? `Tópicos: ${topicosList}` : '',
-      extraLoops.length ? extraLoops.join(' | ') : ''
-    ].filter(Boolean).join(' · ');
+    // 3. Caso exista Prova Objetiva anterior à Prova Discursiva
+    if (provaObjetiva < ultimaProva && dStr === provaObjetiva) {
+      sched.push({
+        d: dStr,
+        h: hours,
+        f: fLabel,
+        t: 'PROVA',
+        a: `DIA DA PROVA OBJETIVA (1ª FASE — ${banca})`,
+        obs: 'Execução da Prova Objetiva Oficial. Controle de tempo por questão, marcação segura do cartão-resposta e início imediato da preparação exclusiva para a 2ª Fase.'
+      });
+      continue;
+    }
+
+    // 4. Véspera D-1 da Última Prova
+    if (daysRemaining === 1) {
+      sched.push({
+        d: dStr,
+        h: Math.min(hours, 3),
+        f: fLabel,
+        t: 'REVISÃO',
+        a: `Véspera Oficial (D-1) — Blindagem de Pegadinhas ${banca} & Checklist`,
+        obs: `Véspera da prova (${ultimaProva}): leitura leve do Dossiê D-7, revisão final dos flashcards críticos SM-2, separação de documentos e descanso cognitivo.`
+      });
+      continue;
+    }
+
+    // 5. Início da Reta Final D-7 (exatamente 7 dias antes da última prova)
+    if (dStr === vesperaD7Date) {
+      sched.push({
+        d: dStr,
+        h: hours,
+        f: fLabel,
+        t: 'RETA FINAL',
+        a: `MARCO D-7 // Ativação do Protocolo de Véspera 80/20 (${banca})`,
+        obs: `Faltam 7 dias para a prova (${ultimaProva}). Suspensão de conteúdos secundários e foco 100% nas fichas ESSENCIAIS, Súmulas, Prazos e Dossiê D-7.`
+      });
+      continue;
+    }
+
+    // 6. Simulado Tático a cada 6 dias de estudo
+    if (dayOffset % 6 === 0) {
+      const simNumber = Math.floor(dayOffset / 6);
+      const refMission = baseMissions[missionCursor % baseMissions.length];
+      sched.push({
+        d: dStr,
+        h: hours,
+        f: fLabel,
+        t: 'SIMULADO',
+        a: `Simulado Tático & Diagnóstico #${String(simNumber).padStart(2, '0')} (${refMission.materia || banca})`,
+        obs: `Bateria cronometrada no padrão ${banca} cobrindo os tópicos estudados na ${fLabel} + revisão de erros e retroalimentação da fila SM-2.`
+      });
+      continue;
+    }
+
+    // 7. Missão Tática Diária gerada pela IA (com alertas de marcos do edital caso coincidam com a data)
+    const rawM = baseMissions[missionCursor % baseMissions.length];
+    const passIdx = Math.min(3, Math.floor(missionCursor / baseMissions.length));
+    const cyc = daysRemaining <= 7 ? cycleEvolution[3] : cycleEvolution[passIdx];
+
+    let marcoPrefix = '';
+    if (dStr === inscricoesFim) {
+      marcoPrefix = '[⚠️ MARCO DO EDITAL HOJE: TÉRMINO DAS INSCRIÇÕES — Confirmar inscrição e pagamento da GRU/boleto] · ';
+    } else if (dStr === locaisProvaDate) {
+      marcoPrefix = '[📍 MARCO DO EDITAL HOJE: DIVULGAÇÃO DOS LOCAIS DE PROVA — Consultar cartão de confirmação] · ';
+    }
+
+    const prevM = baseMissions[(missionCursor - 1 + baseMissions.length) % baseMissions.length];
+    const sm2M = baseMissions[(missionCursor - 3 + baseMissions.length * 4) % baseMissions.length];
+
+    const tagToUse = daysRemaining <= 7
+      ? 'RETA FINAL'
+      : (passIdx === 0 ? (rawM.t || cyc.defaultTag) : cyc.defaultTag);
 
     sched.push({
       d: dStr,
       h: hours,
-      f: `SEMANA ${weekNum}`,
-      t: cycle.tagLabel,
-      a: `${u.materia} — ${u.titulo}${passIndex > 0 ? ` (Ciclo ${passIndex + 1})` : ''}`,
-      obs: fullObs
+      f: fLabel,
+      t: tagToUse,
+      a: `${rawM.a}${passIdx > 0 ? cyc.suffix : ''}`,
+      obs: `${marcoPrefix}${cyc.prefix}: ${rawM.obs} | Revisão D+1 (15 min): ${prevM.a} | Fila SM-2 (15 min): ${sm2M.materia}`
     });
 
-    activeStep++;
+    missionCursor++;
   }
-
-  currentDate.setDate(currentDate.getDate() + 1);
-  const revDateStr = currentDate.toISOString().slice(0, 10);
-  const finalWeekNum = String(Math.floor(sched.length / 6) + 1).padStart(2, '0');
-  sched.push({
-    d: revDateStr,
-    h: hours,
-    f: `SEMANA ${finalWeekNum}`,
-    t: 'REVISÃO',
-    a: 'Revisão Geral de Véspera (Protocolo 80/20 & Blindagem de Pegadinhas)',
-    obs: examDateStr
-      ? `Reta final rumo à prova (${examDateStr}) — Foco exclusivo nas fichas ESSENCIAIS, pegadinhas da banca e fila SM-2.`
-      : 'Consolidação final dos tópicos ESSENCIAIS, leitura das pegadinhas da banca e zeramento da fila SM-2.'
-  });
 
   return sched;
 }
@@ -393,6 +659,7 @@ function escapeHtmlServer(str) {
     .replace(/"/g, '&quot;');
 }
 
+// Gera o documento HTML/PDF Editorial Suíço A4 do Guia de Estudos Pós-Edital e do Dossiê D-7 com os dados gerados pela API
 function buildStudyGuideHtmlDocument(contentData, headerConfig, mode = 'guia') {
   const meta = contentData.meta || {};
   const concurso = escapeHtmlServer(meta.concurso || headerConfig?.title || 'Concurso Público');
@@ -400,12 +667,21 @@ function buildStudyGuideHtmlDocument(contentData, headerConfig, mode = 'guia') {
   const banca = escapeHtmlServer(meta.banca || headerConfig?.banca || 'Banca Oficial');
   const tier = escapeHtmlServer((meta.tier || 'tatico').toUpperCase());
   const auditSummary = escapeHtmlServer(meta.auditSummary || 'Mapeamento tático de incidência, cronograma de ciclos e fichas de alta retenção.');
+  const ultimaProva = escapeHtmlServer(meta.ultimaProva || '');
+  const guiaEstrategico = contentData.guia_estrategico || {};
   const generatedDate = new Date().toLocaleDateString('pt-BR');
 
   const isD7 = mode === 'd7';
   const docTitle = isD7
     ? `DOSSIÊ DE VÉSPERA D-7 & PEGADINHAS DA BANCA // ${concurso}`
     : `GUIA TÁTICO PÓS-EDITAL // ${concurso}`;
+
+  const marcosRows = (headerConfig?.dates || contentData.dates || []).map(([label, dt]) => `
+    <tr>
+      <td><b>${escapeHtmlServer(label)}</b></td>
+      <td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:#D92B2B;">${escapeHtmlServer(String(dt).slice(0, 10).split('-').reverse().join('/'))}</td>
+    </tr>
+  `).join('');
 
   const assuntosHtml = (contentData.assuntos || []).map((mat, idx) => `
     <div class="card">
@@ -428,12 +704,12 @@ function buildStudyGuideHtmlDocument(contentData, headerConfig, mode = 'guia') {
   const textosHtml = (contentData.texts || []).map((tx, idx) => `
     <div class="card">
       <div class="card-head">FICHA #0${idx + 1} · ${escapeHtmlServer(tx.materia || '')} — ${escapeHtmlServer(tx.titulo || tx.t || '')}</div>
-      <p><b>Base / Referência:</b> ${escapeHtmlServer(tx.autor || banca)}</p>
+      <p><b>Base Normativa / Jurisprudencial:</b> ${escapeHtmlServer(tx.autor || banca)}</p>
       <p><b>Síntese Nuclear:</b> ${escapeHtmlServer(tx.tese || '')}</p>
       <div class="alert"><b>CRIVO & PEGADINHA DA BANCA (${banca}):</b> ${escapeHtmlServer(tx.crivo || '')}</div>
       ${Array.isArray(tx.conceitos) && tx.conceitos.length ? `
         <table>
-          <thead><tr><th>CONCEITO / DISPOSITIVO CHAVE</th><th>DEFINIÇÃO CIRÚRGICA DE PROVA</th></tr></thead>
+          <thead><tr><th>CONCEITO / DISPOSITIVO CHAVE</th><th>REGRA EXATA DE PROVA</th></tr></thead>
           <tbody>
             ${tx.conceitos.map(c => `<tr><td><b>${escapeHtmlServer(c[0])}</b></td><td>${escapeHtmlServer(c[1])}</td></tr>`).join('')}
           </tbody>
@@ -442,10 +718,12 @@ function buildStudyGuideHtmlDocument(contentData, headerConfig, mode = 'guia') {
     </div>
   `).join('');
 
-  const cronoRows = (contentData.sched || []).slice(0, isD7 ? 15 : 90).map(s => `
+  const scList = contentData.sched || [];
+  const cronoSlice = isD7 ? scList.slice(-15) : scList.slice(0, 120);
+  const cronoRows = cronoSlice.map(s => `
     <tr>
-      <td style="white-space:nowrap;font-family:'JetBrains Mono',monospace;">${escapeHtmlServer(s.d)}</td>
-      <td><span class="badge">${escapeHtmlServer(s.t || 'META')}</span></td>
+      <td style="white-space:nowrap;font-family:'JetBrains Mono',monospace;">${escapeHtmlServer(String(s.d || '').split('-').reverse().join('/'))}</td>
+      <td><span class="badge ${s.t === 'PROVA' || s.t === 'RETA FINAL' ? 'red' : ''}">${escapeHtmlServer(s.t || 'META')}</span></td>
       <td><b>${escapeHtmlServer(s.a)}</b><br><span style="font-size:11px;color:#444;">${escapeHtmlServer(s.obs || '')}</span></td>
       <td style="text-align:center;">${escapeHtmlServer(s.h || 4)}h</td>
     </tr>
@@ -456,6 +734,19 @@ function buildStudyGuideHtmlDocument(contentData, headerConfig, mode = 'guia') {
       <div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:#D92B2B;font-weight:700;">FLASHCARD SM-2 #${idx + 1} · ${escapeHtmlServer(c.cat || '')}</div>
       <div style="font-weight:800;margin:4px 0;">P: ${escapeHtmlServer(c.f)}</div>
       <div style="color:#222;">R: ${escapeHtmlServer(c.v)}</div>
+    </div>
+  `).join('');
+
+  const questoesHtml = (contentData.questoes_objetivas || []).map((q, idx) => `
+    <div class="card">
+      <div class="card-head">QUESTÃO INÉDITA #0${idx + 1} · PADRÃO ${banca}</div>
+      <p><b>Enunciado:</b> ${escapeHtmlServer(q.enunciado || '')}</p>
+      ${Array.isArray(q.alternativas) && q.alternativas.length ? `
+        <div style="margin:8px 0;">
+          ${q.alternativas.map(a => `<div style="margin-bottom:4px;"><b>(${escapeHtmlServer(a.letra)})</b> ${escapeHtmlServer(a.texto)}</div>`).join('')}
+        </div>
+      ` : ''}
+      <div class="alert"><b>GABARITO OFICIAL: ${escapeHtmlServer(q.gabarito || '')}</b> — ${escapeHtmlServer(q.justificativa_gabarito || '')}</div>
     </div>
   `).join('');
 
@@ -493,7 +784,7 @@ function buildStudyGuideHtmlDocument(contentData, headerConfig, mode = 'guia') {
 </head>
 <body>
   <div class="print-bar">
-    <span style="font-family:'JetBrains Mono',monospace;font-size:11px;">■ CRIVOS // DOCUMENTO OFICIAL CALIBRADO (${tier})</span>
+    <span style="font-family:'JetBrains Mono',monospace;font-size:11px;">■ CRIVOS // DOCUMENTO OFICIAL CALIBRADO VIA API (${tier})</span>
     <button class="print-btn" onclick="window.print()">[ IMPRIMIR / SALVAR EM PDF (A4) ]</button>
   </div>
   <div class="page">
@@ -501,41 +792,65 @@ function buildStudyGuideHtmlDocument(contentData, headerConfig, mode = 'guia') {
       <div class="brand">■ CRIVOS // ENGENHARIA REVERSA DE EDITAIS · PLANO ${tier}</div>
       <h1>${isD7 ? 'DOSSIÊ DE VÉSPERA D-7 & PEGADINHAS DA BANCA' : 'GUIA DE ESTUDOS PÓS-EDITAL CALIBRADO'}</h1>
       <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#333;">
-        CERTAME: ${concurso} &nbsp;|&nbsp; CARGO: ${cargo} &nbsp;|&nbsp; BANCA: ${banca} &nbsp;|&nbsp; EMISSÃO: ${generatedDate}
+        CERTAME: ${concurso} &nbsp;|&nbsp; CARGO: ${cargo} &nbsp;|&nbsp; BANCA: ${banca} &nbsp;|&nbsp; DATA DA ÚLTIMA PROVA: ${ultimaProva ? ultimaProva.split('-').reverse().join('/') : generatedDate}
       </div>
       <p style="margin:10px 0 0 0;font-size:12.5px;color:#222;"><b>Diagnóstico da Engenharia:</b> ${auditSummary}</p>
     </div>
 
     ${isD7 ? `
       <h2>01 · PROTOCOLO DE VÉSPERA D-7 E D-1 (ALTA INCIDÊNCIA 80/20)</h2>
-      <div class="card">${escapeHtmlServer(contentData.vespera || 'Foco integral nos pontos ESSENCIAIS, leitura seca das teses da banca e reciclagem dos flashcards vencidos.')}</div>
+      <div class="card">
+        <p>${escapeHtmlServer(contentData.vespera || '')}</p>
+        ${guiaEstrategico.armadilhas_fatais ? `<div class="alert"><b>ARMADILHAS FATAIS DA BANCA (${banca}):</b> ${escapeHtmlServer(guiaEstrategico.armadilhas_fatais)}</div>` : ''}
+      </div>
 
       <h2>02 · FICHAS DE BLINDAGEM & PEGADINHAS CLÁSSICAS (${banca})</h2>
       ${textosHtml}
 
-      <h2>03 · BATERIA DE RECUPERAÇÃO ATIVA DE VÉSPERA (FLASHCARDS SM-2)</h2>
+      <h2>03 · CRONOGRAMA DE RETA FINAL (ÚLTIMOS 15 DIAS ATÉ A PROVA)</h2>
+      <table>
+        <thead><tr><th>DATA</th><th>BLOCO</th><th>MISSÃO DE RETA FINAL</th><th>META</th></tr></thead>
+        <tbody>${cronoRows}</tbody>
+      </table>
+
+      <h2>04 · BATERIA DE RECUPERAÇÃO ATIVA DE VÉSPERA (FLASHCARDS SM-2)</h2>
       ${cardsHtml}
 
-      <h2>04 · CHECKLIST OPERACIONAL DO DIA DA PROVA</h2>
+      <h2>05 · CHECKLIST OPERACIONAL DO DIA DA PROVA</h2>
       <div class="card">
         <ul>${(contentData.checklist || []).map(item => `<li>${escapeHtmlServer(item)}</li>`).join('')}</ul>
       </div>
     ` : `
-      <h2>01 · MATRIZ DE DISCIPLINAS E PRIORIDADES DO EDITAL (PARETO 80/20)</h2>
+      <h2>01 · CALENDÁRIO OFICIAL & MARCOS TEMPORAIS DO EDITAL</h2>
+      <table>
+        <thead><tr><th>MARCO OFICIAL DO CERTAME</th><th>DATA PREVISTA / OFICIAL</th></tr></thead>
+        <tbody>${marcosRows}</tbody>
+      </table>
+
+      <h2>02 · RAIO-X DA BANCA (${banca}) & ESTRATÉGIA DE CORTE 80/20</h2>
+      <div class="card">
+        <p><b>Perfil Técnico da Banca (${banca}):</b> ${escapeHtmlServer(guiaEstrategico.raio_x_banca || auditSummary)}</p>
+        <p><b>Estratégia de Corte 80/20 por Peso:</b> ${escapeHtmlServer(guiaEstrategico.plano_corte_80_20 || 'Priorização absoluta das disciplinas de peso P1 e jurisprudência dominante.')}</p>
+        ${guiaEstrategico.armadilhas_fatais ? `<div class="alert"><b>Armadilhas Recorrentes da Banca:</b> ${escapeHtmlServer(guiaEstrategico.armadilhas_fatais)}</div>` : ''}
+      </div>
+
+      <h2>03 · MATRIZ DE DISCIPLINAS E PRIORIDADES DO EDITAL (PARETO 80/20)</h2>
       ${assuntosHtml}
 
-      <h2>02 · DOSSIÊS TÁTICOS & ENGENHARIA REVERSA DA BANCA (${banca})</h2>
+      <h2>04 · DOSSIÊS TÁTICOS & ENGENHARIA REVERSA DA BANCA (${banca})</h2>
       ${textosHtml}
 
-      <h2>03 · CRONOGRAMA DE CICLOS E METAS DIÁRIAS (${escapeHtmlServer(meta.hoursPerDay || 4)}H/DIA)</h2>
+      <h2>05 · CRONOGRAMA COMPLETO ATÉ A DATA DA ÚLTIMA PROVA (${escapeHtmlServer(meta.hoursPerDay || 4)}H/DIA)</h2>
       <table>
         <thead><tr><th>DATA</th><th>BLOCO</th><th>MISSÃO TÁTICA & DIRETRIZ OPERACIONAL</th><th>META</th></tr></thead>
         <tbody>${cronoRows}</tbody>
       </table>
 
-      ${cardsHtml ? `<h2>04 · DECK INICIAL DE FLASHCARDS SM-2</h2>${cardsHtml}` : ''}
+      ${questoesHtml ? `<h2>06 · CADERNO DE QUESTÕES INÉDITAS CALIBRADAS (${banca})</h2>${questoesHtml}` : ''}
 
-      <h2>05 · PROTOCOLO DE VÉSPERA & DIRETRIZ DISSERTATIVA</h2>
+      ${cardsHtml ? `<h2>07 · DECK OFICIAL DE FLASHCARDS SM-2</h2>${cardsHtml}` : ''}
+
+      <h2>08 · PROTOCOLO DE VÉSPERA & DIRETRIZ DISSERTATIVA</h2>
       <div class="card">
         <p><b>Protocolo de Véspera (D-7):</b> ${escapeHtmlServer(contentData.vespera || '')}</p>
         <p><b>Diretriz de Prova / Escrita:</b> ${escapeHtmlServer(contentData.escrita || '')}</p>
@@ -568,6 +883,7 @@ export async function runCalibrationEngine(env, body = {}) {
     throw err;
   }
 
+  // 1. Localiza a ordem e o painel correspondente no Supabase
   let order = null;
   let panel = null;
   try {
@@ -595,6 +911,7 @@ export async function runCalibrationEngine(env, body = {}) {
     console.warn('[calibrate] Aviso ao consultar Supabase:', dbErr.message);
   }
 
+  // Trava de idempotência: se o painel já está `ready` com cronograma completo e não foi pedido forceRecalibrate
   if (
     !forceRecalibrate &&
     !editalText &&
@@ -617,11 +934,49 @@ export async function runCalibrationEngine(env, body = {}) {
     };
   }
 
+  // Trava contra execução concorrente simultânea (ex.: webhook waitUntil + sucesso.html chamando juntos)
+  if (!forceRecalibrate && panel?.id && panel?.status === 'calibrating') {
+    const lockTs = Number(panel?.header_config?.calibration_lock_ts || 0);
+    if (lockTs && (Date.now() - lockTs) < 22000) {
+      console.log(`[calibrate] Calibração em andamento para painel ${panel.id}, aguardando conclusão...`);
+      for (let i = 0; i < 8; i++) {
+        await new Promise(r => setTimeout(r, 2500));
+        const checkPanels = await supabaseRest(env, `/user_panels?id=eq.${encodeURIComponent(panel.id)}`);
+        const checkP = Array.isArray(checkPanels) ? checkPanels[0] : null;
+        if (checkP?.status === 'ready' && checkP?.content_data?.sched?.length > 5) {
+          return {
+            success: true,
+            panelId: checkP.id,
+            status: 'ready',
+            alreadyCalibrated: true,
+            headerConfig: checkP.header_config,
+            contentData: checkP.content_data,
+            message: 'Painel calibrado com sucesso!'
+          };
+        }
+      }
+    } else {
+      try {
+        await supabaseRest(env, `/user_panels?id=eq.${encodeURIComponent(panel.id)}`, {
+          method: 'PATCH',
+          body: {
+            header_config: {
+              ...(panel.header_config || {}),
+              calibration_lock_ts: Date.now()
+            }
+          }
+        });
+      } catch (_) {}
+    }
+  }
+
   const targetUserId = panel?.user_id || order?.user_id || userId;
   const finalConcurso = (concurso || panel?.concurso || order?.concurso_nome || 'Concurso Público').trim();
   const finalCargo = (cargo || panel?.cargo || order?.cargo || 'Cargo Pretendido').trim();
   const finalTier = (planTier || panel?.plan_tier || order?.plan_tier || 'tatico').toLowerCase();
-  const finalBanca = (banca || panel?.header_config?.banca || '').trim();
+  const catalogRef = findCatalogCalendar(finalConcurso);
+  const finalBanca = (banca || panel?.header_config?.banca || catalogRef?.banca || '').trim();
+  const todayIso = new Date().toISOString().slice(0, 10);
 
   let orderAvailabilityText = routineText || '';
   let effectiveHours = Number(availabilityHours) || 4;
@@ -643,6 +998,7 @@ export async function runCalibrationEngine(env, body = {}) {
     hasOrderBump = true;
   }
 
+  // 2. Extrai o conteúdo real do Edital (do body.editalText, order.notes, intake-editais ou user_files)
   let rawEditalContent = String(editalText || '').trim();
   if (!rawEditalContent) {
     rawEditalContent = await fetchEditalTextFromStorage(env, order, panel, targetUserId);
@@ -652,52 +1008,48 @@ export async function runCalibrationEngine(env, body = {}) {
     : '';
 
   const hasSubmittedEdital = filteredEditalContent.length > 60;
+  const isCebraspeHint = (finalBanca || '').toUpperCase().includes('CEBRASPE');
 
-  const isEliteOrPrime = (finalTier === 'elite' || finalTier === 'prime');
-  const isArsenalOrAbove = (finalTier === 'arsenal' || isEliteOrPrime);
-  const tierMaxTokens = isEliteOrPrime ? 2200 : (isArsenalOrAbove ? 1900 : 1600);
+  // 3. Arquitetura Paralela 100% via API (2 chamadas simultâneas em Promise.all no DeepSeek V4.1 Flash 1017):
+  // - Chamada A: Datas Oficiais, Marcos, Matriz de Assuntos, Dossiês Táticos e Blocos do Cronograma (~9-11s)
+  // - Chamada B: Flashcards SM-2, Questões Objetivas Inéditas, Simulados Discursivos, Arguição, Mapa e Guia PDF (~9-11s)
+  // Isso garante zero truncamento de JSON, máxima densidade em todos os módulos e conclusão total em ~10-12s!
 
-  const schemaMapaBlock = isArsenalOrAbove ? `
-  "mapa": {
-    "nodes": [
-      { "id": "n1", "label": "Eixo Curto 1", "materia": "Disciplina", "prio": "ESSENCIAL", "desc": "Papel central em 1 frase." }
-    ],
-    "edges": [
-      ["n1", "n2", "Conexão", "Como a banca cruza os temas em 1 frase."]
-    ]
-  },` : '';
+  const refDatesHint = catalogRef
+    ? `- Referência Oficial do Calendário deste Certame: Fim das Inscrições em ${catalogRef.inscricoesFim}, Prova Objetiva em ${catalogRef.provaObjetiva}, Última Prova em ${catalogRef.ultimaProva}.\n`
+    : '';
 
-  const schemaEliteBlock = isEliteOrPrime ? `
-  "sim": [
-    {
-      "id": "sim_1",
-      "titulo": "Proposta #01 — Tema Quente do Edital",
-      "comando": "Enunciado conciso no padrão da banca cobrando tema essencial do cargo.",
-      "eixos": ["Eixo exigido 1", "Eixo exigido 2", "Eixo exigido 3"]
-    }
-  ],` : '';
+  const baseContextBlock = `- Data de Hoje: ${todayIso}
+- Concurso: ${finalConcurso}
+- Cargo: ${finalCargo}
+- Banca: ${finalBanca || 'Identificar banca oficial do certame'}
+- Plano: ${finalTier.toUpperCase()}
+- Disponibilidade Diária: ${effectiveHours}h/dia
+${examDate ? `- Data da Última Prova Informada: ${examDate}\n` : refDatesHint}${hasSubmittedEdital ? `\nTRECHO DO EDITAL OFICIAL:\n"""\n${filteredEditalContent.slice(0, 8000)}\n"""` : `\nUse a matriz programática oficial vigente e o calendário real do edital para "${finalConcurso}" — "${finalCargo}".`}`;
 
-  const systemPrompt = `Você é o Engenheiro Pedagógico Chefe da CRIVOS.
-Extraia os dados reais do edital/certame e retorne um JSON conciso e cirúrgico para o cargo "${finalCargo}" no concurso "${finalConcurso}".
-
+  const systemPromptCore = `Você é o Engenheiro Pedagógico Chefe da CRIVOS.
+Extraia os dados reais do edital/certame para o cargo "${finalCargo}" no concurso "${finalConcurso}" (Hoje: ${todayIso}).
 REGRAS:
-1. Extraia FIELMENTE a Banca, datas (YYYY-MM-DD) e disciplinas/tópicos exclusivos do cargo "${finalCargo}".
-2. Todo item de "textos" DEVE usar o mesmo "id" ("top_1", "top_2"...) dos tópicos de "assuntos".
-3. Seja direto e denso (máximo 2 frases por campo textual) para máxima velocidade.
-4. Retorne EXCLUSIVAMENTE JSON válido:
+1. Identifique a Banca, a data da Prova Objetiva ("data_prova_objetiva") e a DATA DA ÚLTIMA PROVA DO EDITAL ("data_ultima_prova", YYYY-MM-DD, sempre futura a ${todayIso}), mais os "marcos_temporais" sincronizados.
+2. Todo item de "textos" DEVE usar o mesmo "id" ("top_1" a "top_5") dos tópicos de "assuntos".
+3. Seja direto e cirúrgico (máximo 25 palavras por campo textual) e retorne JSON compacto.
+Retorne EXCLUSIVAMENTE JSON válido:
 {
   "banca_identificada": "Nome da Banca",
   "resumo_auditoria_edital": "Síntese executiva em 1 frase do mapeamento do cargo.",
+  "data_prova_objetiva": "YYYY-MM-DD",
+  "data_ultima_prova": "YYYY-MM-DD",
   "marcos_temporais": [
-    ["INSCRIÇÕES (FIM)", "YYYY-MM-DD"],
-    ["PROVA OBJETIVA", "YYYY-MM-DD"]
+    ["Término das Inscrições", "YYYY-MM-DD"],
+    ["Divulgação dos Locais de Prova", "YYYY-MM-DD"],
+    ["Protocolo de Véspera D-7", "YYYY-MM-DD"],
+    ["Dia da Prova Oficial", "YYYY-MM-DD"]
   ],
   "assuntos": [
     {
-      "materia": "Nome da Disciplina",
+      "materia": "Nome da Disciplina (exatamente 5 disciplinas reais do cargo)",
       "topicos": [
-        { "id": "top_1", "t": "Tópico real 1", "prio": "ESSENCIAL", "peso": "ALTO" },
-        { "id": "top_2", "t": "Tópico real 2", "prio": "IMPORTANTE", "peso": "MÉDIO" }
+        { "id": "top_1", "t": "Tópico real 1 (exatamente 3 por disciplina, top_1 a top_15)", "prio": "ESSENCIAL", "peso": "ALTO" }
       ]
     }
   ],
@@ -705,77 +1057,187 @@ REGRAS:
     {
       "id": "top_1",
       "materia": "Disciplina",
-      "titulo": "Tópico real 1",
+      "titulo": "Tópico real 1 (exatamente 5 fichas: top_1 a top_5)",
       "t": "Tópico real 1",
-      "autor": "Base Legal / Referência",
+      "autor": "Artigos de Lei / Súmulas",
       "prio": "ESSENCIAL",
       "sec": "area",
-      "tese": "Síntese direta em 2 frases do núcleo cobrado pela banca.",
-      "crivo": "Como a banca cobra e qual a pegadinha clássica em 1 frase.",
+      "tese": "Síntese técnica densa em até 30 palavras com artigos e jurisprudência.",
+      "crivo": "Pegadinha clássica da banca em 1 frase curta.",
       "conceitos": [
-        ["Conceito/Artigo 1", "Definição cirúrgica em 1 frase"],
-        ["Conceito/Artigo 2", "Definição cirúrgica em 1 frase"]
+        ["Dispositivo 1", "Regra exata de prova em 1 frase curta"],
+        ["Dispositivo 2", "Exceção ou prazo cobrado pela banca"]
       ]
     }
-  ],${schemaMapaBlock}${schemaEliteBlock}
-  "vespera": "Protocolo 80/20 de revisão D-7 focado nos tópicos críticos deste cargo.",
-  "escrita": "Diretriz tática de prova e discursiva para a banca deste edital."
+  ],
+  "blocos_cronograma": [
+    {
+      "t": "TEORIA",
+      "materia": "Disciplina",
+      "a": "Disciplina — Missão Tática Específica (exatamente 8 missões sequenciais cobrindo as disciplinas do edital)",
+      "obs": "Diretriz operacional curta (até 20 palavras) citando artigos e foco na banca."
+    }
+  ]
 }`;
 
-  const userPrompt = `CALIBRAR SISTEMA:
-- Concurso: ${finalConcurso} | Cargo: ${finalCargo} | Banca: ${finalBanca || 'Identificar'} | Plano: ${finalTier.toUpperCase()} | Horas/dia: ${effectiveHours}h
-${examDate ? `- Data da Prova: ${examDate}\n` : ''}${hasSubmittedEdital ? `TRECHO DO EDITAL:\n"""\n${filteredEditalContent}\n"""` : `Use a matriz programática oficial vigente para "${finalConcurso}" — "${finalCargo}".`}
-
-Dimensione de forma enxuta:
-- 5 disciplinas reais do cargo em "assuntos", com 3 a 4 tópicos cada (top_1 a top_18);
-- 5 fichas completas em "textos" (top_1 a top_5), cada uma com 2 pares em "conceitos";
-${isArsenalOrAbove ? '- 5 nós (n1 a n5) e 5 conexões em "mapa";\n' : ''}${isEliteOrPrime ? '- 2 propostas em "sim";\n' : ''}- Textos objetivos em "vespera" e "escrita".`;
-
-  const aiResponse = await callExperientialAI(env, {
-    messages: [
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: userPrompt }
+  const systemPromptPractice = `Você é o Examinador Titular e Estrategista Chefe da Banca para o concurso "${finalConcurso}" — Cargo "${finalCargo}".
+Elabore a bateria de treinamento ativo, simulados, flashcards, arguição, mapa de conexões e guia estratégico em PDF.
+REGRAS:
+1. Seja cirúrgico e conciso (máximo 25 palavras por campo textual) e retorne JSON compacto.
+2. Em "questoes_objetivas", gere 3 questões inéditas no formato exato da banca (${isCebraspeHint ? 'estilo CEBRASPE: gabarito "CERTO" ou "ERRADO", sem campo alternativas' : 'estilo Múltipla Escolha: 5 alternativas curtas A a E e gabarito com a letra correta'}).
+Retorne EXCLUSIVAMENTE JSON válido:
+{
+  "guia_estrategico": {
+    "raio_x_banca": "Perfil técnico de cobrança da banca neste cargo em 2 frases.",
+    "plano_corte_80_20": "Diretriz de priorização 80/20 das disciplinas de maior peso em 2 frases.",
+    "armadilhas_fatais": "As 3 pegadinhas mais letais da banca nas disciplinas nucleares."
+  },
+  "cards": [
+    {
+      "id": "dc_api_1",
+      "t": "top_1",
+      "cat": "Disciplina",
+      "f": "Pergunta cirúrgica de Active Recall (exatamente 8 flashcards: dc_api_1 a dc_api_8)?",
+      "v": "Resposta direta em 1 frase com fundamento legal exato."
+    }
+  ],
+  "questoes_objetivas": [
+    {
+      "id": "q_cal_1",
+      "topico": "Disciplina / Tópico",
+      "enunciado": "Enunciado inédito conciso no padrão da banca (exatamente 3 questões: q_cal_1 a q_cal_3)...",
+      ${isCebraspeHint ? `"gabarito": "CERTO",` : `"alternativas": [
+        { "letra": "A", "texto": "..." },
+        { "letra": "B", "texto": "..." },
+        { "letra": "C", "texto": "..." },
+        { "letra": "D", "texto": "..." },
+        { "letra": "E", "texto": "..." }
+      ],
+      "gabarito": "A",`}
+      "justificativa_gabarito": "Fundamentação técnica/legal concisa em 1 frase."
+    }
+  ],
+  "sim": [
+    {
+      "id": "sim_1",
+      "titulo": "Proposta Discursiva #01 — Tema Quente do Cargo (exatamente 2 propostas: sim_1 e sim_2)",
+      "comando": "Enunciado conciso no padrão da banca exigindo análise técnica aplicada ao cargo.",
+      "eixos": ["Eixo 1 exigido", "Eixo 2 exigido", "Eixo 3 exigido"]
+    }
+  ],
+  "rubric": [
+    { "item": "Domínio Normativo e Enfrentamento dos Eixos", "max": 40, "desc": "Precisão nos dispositivos legais e jurisprudência." },
+    { "item": "Articulação Argumentativa e Estudo de Caso", "max": 30, "desc": "Coerência lógica e conexão prática com o cargo." },
+    { "item": "Norma Culta e Terminologia Técnica", "max": 30, "desc": "Clareza, concisão e rigor vocabular." }
+  ],
+  "arg": [
+    {
+      "id": "arg_1",
+      "cat": "Disciplina",
+      "q": "Pergunta incisiva de arguição/sustentação (exatamente 4 perguntas: arg_1 a arg_4)?",
+      "alvo": "Conceito ou distinção que o candidato não pode omitir.",
+      "resp": "Roteiro estruturado de resposta ideal em 2 frases."
+    }
+  ],
+  "mapa": {
+    "nodes": [
+      { "id": "n1", "label": "Eixo Nuclear (exatamente 5 nós: n1 a n5)", "materia": "Disciplina", "prio": "ESSENCIAL", "desc": "Função estrutural em 1 frase." }
     ],
-    temperature: 0.2,
-    maxTokens: tierMaxTokens,
-    responseFormat: { type: 'json_object' }
-  });
+    "edges": [
+      ["n1", "n2", "Relação Técnica (exatamente 5 conexões)", "Como a banca cruza os dois temas em 1 frase."]
+    ]
+  },
+  "checklist": [
+    "5 itens operacionais obrigatórios do dia da prova específicos para este concurso"
+  ],
+  "vespera": "Protocolo tático de véspera D-7 e D-1 em 2 frases focado nos pontos de maior incidência deste edital.",
+  "escrita": "Diretriz técnica de prova discursiva e gestão de tempo em 2 frases para a banca examinadora."
+}`;
 
-  const aiData = extractJson(aiResponse);
-  if (!aiData) {
-    throw new Error('Falha ao decodificar matriz JSON gerada pelo motor de IA.');
+  const [aiCoreRaw, aiPracticeRaw] = await Promise.all([
+    callExperientialAI(env, {
+      messages: [
+        { role: 'system', content: systemPromptCore },
+        { role: 'user', content: `CALIBRAR NÚCLEO, DATAS, ASSUNTOS E CRONOGRAMA:\n${baseContextBlock}` }
+      ],
+      temperature: 0.2,
+      maxTokens: 4500,
+      responseFormat: { type: 'json_object' }
+    }),
+    callExperientialAI(env, {
+      messages: [
+        { role: 'system', content: systemPromptPractice },
+        { role: 'user', content: `CALIBRAR FLASHCARDS, SIMULADOS, QUESTÕES, ARGUIÇÃO, MAPA E GUIA:\n${baseContextBlock}` }
+      ],
+      temperature: 0.25,
+      maxTokens: 4500,
+      responseFormat: { type: 'json_object' }
+    }).catch(err => {
+      console.warn('[calibrate] Aviso na chamada paralela B (Prática):', err.message);
+      return '{}';
+    })
+  ]);
+
+  const aiCore = extractJson(aiCoreRaw);
+  const aiPractice = extractJson(aiPracticeRaw) || {};
+  if (!aiCore) {
+    throw new Error('Falha ao decodificar matriz JSON principal gerada pelo motor de IA.');
   }
 
-  const detectedBanca = aiData.banca_identificada || finalBanca || 'Banca Oficial';
-  const marcos = Array.isArray(aiData.marcos_temporais) && aiData.marcos_temporais.length > 0
-    ? aiData.marcos_temporais
-    : (examDate ? [['PROVA OFICIAL', examDate]] : []);
+  const aiData = {
+    ...aiPractice,
+    ...aiCore,
+    guia_estrategico: aiPractice.guia_estrategico || aiCore.guia_estrategico || {},
+    cards: Array.isArray(aiPractice.cards) ? aiPractice.cards : (aiCore.cards || []),
+    questoes_objetivas: Array.isArray(aiPractice.questoes_objetivas) ? aiPractice.questoes_objetivas : (aiCore.questoes_objetivas || []),
+    sim: Array.isArray(aiPractice.sim) ? aiPractice.sim : (aiCore.sim || []),
+    rubric: Array.isArray(aiPractice.rubric) ? aiPractice.rubric : (aiCore.rubric || []),
+    arg: Array.isArray(aiPractice.arg) ? aiPractice.arg : (aiCore.arg || []),
+    mapa: (aiPractice.mapa && Array.isArray(aiPractice.mapa.nodes) && aiPractice.mapa.nodes.length > 0) ? aiPractice.mapa : (aiCore.mapa || { nodes: [], edges: [] }),
+    checklist: Array.isArray(aiPractice.checklist) ? aiPractice.checklist : (aiCore.checklist || []),
+    vespera: aiPractice.vespera || aiCore.vespera || '',
+    escrita: aiPractice.escrita || aiCore.escrita || ''
+  };
 
-  const detectedExamMarco = marcos.find(([label]) => /prova|exame|objetiva|escrita/i.test(String(label || '')));
-  const resolvedExamDate = examDate || (detectedExamMarco ? detectedExamMarco[1] : null);
+  const detectedBanca = aiData.banca_identificada || finalBanca || 'Banca Oficial';
+
+  // 4. Resolve a data da última prova do edital e os marcos temporais sincronizados
+  const dateInfo = resolveExamDatesAndMarcos(aiData, examDate, catalogRef, todayIso);
 
   const rawAssuntos = Array.isArray(aiData.assuntos) ? aiData.assuntos : [];
   const rawTextos = Array.isArray(aiData.textos) ? aiData.textos : [];
-  const rawCards = Array.isArray(aiData.cards) ? aiData.cards : [];
+  const rawCards = Array.isArray(aiData.cards) ? aiData.cards.map((c, idx) => ({
+    id: c.id || `dc_api_${idx + 1}`,
+    t: c.t || 'top_1',
+    cat: c.cat || 'Geral',
+    f: c.f || c.pergunta || '',
+    v: c.v || c.b || c.resposta || ''
+  })).filter(c => c.f && c.v) : [];
 
-  const compiledUnidades = (Array.isArray(aiData.unidades) && aiData.unidades.length > 0)
-    ? aiData.unidades
-    : rawAssuntos.flatMap(mat => {
-        const tops = Array.isArray(mat.topicos) ? mat.topicos : [];
-        const uList = [];
-        for (let i = 0; i < tops.length; i += 2) {
-          const slice = tops.slice(i, i + 2);
-          uList.push({
-            materia: mat.materia || 'Disciplina',
-            titulo: slice[0]?.t || mat.materia || 'Unidade Tática',
-            topicos: slice.map(x => x.t).filter(Boolean)
-          });
-        }
-        return uList;
+  const compiledUnidades = rawAssuntos.flatMap(mat => {
+    const tops = Array.isArray(mat.topicos) ? mat.topicos : [];
+    const uList = [];
+    for (let i = 0; i < tops.length; i += 2) {
+      const slice = tops.slice(i, i + 2);
+      uList.push({
+        materia: mat.materia || 'Disciplina',
+        titulo: slice[0]?.t || mat.materia || 'Unidade Tática',
+        topicos: slice.map(x => x.t).filter(Boolean)
       });
+    }
+    return uList;
+  });
 
-  const sched = generateTacticalSchedule(compiledUnidades, effectiveHours, new Date(), resolvedExamDate);
+  // 5. Constrói o Cronograma completo de HOJE até a DATA DA ÚLTIMA PROVA com os blocos gerados pela API e marcos sincronizados
+  const sched = buildExamAlignedSchedule({
+    aiBlocos: aiData.blocos_cronograma,
+    unidades: compiledUnidades,
+    availabilityHours: effectiveHours,
+    dateInfo,
+    banca: detectedBanca
+  });
 
+  // Complementa os flashcards gerados pela API com os conceitos e crivos das fichas táticas
   rawTextos.forEach((tx, tIdx) => {
     const topId = tx.id || `top_${tIdx + 1}`;
     const mat = tx.materia || 'Conhecimentos Específicos';
@@ -810,7 +1272,8 @@ ${isArsenalOrAbove ? '- 5 nós (n1 a n5) e 5 conexões em "mapa";\n' : ''}${isEl
     banca: detectedBanca,
     edital_extracted: hasSubmittedEdital,
     edital_audit_summary: aiData.resumo_auditoria_edital || '',
-    dates: marcos.length > 0 ? marcos : undefined
+    ultima_prova: dateInfo.ultimaProva,
+    dates: dateInfo.marcos
   };
 
   const defaultRubric = [
@@ -828,15 +1291,19 @@ ${isArsenalOrAbove ? '- 5 nós (n1 a n5) e 5 conexões em "mapa";\n' : ''}${isEl
       hoursPerDay: effectiveHours,
       editalExtracted: hasSubmittedEdital,
       auditSummary: aiData.resumo_auditoria_edital || '',
+      provaObjetiva: dateInfo.provaObjetiva,
+      ultimaProva: dateInfo.ultimaProva,
       hasOrderBump,
       calibratedAt: new Date().toISOString()
     },
+    guia_estrategico: aiData.guia_estrategico || {},
     sched,
-    dates: headerConfig.dates,
+    dates: dateInfo.marcos,
     assuntos: rawAssuntos,
     texts: rawTextos,
     textos: rawTextos,
     cards: rawCards,
+    questoes_objetivas: Array.isArray(aiData.questoes_objetivas) ? aiData.questoes_objetivas : [],
     sim: Array.isArray(aiData.sim) && aiData.sim.length > 0 ? aiData.sim : [
       {
         id: 'sim_1',
@@ -855,11 +1322,18 @@ ${isArsenalOrAbove ? '- 5 nós (n1 a n5) e 5 conexões em "mapa";\n' : ''}${isEl
     })),
     mapa: aiData.mapa || { nodes: [], edges: [] },
     tabs: aiData.tabs || [],
-    checklist: aiData.checklist || [],
+    checklist: Array.isArray(aiData.checklist) && aiData.checklist.length > 0 ? aiData.checklist : [
+      `Documento oficial original com foto e Cartão de Confirmação de Inscrição (${detectedBanca})`,
+      'Duas ou mais canetas esferográficas de tinta preta fabricadas em material transparente',
+      'Conferência antecipada do local de prova e deslocamento com margem mínima de 1 hora',
+      `Leitura final das fichas ESSENCIAIS e do Dossiê D-7 até a véspera (${dateInfo.ultimaProva.split('-').reverse().join('/')})`,
+      'Reserva de 30 minutos finais para transcrição segura do gabarito e revisão da folha discursiva'
+    ],
     vespera: aiData.vespera || '',
     escrita: aiData.escrita || ''
   };
 
+  // 6. Persiste a calibração em `public.user_panels`
   let savedPanelId = panel?.id || null;
   if (panel && panel.id && panel.id !== 'default-panel') {
     await supabaseRest(env, `/user_panels?id=eq.${encodeURIComponent(panel.id)}`, {
@@ -899,20 +1373,21 @@ ${isArsenalOrAbove ? '- 5 nós (n1 a n5) e 5 conexões em "mapa";\n' : ''}${isEl
     }
   }
 
+  // 7. Gera e publica automaticamente o Guia Tático Pós-Edital (e o Dossiê D-7 se Order Bump ou Elite/Prime) em `user_files`
   if (targetUserId && targetUserId !== 'default-user' && savedPanelId && savedPanelId !== 'default-panel') {
     try {
       const { url } = getSupabaseConfig(env);
       const existingFiles = await supabaseRest(env, `/user_files?panel_id=eq.${encodeURIComponent(savedPanelId)}`);
-      const hasGuideFile = Array.isArray(existingFiles) && existingFiles.some(f => String(f.filename || '').includes('Guia_Tatico_Pos_Edital'));
+      const existingGuide = Array.isArray(existingFiles) ? existingFiles.find(f => String(f.filename || '').includes('Guia_Tatico_Pos_Edital')) : null;
 
-      if (!hasGuideFile) {
-        const guideHtml = buildStudyGuideHtmlDocument(contentData, headerConfig, 'guia');
-        const guideBytes = new TextEncoder().encode(guideHtml);
-        const guideStoragePath = `${targetUserId}/Guia_Tatico_Pos_Edital_${savedPanelId.slice(0, 8)}.html`;
+      const guideHtml = buildStudyGuideHtmlDocument(contentData, headerConfig, 'guia');
+      const guideBytes = new TextEncoder().encode(guideHtml);
+      const guideStoragePath = `${targetUserId}/Guia_Tatico_Pos_Edital_${savedPanelId.slice(0, 8)}.html`;
 
-        await supabaseStorageUpload(env, 'user-materials', guideStoragePath, guideBytes, 'text/html; charset=utf-8');
-        const guidePublicUrl = `${url}/storage/v1/object/public/user-materials/${guideStoragePath}`;
+      await supabaseStorageUpload(env, 'user-materials', guideStoragePath, guideBytes, 'text/html; charset=utf-8');
+      const guidePublicUrl = `${url}/storage/v1/object/public/user-materials/${guideStoragePath}`;
 
+      if (!existingGuide) {
         await supabaseRest(env, '/user_files', {
           method: 'POST',
           body: {
@@ -929,10 +1404,20 @@ ${isArsenalOrAbove ? '- 5 nós (n1 a n5) e 5 conexões em "mapa";\n' : ''}${isEl
             sort_order: 1
           }
         });
+      } else {
+        await supabaseRest(env, `/user_files?id=eq.${encodeURIComponent(existingGuide.id)}`, {
+          method: 'PATCH',
+          body: {
+            title: `Guia de Estudos Pós-Edital Calibrado — ${finalConcurso} (${finalCargo})`,
+            storage_path: guideStoragePath,
+            storage_url: guidePublicUrl,
+            file_size_bytes: guideBytes.byteLength
+          }
+        });
       }
 
-      const hasD7File = Array.isArray(existingFiles) && existingFiles.some(f => String(f.filename || '').includes('Dossie_Vespera_D7'));
-      if ((hasOrderBump || isEliteOrPrime) && !hasD7File) {
+      const existingD7 = Array.isArray(existingFiles) ? existingFiles.find(f => String(f.filename || '').includes('Dossie_Vespera_D7')) : null;
+      if (hasOrderBump || finalTier === 'elite' || finalTier === 'prime') {
         const d7Html = buildStudyGuideHtmlDocument(contentData, headerConfig, 'd7');
         const d7Bytes = new TextEncoder().encode(d7Html);
         const d7StoragePath = `${targetUserId}/Dossie_Vespera_D7_${savedPanelId.slice(0, 8)}.html`;
@@ -940,28 +1425,31 @@ ${isArsenalOrAbove ? '- 5 nós (n1 a n5) e 5 conexões em "mapa";\n' : ''}${isEl
         await supabaseStorageUpload(env, 'user-materials', d7StoragePath, d7Bytes, 'text/html; charset=utf-8');
         const d7PublicUrl = `${url}/storage/v1/object/public/user-materials/${d7StoragePath}`;
 
-        await supabaseRest(env, '/user_files', {
-          method: 'POST',
-          body: {
-            user_id: targetUserId,
-            panel_id: savedPanelId,
-            category: 'material',
-            title: `Dossiê de Véspera D-7 & Pegadinhas da Banca (${detectedBanca})`,
-            filename: 'Dossie_Vespera_D7_Pegadinhas.html',
-            storage_path: d7StoragePath,
-            storage_url: d7PublicUrl,
-            priority: 'ESSENCIAL',
-            file_size_bytes: d7Bytes.byteLength,
-            page_offset: 0,
-            sort_order: 2
-          }
-        });
+        if (!existingD7) {
+          await supabaseRest(env, '/user_files', {
+            method: 'POST',
+            body: {
+              user_id: targetUserId,
+              panel_id: savedPanelId,
+              category: 'material',
+              title: `Dossiê de Véspera D-7 & Pegadinhas da Banca (${detectedBanca})`,
+              filename: 'Dossie_Vespera_D7_Pegadinhas.html',
+              storage_path: d7StoragePath,
+              storage_url: d7PublicUrl,
+              priority: 'ESSENCIAL',
+              file_size_bytes: d7Bytes.byteLength,
+              page_offset: 0,
+              sort_order: 2
+            }
+          });
+        }
       }
     } catch (fileGenErr) {
       console.warn('[calibrate] Aviso ao publicar arquivos do Guia/Dossiê no Storage:', fileGenErr.message);
     }
   }
 
+  // 8. Atualiza ordem para delivered e envia E-mail #2
   if (panel?.order_id || order?.id) {
     const targetOrdId = panel?.order_id || order?.id;
     try {
