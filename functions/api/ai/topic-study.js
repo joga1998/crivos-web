@@ -8,7 +8,6 @@ function extractJson(text) {
   if (!text) return null;
   if (typeof text === 'object') return text;
   
-  // Limpeza de possíveis blocos markdown ```json ... ```
   let cleaned = String(text).trim();
   if (cleaned.startsWith('```json')) {
     cleaned = cleaned.replace(/^```json\s*/i, '').replace(/\s*```$/, '').trim();
@@ -19,7 +18,6 @@ function extractJson(text) {
   try {
     return JSON.parse(cleaned);
   } catch (e) {
-    // Tenta capturar o primeiro objeto {} balanceado
     const match = cleaned.match(/\{[\s\S]*\}/);
     if (match) {
       try {
@@ -46,25 +44,23 @@ export async function onRequestPost(context) {
     }
 
     const systemPrompt = `Você é o Engenheiro Tático-Pedagógico da CRIVOS.
-Sua missão é produzir um dossiê cirúrgico de estudo e fixação Just-in-Time sobre um tópico específico do edital para o aluno, finalizando com um lote de Flashcards de memorização ativa para repetição espaçada SM-2.
-
-Retorne ESTRITAMENTE um objeto JSON válido no formato:
+Produza um dossiê conciso e cirúrgico com Flashcards SM-2 sobre o tópico do edital.
+Retorne ESTRITAMENTE um objeto JSON válido (sem tags markdown):
 {
-  "resumo_tatico": "Síntese em 2 a 3 parágrafos objetivos sobre o núcleo essencial deste assunto para a banca...",
-  "tese_banca": "Posição doutrinária, jurisprudencial ou entendimento predominante da banca...",
+  "resumo_tatico": "Síntese em 2 parágrafos objetivos sobre o núcleo essencial deste assunto...",
+  "tese_banca": "Posição e jurisprudência da banca...",
   "pontos_atencao": [
-    "Regra de ouro 1 ou dispositivo legal crítico...",
-    "Regra de ouro 2 ou exceção frequente...",
-    "Regra de ouro 3..."
+    "Regra de ouro 1...",
+    "Regra de ouro 2..."
   ],
   "pegadinha_banca": {
-    "como_induz": "Como a banca monta a pegadinha na questão para enganar o candidato...",
-    "blindagem": "Regra binária ou mnemônica para o candidato gabaritar com certeza."
+    "como_induz": "Como a banca induz ao erro...",
+    "blindagem": "Regra binária de certeza..."
   },
   "cards": [
     {
-      "f": "Pergunta cirúrgica de Active Recall sobre o tema?",
-      "v": "Resposta objetiva, direta e memorizável.",
+      "f": "Pergunta cirúrgica de Active Recall?",
+      "v": "Resposta direta e memorizável.",
       "cat": "${materia}"
     },
     {
@@ -76,23 +72,16 @@ Retorne ESTRITAMENTE um objeto JSON válido no formato:
       "f": "Pergunta de aplicação prática ou prazo legal?",
       "v": "Resposta precisa.",
       "cat": "${materia}"
-    },
-    {
-      "f": "Pergunta de diferenciação conceitual?",
-      "v": "Resposta contrastando os dois conceitos.",
-      "cat": "${materia}"
     }
   ]
 }`;
 
-    const userPrompt = `DADOS DO TÓPICO PARA ESTUDO JUST-IN-TIME:
+    const userPrompt = `DADOS DO TÓPICO:
 - Concurso: ${concurso || 'Concurso Público'}
 - Cargo: ${cargo || 'Candidato'}
 - Banca Examinadora: ${banca}
 - Disciplina: ${materia}
-- Assunto Específico do Edital: ${topico}
-
-Gere o dossiê técnico e os flashcards com máximo rigor tático e concisão suíça.`;
+- Assunto: ${topico}`;
 
     const aiResponse = await callExperientialAI(env, {
       messages: [
@@ -100,7 +89,7 @@ Gere o dossiê técnico e os flashcards com máximo rigor tático e concisão su
         { role: 'user', content: userPrompt }
       ],
       temperature: 0.2,
-      maxTokens: 2500,
+      maxTokens: 4000,
       responseFormat: { type: 'json_object' }
     });
 
@@ -119,7 +108,7 @@ Gere o dossiê técnico e os flashcards com máximo rigor tático e concisão su
   } catch (err) {
     console.error('[topic-study] Erro no processamento JIT:', err);
     return new Response(JSON.stringify({
-      error: 'Falha ao processar estudo do assunto via IA.',
+      error: 'Falha ao processar estudo do assunto.',
       details: err.message
     }), {
       status: 500,
