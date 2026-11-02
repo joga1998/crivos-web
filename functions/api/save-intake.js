@@ -66,14 +66,14 @@ export async function onRequestPost(context) {
     }
 
     const planPrices = {
-      tatico: 67.00,
-      arsenal: 124.00,
-      elite: 221.00,
-      prime: 288.00,
+      tatico: 37.00,
+      arsenal: 67.00,
+      elite: 97.00,
+      prime: 217.00,
     };
 
     const cleanPlan = (plan || 'tatico').toLowerCase();
-    const amount = planPrices[cleanPlan] || 67.00;
+    const amount = planPrices[cleanPlan] || 37.00;
 
     const isJson = contentType.includes('application/json');
     let utmSource = '', utmMedium = '', utmCampaign = '', utmContent = '', utmTerm = '', fbclid = '', gclid = '';

@@ -109,7 +109,7 @@ export async function onRequestPost(context) {
       await sendAdminSaleNotification(env, {
         event: 'PRIME_UPLOAD_FINALIZADO',
         plan_title: 'CRIVOS // Nível 4 · Prime (Materiais Enviados)',
-        amount: '288,00',
+        amount: '217,00',
         student_name: studentName,
         student_email: studentEmail,
         concurso: concursoNome,

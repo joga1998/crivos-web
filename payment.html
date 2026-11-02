@@ -1170,10 +1170,10 @@
           <div class="form-group">
             <label for="product-select">PLANO ESCOLHIDO <span class="req">*</span></label>
             <select id="product-select">
-              <option value="tatico">Nível 1 · Tático — R$ 67,00 (Pagamento Único)</option>
-              <option value="arsenal">Nível 2 · Arsenal (Com Motor SM-2) — R$ 124,00</option>
-              <option value="elite">Nível 3 · Elite (Pacote Completo) — R$ 221,00</option>
-              <option value="prime">Nível 4 · Prime (Com Seus Próprios Materiais) — R$ 288,00</option>
+              <option value="tatico">Nível 1 · Tático — R$ 37,00 (Pagamento Único)</option>
+              <option value="arsenal">Nível 2 · Arsenal (Com Motor SM-2) — R$ 67,00</option>
+              <option value="elite">Nível 3 · Elite (Pacote Completo) — R$ 97,00</option>
+              <option value="prime">Nível 4 · Prime (Calibração Artesanal VIP) — R$ 217,00</option>
             </select>
           </div>
 
@@ -1195,7 +1195,7 @@
           </div>
 
           <button type="submit" class="submit-btn">
-            <span>[ AVANÇAR PARA PAGAMENTO // R$ <span class="current-price-label">67,00</span> ]</span>
+            <span>[ AVANÇAR PARA PAGAMENTO // R$ <span class="current-price-label">37,00</span> ]</span>
             <span>→</span>
           </button>
         </form>
@@ -1214,7 +1214,7 @@
           <div><strong>EDITAL ALVO:</strong> <span id="sum-concurso">...</span> (<span id="sum-cargo">...</span>)</div>
           <div><strong>DISPONIBILIDADE:</strong> <span id="sum-rotina">...</span></div>
           <div><strong>EDITAL:</strong> <span id="sum-edital">...</span></div>
-          <div><strong>PLANO:</strong> <span id="sum-plano">...</span> — <strong>R$ <span class="current-price-label">67,00</span></strong></div>
+          <div><strong>PLANO:</strong> <span id="sum-plano">...</span> — <strong>R$ <span class="current-price-label">37,00</span></strong></div>
         </div>
 
         
@@ -1223,7 +1223,7 @@
           <label class="order-bump-label" for="order-bump-checkbox">
             <input type="checkbox" id="order-bump-checkbox" class="order-bump-checkbox" onchange="toggleOrderBump(this)" />
             <div class="order-bump-content">
-              <span class="order-bump-badge">OFERTA ÚNICA // + R$ 27,00</span>
+              <span class="order-bump-badge">OFERTA ÚNICA // + R$ 19,00</span>
               <div class="order-bump-title">SIM! Adicionar o Dossiê de Véspera D-7 &amp; Pegadinhas da Banca</div>
               <div class="order-bump-desc">
                 Caderno tático extra em PDF com o mapeamento das 50 pegadinhas clássicas da sua banca examinadora (Cebraspe / FGV / Vunesp) e checklist de revisão rápida para os últimos 7 dias.
@@ -1258,7 +1258,7 @@
             </div>
 
             <button type="submit" id="pix-submit-btn" class="submit-btn btn-pix">
-              <span>[ GERAR QR CODE PIX // R$ <span class="current-price-label">67,00</span> ]</span>
+              <span>[ GERAR QR CODE PIX // R$ <span class="current-price-label">37,00</span> ]</span>
               <span>⚡</span>
             </button>
           </form>
@@ -1375,27 +1375,27 @@
     const planData = {
       tatico: {
         title: "Nível 1 · Tático",
-        price: "67.00",
-        formatted: "67,00",
+        price: "37.00",
+        formatted: "37,00",
         desc: "<strong>[ NÍVEL 1: TÁTICO — EXECUÇÃO ]</strong><br>Sistema enxuto e cirúrgico para quem precisa estudar o que realmente cai. Você envia o edital e sua rotina semanal; nós devolvemos seu cronograma diário estruturado com pesos estatísticos."
       },
       arsenal: {
         title: "Nível 2 · Arsenal (SM-2)",
-        price: "124.00",
-        formatted: "124,00",
+        price: "67.00",
+        formatted: "67,00",
         desc: "<strong>[ NÍVEL 2: ARSENAL — RETENÇÃO ATIVA + SM-2 ]</strong><br>Tudo do Nível Tático acoplado ao motor de repetição espaçada SuperMemo-2 (SM-2), banco de flashcards de alta densidade e mapa de conexões conceituais."
       },
       elite: {
         title: "Nível 3 · Elite",
-        price: "221.00",
-        formatted: "221,00",
+        price: "97.00",
+        formatted: "97,00",
         desc: "<strong>[ NÍVEL 3: ELITE — ECOSSISTEMA COMPLETO ]</strong><br>O pacote integral de engenharia: Tático + Arsenal + Simulador cronometrado de Discursivas e Grade técnica espelhada nos critérios da banca examinadora."
       },
       prime: {
-        title: "Nível 4 · Prime",
-        price: "288.00",
-        formatted: "288,00",
-        desc: "<strong>[ NÍVEL 4: PRIME — MÁXIMA PERSONALIZAÇÃO ]</strong><br>O ápice da engenharia CRIVOS: Tudo do Nível Elite somado à ingestão e calibração dos seus próprios materiais de estudo (apostilas, resumos e cadernos enviados em até 48h) diretamente no seu cronograma."
+        title: "Nível 4 · Prime (Calibração Artesanal)",
+        price: "217.00",
+        formatted: "217,00",
+        desc: "<strong>[ NÍVEL 4: PRIME — CALIBRAÇÃO ARTESANAL VIP ]</strong><br>Acompanhamento e curadoria cirúrgica: Além de todo o pacote Elite, nossa equipe pedagógica analisa suas apostilas e resumos enviados e calibra seu cronograma e fichas em até 6 horas úteis."
       }
     };
 
@@ -1412,7 +1412,7 @@
 
     
     let orderBumpActive = false;
-    const ORDER_BUMP_PRICE = 27.00;
+    const ORDER_BUMP_PRICE = 19.00;
 
     function toggleOrderBump(checkbox) {
       orderBumpActive = !!checkbox.checked;

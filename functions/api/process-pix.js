@@ -40,12 +40,12 @@ export async function onRequestPost(context) {
 
     // Tabela oficial de preços no servidor (anti-adulteração de preços no frontend)
     const planPrices = {
-      tatico: { amount: 67.00, title: 'CRIVOS // Nível 1 · Tático' },
-      arsenal: { amount: 124.00, title: 'CRIVOS // Nível 2 · Arsenal (SM-2)' },
-      elite: { amount: 221.00, title: 'CRIVOS // Nível 3 · Elite (Completo)' },
+      tatico: { amount: 37.00, title: 'CRIVOS // Nível 1 · Tático' },
+      arsenal: { amount: 67.00, title: 'CRIVOS // Nível 2 · Arsenal (SM-2)' },
+      elite: { amount: 97.00, title: 'CRIVOS // Nível 3 · Elite (Completo)' },
     
-      prime: { amount: 288.00, title: 'CRIVOS // Nível 4 · Prime (Máxima Personalização)' },
-};
+      prime: { amount: 217.00, title: 'CRIVOS // Nível 4 · Prime (Calibração Artesanal)' }
+    };
 
     const selected = planPrices[plan];
     if (!selected) {
@@ -89,7 +89,7 @@ export async function onRequestPost(context) {
 
     // Chave única de idempotência para evitar cobranças duplicadas em requisições repetidas
     const idempotencyKey = `pix-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-    const orderBumpPrice = 27.00;
+    const orderBumpPrice = 19.00;
     const finalAmount = orderBump ? Number((selected.amount + orderBumpPrice).toFixed(2)) : selected.amount;
     const finalDesc = orderBump ? `${selected.title} + Dossiê D-7` : selected.title;
 
