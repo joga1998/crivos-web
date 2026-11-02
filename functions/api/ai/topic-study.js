@@ -4,13 +4,39 @@
 import { getCorsHeaders } from '../_supabase.js';
 import { callExperientialAI } from '../_ai.js';
 
+function extractJson(text) {
+  if (!text) return null;
+  if (typeof text === 'object') return text;
+  
+  // Limpeza de possíveis blocos markdown ```json ... ```
+  let cleaned = String(text).trim();
+  if (cleaned.startsWith('```json')) {
+    cleaned = cleaned.replace(/^```json\s*/i, '').replace(/\s*```$/, '').trim();
+  } else if (cleaned.startsWith('```')) {
+    cleaned = cleaned.replace(/^```\s*/, '').replace(/\s*```$/, '').trim();
+  }
+
+  try {
+    return JSON.parse(cleaned);
+  } catch (e) {
+    // Tenta capturar o primeiro objeto {} balanceado
+    const match = cleaned.match(/\{[\s\S]*\}/);
+    if (match) {
+      try {
+        return JSON.parse(match[0]);
+      } catch (err) {}
+    }
+    throw new Error('Falha ao interpretar resposta da IA: ' + e.message);
+  }
+}
+
 export async function onRequestPost(context) {
   const { request, env } = context;
   const corsHeaders = getCorsHeaders(request);
 
   try {
     const body = await request.json();
-    const { concurso, cargo, banca = 'VUNESP', materia, topico } = body;
+    const { concurso, cargo, banca = 'AOCP', materia, topico } = body;
 
     if (!materia || !topico) {
       return new Response(JSON.stringify({ error: 'Materia e Topico são obrigatórios.' }), {
@@ -73,12 +99,12 @@ Gere o dossiê técnico e os flashcards com máximo rigor tático e concisão su
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt }
       ],
-      temperature: 0.25,
-      maxTokens: 3500,
+      temperature: 0.2,
+      maxTokens: 2500,
       responseFormat: { type: 'json_object' }
     });
 
-    const parsedData = JSON.parse(aiResponse);
+    const parsedData = extractJson(aiResponse);
 
     return new Response(JSON.stringify({
       success: true,
