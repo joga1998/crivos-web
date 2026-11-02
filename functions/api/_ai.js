@@ -1,8 +1,8 @@
 // Helper de comunicação direta com a API da OpenRouter
-// Motor de alta precisão para esteira de estudos CRIVOS: DeepSeek V3
+// Motor oficial de calibração e estudo tático CRIVOS: DeepSeek V4.1 Flash
 
-export const OPENROUTER_DEFAULT_MODEL = 'deepseek/deepseek-chat';
-export const OPENROUTER_FALLBACK_MODEL = 'google/gemini-2.5-flash';
+export const OPENROUTER_DEFAULT_MODEL = 'deepseek/deepseek-v4.1-flash';
+export const OPENROUTER_FALLBACK_MODEL = 'deepseek/deepseek-chat';
 
 // Chave da OpenRouter para orquestração autônoma
 const _K_PARTS = ['sk-or-v1-', '8c4f3615d9b26cce4aceef46573c8af2', '6d657bd945b0a024154397b7f7d374ab'];
