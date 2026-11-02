@@ -35,9 +35,10 @@ export async function onRequestPost(context) {
     }
 
     const planTier = (userPanel?.plan_tier || '').toLowerCase();
-    if (planTier !== 'prime') {
+    const isEditalCategory = String(category || '').toLowerCase() === 'edital';
+    if (planTier !== 'prime' && !isEditalCategory) {
       return new Response(JSON.stringify({ 
-        error: 'O envio de arquivos pelo painel é um recurso exclusivo do Plano CRIVOS PRIME. Para integrar suas apostilas, realize o upgrade para o Prime.' 
+        error: 'O envio de apostilas e materiais pessoais pelo painel é um recurso exclusivo do Plano CRIVOS PRIME. O envio de Editais (PDF) é liberado para todos os planos.' 
       }), {
         status: 403,
         headers: corsHeaders,

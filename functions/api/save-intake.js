@@ -7,7 +7,7 @@ export async function onRequestPost(context) {
 
   try {
     const contentType = request.headers.get('content-type') || '';
-    let name, email, concurso, cargo, availability, plan, editalBase64, editalFileName, editalMimeType;
+    let name, email, concurso, cargo, availability, plan, editalBase64, editalFileName, editalMimeType, editalText = '';
 
     if (contentType.includes('application/json')) {
       const body = await request.json();
@@ -20,6 +20,7 @@ export async function onRequestPost(context) {
       editalBase64 = body.editalBase64;
       editalFileName = body.editalFileName;
       editalMimeType = body.editalMimeType;
+      editalText = body.editalText || '';
     } else if (contentType.includes('multipart/form-data')) {
       const formData = await request.formData();
       name = formData.get('name') || formData.get('fullName');
@@ -28,6 +29,7 @@ export async function onRequestPost(context) {
       cargo = formData.get('cargo');
       availability = formData.get('availability');
       plan = formData.get('plan');
+      editalText = formData.get('editalText') || '';
       
       const file = formData.get('editalFile');
       if (file && typeof file === 'object' && file.name) {
@@ -121,6 +123,7 @@ export async function onRequestPost(context) {
       notes: JSON.stringify({
         full_name: String(name || '').trim() || undefined,
         availability: String(availability || '').trim(),
+        edital_text: editalText ? String(editalText).slice(0, 32000) : undefined,
         utm_source: utmSource || undefined,
         utm_medium: utmMedium || undefined,
         utm_campaign: utmCampaign || undefined,
