@@ -2,8 +2,8 @@
 // Motor primário oficial CRIVOS: DeepSeek V4.1 Flash (deepseek/deepseek-v4.1-flash)
 // Otimizado com controle explícito de reasoning_tokens para máxima densidade técnica, baixa latência e mínimo consumo de tokens.
 
-export const OPENROUTER_DEFAULT_MODEL = 'deepseek/deepseek-v4.1-flash'; // Primário: DeepSeek V4.1 Flash (CED 552B MoE - $0.045/M in, $0.50/M out)
-export const OPENROUTER_FALLBACK_MODEL = 'deepseek/deepseek-v4.1-flash-1017'; // Secundário: Snapshot 1017 (#1 Academia / #2 Legal)
+export const OPENROUTER_DEFAULT_MODEL = 'deepseek/deepseek-v4.1-flash-1017'; // Primário: DeepSeek V4.1 Flash 1017 (#1 Academia / #2 Legal / 54T tokens)
+export const OPENROUTER_FALLBACK_MODEL = 'deepseek/deepseek-v4.1-flash'; // Secundário: DeepSeek V4.1 Flash (88% off input)
 export const OPENROUTER_TERTIARY_MODEL = 'z-ai/glm-5.3-flash'; // Terciário: Z.ai GLM 5.3 Flash ($0.0285/M in, $0.0923/M out)
 
 const _K_PARTS = ['sk-or-v1-', '8c4f3615d9b26cce4aceef46573c8af2', '6d657bd945b0a024154397b7f7d374ab'];
