@@ -1,9 +1,10 @@
 // Helper de comunicação direta com a API da OpenRouter
-// Motor oficial de calibração e estudo tático CRIVOS: DeepSeek V4.1 Flash -> DeepSeek Chat -> Gemini 2.5 Flash
+// Motor oficial de calibração e estudo tático CRIVOS: DeepSeek V4.1 Flash -> DeepSeek V3 (deepseek/deepseek-chat)
+// Fallback estritamente DeepSeek V3 conforme diretriz da arquitetura pedagógica.
 
 export const OPENROUTER_DEFAULT_MODEL = 'deepseek/deepseek-v4.1-flash';
-export const OPENROUTER_FALLBACK_MODEL = 'deepseek/deepseek-chat';
-export const OPENROUTER_TERTIARY_MODEL = 'google/gemini-2.5-flash';
+export const OPENROUTER_FALLBACK_MODEL = 'deepseek/deepseek-chat'; // DeepSeek V3 oficial no OpenRouter
+export const OPENROUTER_TERTIARY_MODEL = 'deepseek/deepseek-chat-v3.1'; // Snapshot / variante DeepSeek V3
 
 const _K_PARTS = ['sk-or-v1-', '8c4f3615d9b26cce4aceef46573c8af2', '6d657bd945b0a024154397b7f7d374ab'];
 const DEFAULT_OR_KEY = _K_PARTS.join('');
@@ -23,8 +24,8 @@ export async function callExperientialAI(env, {
   let lastError = null;
 
   for (const currentModel of modelsQueue) {
-    // deepseek-chat possui teto estrito de 8192 tokens de saída
-    const safeMaxTokens = currentModel.includes('deepseek-chat')
+    // Modelos DeepSeek Chat / V3 possuem teto de 8192 tokens de saída na API
+    const safeMaxTokens = (currentModel.includes('deepseek-chat') || currentModel.includes('deepseek-v3'))
       ? Math.min(maxTokens, 7800)
       : Math.min(maxTokens, 12000);
 
