@@ -21,13 +21,17 @@ export async function onRequestPost(context) {
 
     // 1. Localiza o painel do aluno
     let userPanel = null;
-    if (panelId) {
-      const panels = await supabaseRest(env, `/user_panels?id=eq.${encodeURIComponent(panelId)}`);
-      if (Array.isArray(panels) && panels.length > 0) userPanel = panels[0];
+    if (panelId && panelId !== 'default-panel') {
+      try {
+        const panels = await supabaseRest(env, `/user_panels?id=eq.${encodeURIComponent(panelId)}`);
+        if (Array.isArray(panels) && panels.length > 0) userPanel = panels[0];
+      } catch (_) {}
     }
-    if (!userPanel) {
-      const panels = await supabaseRest(env, `/user_panels?user_id=eq.${encodeURIComponent(userId)}&order=created_at.desc&limit=1`);
-      if (Array.isArray(panels) && panels.length > 0) userPanel = panels[0];
+    if (!userPanel && userId && userId !== 'default-user') {
+      try {
+        const panels = await supabaseRest(env, `/user_panels?user_id=eq.${encodeURIComponent(userId)}&order=created_at.desc&limit=1`);
+        if (Array.isArray(panels) && panels.length > 0) userPanel = panels[0];
+      } catch (_) {}
     }
 
     const planTier = (userPanel?.plan_tier || '').toLowerCase();

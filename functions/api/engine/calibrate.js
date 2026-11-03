@@ -841,6 +841,10 @@ Retorne EXCLUSIVAMENTE JSON válido:
 {
   "banca_identificada": "Nome da Banca",
   "resumo_auditoria_edital": "Síntese executiva em 1 frase do mapeamento do cargo.",
+  "nota_corte_estimada": 78,
+  "pesos_disciplinas": [
+    { "materia": "Nome da Disciplina", "peso": 2, "questoes_estimadas": 15 }
+  ],
   "data_prova_objetiva": "YYYY-MM-DD",
   "data_ultima_prova": "YYYY-MM-DD",
   "marcos_temporais": [
@@ -945,12 +949,33 @@ Retorne EXCLUSIVAMENTE JSON válido:
   ],
   "mapa": {
     "nodes": [
-      { "id": "n1", "label": "Eixo Nuclear (exatamente 5 nós: n1 a n5)", "materia": "Disciplina", "prio": "ESSENCIAL", "desc": "Função estrutural em 1 frase." }
+      { "id": "n1", "label": "Eixo Nuclear (gere de 10 a 14 nós transversais: n1 a n12)", "materia": "Disciplina", "prio": "ESSENCIAL", "desc": "Função estrutural no edital em 1 frase." }
     ],
     "edges": [
-      ["n1", "n2", "Relação Técnica (exatamente 5 conexões)", "Como a banca cruza os dois temas em 1 frase."]
+      ["n1", "n2", "Relação Técnica (gere de 14 a 22 conexões interdisciplinares)", "Como a banca cruza os dois temas na prova prática/discursiva/objetiva."]
     ]
   },
+  "artigos_legislacao": [
+    {
+      "id": "leg_1",
+      "diploma": "CF/88 ou Lei Específica do Cargo",
+      "artigo": "Art. X, § Y",
+      "prioridade": "CRITICO",
+      "tema": "Tema Central do Dispositivo",
+      "texto": "Texto do artigo real com marcações cloze {{PRAZO:termo}}, {{EXCECAO:termo}}, {{COMPETENCIA:termo}} (gere 35 a 40 artigos nucleares mais quentes da banca com cloze: leg_1 a leg_35)"
+    }
+  ],
+  "jogos_fraudes": [
+    {
+      "id": "fr_1",
+      "diploma": "Diploma Legal e Artigo",
+      "frase": "Frase do dispositivo com 1 palavra adulterada cirurgicamente no padrão da banca (exatamente 4 frases: fr_1 a fr_4)",
+      "integro": false,
+      "palavra_fraudada": "palavra_errada",
+      "gabarito_correto": "palavra_certa",
+      "justificativa": "Como a banca examinadora costuma induzir ao erro trocando este termo."
+    }
+  ],
   "checklist": [
     "5 itens operacionais obrigatórios do dia da prova específicos para este concurso"
   ],
@@ -1086,6 +1111,16 @@ Retorne EXCLUSIVAMENTE JSON válido:
     { item: 'Modalidade Escrita e Precisão Terminológica', max: 30, desc: 'Correção gramatical e emprego do vocabulário técnico da área.' }
   ];
 
+  const compiledPesos = (Array.isArray(aiData.pesos_disciplinas) && aiData.pesos_disciplinas.length > 0)
+    ? aiData.pesos_disciplinas
+    : rawAssuntos.map((m, idx) => ({
+        materia: m.materia || `Disciplina ${idx + 1}`,
+        peso: idx === 0 || idx === 1 ? 2 : 1,
+        questoes_estimadas: 15
+      }));
+
+  const notaCorteEstimada = Math.min(95, Math.max(50, Number(aiData.nota_corte_estimada) || 78));
+
   const contentData = {
     meta: {
       concurso: finalConcurso,
@@ -1100,6 +1135,8 @@ Retorne EXCLUSIVAMENTE JSON válido:
       hasOrderBump,
       calibratedAt: new Date().toISOString()
     },
+    nota_corte_estimada: notaCorteEstimada,
+    pesos_disciplinas: compiledPesos,
     guia_estrategico: aiData.guia_estrategico || {},
     sched,
     dates: dateInfo.marcos,
@@ -1125,6 +1162,348 @@ Retorne EXCLUSIVAMENTE JSON válido:
       resp: tx.crivo || 'Apresentar definição técnica direta + exceção/pegadinha da banca.'
     })),
     mapa: aiData.mapa || { nodes: [], edges: [] },
+    artigos_legislacao: (() => {
+      const aiList = Array.isArray(aiData.artigos_legislacao) ? aiData.artigos_legislacao : [];
+      const defaultList = [
+  {
+    "id": "leg_1",
+    "diploma": "CF/88",
+    "artigo": "Art. 5º, XI",
+    "prioridade": "CRITICO",
+    "tema": "Inviolabilidade de Domicílio",
+    "texto": "A casa é asilo inviolável do indivíduo, ninguém nela podendo penetrar {{EXCECAO:sem consentimento do morador}}, {{EXCECAO:salvo}} em caso de {{CONDICAO:flagrante delito}} ou desastre, ou para prestar socorro, ou, {{PRAZO:durante o dia}}, por {{COMPETENCIA:determinação judicial}}."
+  },
+  {
+    "id": "leg_2",
+    "diploma": "CF/88",
+    "artigo": "Art. 5º, LXI",
+    "prioridade": "CRITICO",
+    "tema": "Prisão Cautelar e Flagrante",
+    "texto": "Ninguém será preso senão em {{CONDICAO:flagrante delito}} ou por ordem escrita e fundamentada de {{COMPETENCIA:autoridade judiciária competente}}, {{EXCECAO:salvo}} nos casos de {{CONDICAO:transgressão militar}} ou crime propriamente militar, definidos em lei."
+  },
+  {
+    "id": "leg_3",
+    "diploma": "CF/88",
+    "artigo": "Art. 5º, LXVIII",
+    "prioridade": "CRITICO",
+    "tema": "Habeas Corpus",
+    "texto": "Conceder-se-á habeas corpus sempre que alguém sofrer ou se achar ameaçado de sofrer violência ou coação em sua {{COMPETENCIA:liberdade de locomoção}}, por {{CONDICAO:ilegalidade}} ou {{CONDICAO:abuso de poder}}."
+  },
+  {
+    "id": "leg_4",
+    "diploma": "CF/88",
+    "artigo": "Art. 5º, LXIX",
+    "prioridade": "CRITICO",
+    "tema": "Mandado de Segurança",
+    "texto": "Conceder-se-á mandado de segurança para proteger {{COMPETENCIA:direito líquido e certo}}, {{EXCECAO:não amparado por habeas corpus ou habeas data}}, quando o responsável pela ilegalidade ou abuso de poder for {{COMPETENCIA:autoridade pública}} ou agente de pessoa jurídica no exercício de atribuições do Poder Público."
+  },
+  {
+    "id": "leg_5",
+    "diploma": "CF/88",
+    "artigo": "Art. 5º, LXXII",
+    "prioridade": "TATICO",
+    "tema": "Habeas Data",
+    "texto": "Conceder-se-á habeas data: a) para assegurar o conhecimento de informações relativas à {{COMPETENCIA:pessoa do impetrante}}, constantes de registros ou bancos de dados de entidades governamentais ou de caráter público; b) para a {{COMPETENCIA:retificação de dados}}, quando não se prefira fazê-lo por processo sigiloso, judicial ou administrativo."
+  },
+  {
+    "id": "leg_6",
+    "diploma": "CF/88",
+    "artigo": "Art. 37, caput",
+    "prioridade": "CRITICO",
+    "tema": "Princípios Expressos da Administração Pública",
+    "texto": "A administração pública direta e indireta de qualquer dos Poderes da União, dos Estados, do Distrito Federal e dos Municípios obedecerá aos princípios de {{CONDICAO:legalidade}}, {{CONDICAO:impessoalidade}}, {{CONDICAO:moralidade}}, {{CONDICAO:publicidade}} e {{CONDICAO:eficiência}}."
+  },
+  {
+    "id": "leg_7",
+    "diploma": "CF/88",
+    "artigo": "Art. 37, II",
+    "prioridade": "CRITICO",
+    "tema": "Concurso Público e Cargos em Comissão",
+    "texto": "A investidura em cargo ou emprego público depende de {{CONDICAO:aprovação prévia em concurso público}} de provas ou de provas e títulos, de acordo com a natureza e a complexidade do cargo ou emprego, na forma prevista em lei, {{EXCECAO:ressalvadas as nomeações para cargo em comissão}} declarado em lei de livre nomeação e exoneração."
+  },
+  {
+    "id": "leg_8",
+    "diploma": "CF/88",
+    "artigo": "Art. 37, III",
+    "prioridade": "CRITICO",
+    "tema": "Validade do Concurso Público",
+    "texto": "O prazo de validade do concurso público será de {{PRAZO:até 2 anos}}, {{CONDICAO:prorrogável uma vez}}, por {{PRAZO:igual período}}."
+  },
+  {
+    "id": "leg_9",
+    "diploma": "CF/88",
+    "artigo": "Art. 37, XVI",
+    "prioridade": "CRITICO",
+    "tema": "Vedação de Acumulação Remunerada de Cargos",
+    "texto": "É {{EXCECAO:vedada a acumulação remunerada}} de cargos públicos, {{EXCECAO:exceto}}, quando houver {{CONDICAO:compatibilidade de horários}}, observado em qualquer caso o disposto no inciso XI: a) a de {{COMPETENCIA:dois cargos de professor}}; b) a de um cargo de professor com outro {{COMPETENCIA:técnico ou científico}}; c) a de {{COMPETENCIA:dois cargos ou empregos privativos de profissionais de saúde}}, com profissões regulamentadas."
+  },
+  {
+    "id": "leg_10",
+    "diploma": "CF/88",
+    "artigo": "Art. 37, § 6º",
+    "prioridade": "CRITICO",
+    "tema": "Responsabilidade Civil Objetiva do Estado",
+    "texto": "As pessoas jurídicas de direito público e as de direito privado prestadoras de serviços públicos responderão pelos danos que seus agentes, nessa qualidade, causarem a terceiros, assegurado o {{COMPETENCIA:direito de regresso}} contra o responsável nos casos de {{EXCECAO:dolo ou culpa}}."
+  },
+  {
+    "id": "leg_11",
+    "diploma": "CF/88",
+    "artigo": "Art. 41, caput",
+    "prioridade": "CRITICO",
+    "tema": "Estabilidade do Servidor Público",
+    "texto": "São estáveis após {{PRAZO:3 anos}} de efetivo exercício os servidores nomeados para cargo de provimento efetivo em virtude de {{CONDICAO:concurso público}}."
+  },
+  {
+    "id": "leg_12",
+    "diploma": "CF/88",
+    "artigo": "Art. 41, § 1º",
+    "prioridade": "CRITICO",
+    "tema": "Perda do Cargo do Servidor Estável",
+    "texto": "O servidor público estável só perderá o cargo: I - em virtude de {{CONDICAO:sentença judicial transitada em julgado}}; II - mediante {{CONDICAO:processo administrativo}} em que lhe seja assegurada ampla defesa; III - mediante procedimento de {{CONDICAO:avaliação periódica de desempenho}}, na forma de lei complementar, assegurada ampla defesa."
+  },
+  {
+    "id": "leg_13",
+    "diploma": "CF/88",
+    "artigo": "Art. 144, caput",
+    "prioridade": "CRITICO",
+    "tema": "Segurança Pública: Dever do Estado",
+    "texto": "A segurança pública, dever do Estado, direito e responsabilidade de todos, é exercida para a preservação da ordem pública e da incolumidade das pessoas e do patrimônio, através dos seguintes órgãos: I - {{COMPETENCIA:polícia federal}}; II - {{COMPETENCIA:polícia rodoviária federal}}; III - {{COMPETENCIA:polícia ferroviária federal}}; IV - {{COMPETENCIA:polícias civis}}; V - {{COMPETENCIA:polícias militares e corpos de bombeiros militares}}; VI - {{COMPETENCIA:polícias penais federal, estaduais e distrital}}."
+  },
+  {
+    "id": "leg_14",
+    "diploma": "Lei 8.112/90",
+    "artigo": "Art. 5º",
+    "prioridade": "CRITICO",
+    "tema": "Requisitos Básicos para Investidura em Cargo Público",
+    "texto": "São requisitos básicos para investidura em cargo público: I - a nacionalidade brasileira; II - o gozo dos direitos políticos; III - a quitação com as obrigações militares e eleitorais; IV - o nível de escolaridade exigido para o exercício do cargo; V - a idade mínima de {{PRAZO:18 anos}}; VI - {{CONDICAO:aptidão física e mental}}."
+  },
+  {
+    "id": "leg_15",
+    "diploma": "Lei 8.112/90",
+    "artigo": "Art. 13",
+    "prioridade": "CRITICO",
+    "tema": "Posse e Exercício: Prazos Legais",
+    "texto": "A posse dar-se-á pela assinatura do respectivo termo [...]. § 1º A posse ocorrerá no prazo de {{PRAZO:30 dias}} contados da publicação do ato de provimento. § 6º Será tornado sem efeito o ato de provimento se a posse não ocorrer no prazo previsto no § 1º; § 2º O prazo para o servidor entrar em exercício é de {{PRAZO:15 dias}}, contados da data da posse."
+  },
+  {
+    "id": "leg_16",
+    "diploma": "Lei 8.112/90",
+    "artigo": "Art. 20",
+    "prioridade": "CRITICO",
+    "tema": "Estágio Probatório e Fatores de Avaliação",
+    "texto": "Ao entrar em exercício, o servidor nomeado para cargo de provimento efetivo ficará sujeito a estágio probatório pelo período de {{PRAZO:36 meses}}, durante o qual a sua aptidão e capacidade serão objeto de avaliação para o desempenho do cargo, observados os seguintes fatores: I - {{CONDICAO:assiduidade}}; II - {{CONDICAO:disciplina}}; III - {{CONDICAO:capacidade de iniciativa}}; IV - {{CONDICAO:produtividade}}; V - {{CONDICAO:responsabilidade}}."
+  },
+  {
+    "id": "leg_17",
+    "diploma": "Lei 8.112/90",
+    "artigo": "Art. 28",
+    "prioridade": "CRITICO",
+    "tema": "Reintegração do Servidor Estável",
+    "texto": "A reintegração é a reinvestidura do servidor estável no cargo anteriormente ocupado, ou no cargo resultante de sua transformação, quando {{CONDICAO:invalidada a sua demissão}} por {{COMPETENCIA:decisão administrativa ou judicial}}, com ressarcimento de {{COMPETENCIA:todas as vantagens}}."
+  },
+  {
+    "id": "leg_18",
+    "diploma": "Lei 8.112/90",
+    "artigo": "Art. 33",
+    "prioridade": "CRITICO",
+    "tema": "Formas de Vacância de Cargo Público",
+    "texto": "A vacância do cargo público decorrerá de: I - exoneração; II - demissão; III - promoção; IV - {{EXCECAO:readaptação}}; V - {{EXCECAO:aposentadoria}}; VI - posse em outro cargo inacumulável; VII - falecimento."
+  },
+  {
+    "id": "leg_19",
+    "diploma": "Lei 8.112/90",
+    "artigo": "Art. 127",
+    "prioridade": "CRITICO",
+    "tema": "Penalidades Disciplinares",
+    "texto": "São penalidades disciplinares: I - advertência; II - suspensão; III - demissão; IV - cassação de aposentadoria ou disponibilidade; V - destituição de cargo em comissão; VI - destituição de função comissionada."
+  },
+  {
+    "id": "leg_20",
+    "diploma": "Lei 8.112/90",
+    "artigo": "Art. 130",
+    "prioridade": "CRITICO",
+    "tema": "Suspensão e Conversão em Multa",
+    "texto": "A suspensão será aplicada em caso de reincidência das faltas punidas com advertência e de violação das demais proibições que não tipifiquem infração sujeita a demissão, não podendo exceder de {{PRAZO:90 dias}}. § 2º Quando houver conveniência para o serviço, a penalidade de suspensão poderá ser convertida em multa, na base de {{PRAZO:50% por dia}} de remuneração, ficando o servidor {{CONDICAO:obrigado a permanecer em serviço}}."
+  },
+  {
+    "id": "leg_21",
+    "diploma": "Lei 8.112/90",
+    "artigo": "Art. 132",
+    "prioridade": "CRITICO",
+    "tema": "Hipóteses de Demissão",
+    "texto": "A demissão será aplicada nos seguintes casos: I - crime contra a administração pública; II - {{EXCECAO:abandono de cargo}}; III - inassiduidade habitual; IV - improbidade administrativa; X - lesão aos cofres públicos e dilapidação do patrimônio nacional; XI - corrupção; XIII - aplicação irregular de {{COMPETENCIA:dinheiros públicos}}."
+  },
+  {
+    "id": "leg_22",
+    "diploma": "Lei 8.112/90",
+    "artigo": "Art. 138 e 139",
+    "prioridade": "CRITICO",
+    "tema": "Abandono de Cargo e Inassiduidade Habitual",
+    "texto": "Configura abandono de cargo a ausência intencional do servidor ao serviço por {{PRAZO:mais de 30 dias consecutivos}}. Entende-se por inassiduidade habitual a falta ao serviço, sem causa justificada, por {{PRAZO:60 dias interpoladamente}}, durante o período de {{PRAZO:12 meses}}."
+  },
+  {
+    "id": "leg_23",
+    "diploma": "Lei 8.112/90",
+    "artigo": "Art. 142",
+    "prioridade": "CRITICO",
+    "tema": "Prazos de Prescrição da Ação Disciplinar",
+    "texto": "A ação disciplinar prescreverá: I - em {{PRAZO:5 anos}}, quanto às infrações puníveis com demissão, cassação de aposentadoria ou disponibilidade e destituição de cargo em comissão; II - em {{PRAZO:2 anos}}, quanto à suspensão; III - em {{PRAZO:180 dias}}, quanto à advertência."
+  },
+  {
+    "id": "leg_24",
+    "diploma": "Lei 8.429/92 (LIA)",
+    "artigo": "Art. 1º, §§ 1º e 2º",
+    "prioridade": "CRITICO",
+    "tema": "Exigência de Dolo Específico na Improbidade",
+    "texto": "O sistema de responsabilização por atos de improbidade administrativa tutelará a probidade na organização do Estado e no exercício de suas funções [...]. § 1º Consideram-se atos de improbidade administrativa as condutas tipificadas nos arts. 9º, 10 e 11 desta Lei, ressalvados tipos previstos em leis especiais. § 2º Considera-se dolo a vontade livre e consciente de alcançar o resultado ilícito tipificado nos arts. 9º, 10 e 11 desta Lei, {{EXCECAO:não bastando a voluntariedade ou o mero dolo genérico}}."
+  },
+  {
+    "id": "leg_25",
+    "diploma": "Lei 8.429/92 (LIA)",
+    "artigo": "Art. 9º",
+    "prioridade": "CRITICO",
+    "tema": "Atos de Improbidade que Importam Enriquecimento Ilícito",
+    "texto": "Constitui ato de improbidade administrativa importando em enriquecimento ilícito auferir, mediante a prática de ato doloso, qualquer tipo de {{COMPETENCIA:vantagem patrimonial indevida}} em razão do exercício de cargo, mandato, função, emprego ou atividade nas entidades referidas no art. 1º desta Lei."
+  },
+  {
+    "id": "leg_26",
+    "diploma": "Lei 8.429/92 (LIA)",
+    "artigo": "Art. 10",
+    "prioridade": "CRITICO",
+    "tema": "Atos de Improbidade que Causam Prejuízo ao Erário",
+    "texto": "Constitui ato de improbidade administrativa que causa lesão ao erário qualquer ação ou omissão dolosa, que enseje, efetiva e comprovadamente, {{CONDICAO:perda patrimonial efetiva}}, desvio, apropriação, malbaratamento ou dilapidação dos bens ou haveres das entidades referidas no art. 1º desta Lei."
+  },
+  {
+    "id": "leg_27",
+    "diploma": "Lei 8.429/92 (LIA)",
+    "artigo": "Art. 11",
+    "prioridade": "CRITICO",
+    "tema": "Atos que Atentam contra os Princípios da Administração",
+    "texto": "Constitui ato de improbidade administrativa que atenta contra os princípios da administração pública a ação ou omissão dolosa que viole os deveres de honestidade, de imparcialidade e de legalidade, caracterizada por uma das seguintes condutas: [...] IV - {{CONDICAO:revelar fato ou circunstância de que tem ciência em razão das atribuições e que deva permanecer em segredo}}."
+  },
+  {
+    "id": "leg_28",
+    "diploma": "Lei 8.429/92 (LIA)",
+    "artigo": "Art. 23",
+    "prioridade": "CRITICO",
+    "tema": "Prescrição dos Atos de Improbidade",
+    "texto": "A ação para a aplicação das sanções previstas nesta Lei prescreve em {{PRAZO:8 anos}}, contados a partir da data da {{CONDICAO:ocorrência do fato}} ou, no caso de infrações permanentes, do dia em que cessou a permanência."
+  },
+  {
+    "id": "leg_29",
+    "diploma": "Código Penal",
+    "artigo": "Art. 312",
+    "prioridade": "CRITICO",
+    "tema": "Peculato Próprio, Desvio e Culposo",
+    "texto": "Apropriar-se o funcionário público de dinheiro, valor ou qualquer outro bem móvel, público ou particular, de que tem a posse em razão do cargo, ou desviá-lo, em proveito próprio ou alheio: Pena - reclusão, de {{PRAZO:2 a 12 anos}}, e multa. § 2º Se o funcionário concorre culposamente para o crime de outrem: Pena - detenção, de {{PRAZO:3 meses a 1 ano}}."
+  },
+  {
+    "id": "leg_30",
+    "diploma": "Código Penal",
+    "artigo": "Art. 312, § 3º",
+    "prioridade": "CRITICO",
+    "tema": "Reparação do Dano no Peculato Culposo",
+    "texto": "No caso do § 2º (peculato culposo), a reparação do dano, {{CONDICAO:se precede a sentença irrecorrível}}, {{COMPETENCIA:extingue a punibilidade}}; se lhe é posterior, {{CONDICAO:reduz de metade}} a pena imposta."
+  },
+  {
+    "id": "leg_31",
+    "diploma": "Código Penal",
+    "artigo": "Art. 316",
+    "prioridade": "CRITICO",
+    "tema": "Concussão",
+    "texto": "{{COMPETENCIA:Exigir}}, para si ou para outrem, direta ou indiretamente, ainda que fora da função ou antes de assumi-la, mas em razão dela, {{CONDICAO:vantagem indevida}}: Pena - reclusão, de {{PRAZO:2 a 12 anos}}, e multa."
+  },
+  {
+    "id": "leg_32",
+    "diploma": "Código Penal",
+    "artigo": "Art. 317",
+    "prioridade": "CRITICO",
+    "tema": "Corrupção Passiva",
+    "texto": "{{COMPETENCIA:Solicitar ou receber}}, para si ou para outrem, direta ou indiretamente, ainda que fora da função ou antes de assumi-la, mas em razão dela, vantagem indevida, ou {{COMPETENCIA:aceitar promessa}} de tal vantagem: Pena - reclusão, de {{PRAZO:2 a 12 anos}}, e multa."
+  },
+  {
+    "id": "leg_33",
+    "diploma": "Código Penal",
+    "artigo": "Art. 319",
+    "prioridade": "CRITICO",
+    "tema": "Prevaricação",
+    "texto": "Retardar ou deixar de praticar, indevidamente, ato de ofício, ou praticá-lo contra disposição expressa de lei, para {{CONDICAO:satisfazer interesse ou sentimento pessoal}}: Pena - detenção, de {{PRAZO:3 meses a 1 ano}}, e multa."
+  },
+  {
+    "id": "leg_34",
+    "diploma": "Código Penal",
+    "artigo": "Art. 333",
+    "prioridade": "CRITICO",
+    "tema": "Corrupção Ativa",
+    "texto": "{{COMPETENCIA:Oferecer ou prometer}} vantagem indevida a funcionário público, para determiná-lo a praticar, omitir ou retardar ato de ofício: Pena - reclusão, de {{PRAZO:2 a 12 anos}}, e multa."
+  },
+  {
+    "id": "leg_35",
+    "diploma": "Lei 13.869/19 (Abuso de Autoridade)",
+    "artigo": "Art. 1º, § 1º",
+    "prioridade": "CRITICO",
+    "tema": "Finalidade Específica no Abuso de Autoridade",
+    "texto": "As condutas descritas nesta Lei constituem crime de abuso de autoridade quando praticadas pelo agente com a finalidade específica de {{CONDICAO:prejudicar outrem}} ou {{CONDICAO:beneficiar a si mesmo ou a terceiro}}, ou, ainda, por {{CONDICAO:mero capricho ou satisfação pessoal}}."
+  },
+  {
+    "id": "leg_36",
+    "diploma": "Lei 14.133/21 (Licitações)",
+    "artigo": "Art. 28",
+    "prioridade": "CRITICO",
+    "tema": "Modalidades de Licitação",
+    "texto": "São modalidades de licitação: I - pregão; II - concorrência; III - concurso; IV - leilão; V - {{COMPETENCIA:diálogo competitivo}}. Parágrafo único. É {{EXCECAO:vedada a criação de outras modalidades de licitação}} ou a combinação das referidas neste artigo."
+  }
+];
+      if (aiList.length >= 35) return aiList;
+      const seen = new Set(aiList.map(a => `${a.diploma}_${a.artigo}`));
+      const merged = [...aiList];
+      for (const def of defaultList) {
+        if (!seen.has(`${def.diploma}_${def.artigo}`)) {
+          merged.push(def);
+          seen.add(`${def.diploma}_${def.artigo}`);
+        }
+        if (merged.length >= 36) break;
+      }
+      return merged;
+    })(),
+    jogos_fraudes: Array.isArray(aiData.jogos_fraudes) && aiData.jogos_fraudes.length > 0 ? aiData.jogos_fraudes : [
+      {
+        id: 'fr_1',
+        diploma: 'CF/88 - Art. 5º, XI',
+        frase: 'A casa é asilo inviolável do indivíduo, podendo nela penetrar a qualquer hora por determinação policial.',
+        integro: false,
+        palavra_fraudada: 'policial',
+        gabarito_correto: 'judicial',
+        justificativa: 'A banca trocou determinação judicial por policial. Apenas a autoridade judiciária tem competência para expedir mandado, e a execução restringe-se ao período diurno.'
+      },
+      {
+        id: 'fr_2',
+        diploma: 'CF/88 - Art. 5º, XLVII',
+        frase: 'Não haverá penas de morte, salvo em caso de guerra declarada, nos termos da lei.',
+        integro: true,
+        palavra_fraudada: null,
+        gabarito_correto: null,
+        justificativa: 'Dispositivo 100% íntegro e autêntico conforme a Constituição Federal.'
+      },
+      {
+        id: 'fr_3',
+        diploma: 'CF/88 - Art. 37, II',
+        frase: 'A investidura em cargo ou emprego público depende de aprovação prévia em concurso público de provas ou de provas e títulos, ressalvadas as nomeações para cargo em comissão declarado em lei de livre nomeação e exoneração.',
+        integro: true,
+        palavra_fraudada: null,
+        gabarito_correto: null,
+        justificativa: 'Dispositivo autêntico e de altíssima incidência nas provas da banca examinadora.'
+      },
+      {
+        id: 'fr_4',
+        diploma: 'Lei 8.112/90 - Art. 138',
+        frase: 'Configura abandono de cargo a ausência intencional do servidor ao serviço por mais de quinze dias consecutivos.',
+        integro: false,
+        palavra_fraudada: 'quinze',
+        gabarito_correto: 'trinta',
+        justificativa: 'Pegadinha clássica: o abandono de cargo exige ausência intencional por mais de 30 dias consecutivos (e não 15).'
+      }
+    ],
     tabs: aiData.tabs || [],
     checklist: Array.isArray(aiData.checklist) && aiData.checklist.length > 0 ? aiData.checklist : [
       `Documento oficial original com foto e Cartão de Confirmação de Inscrição (${detectedBanca})`,

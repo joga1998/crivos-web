@@ -34,7 +34,7 @@ export async function onRequestPost(context) {
 
   try {
     const body = await request.json();
-    const { concurso, cargo, banca = 'Banca Examinadora', materia, topico } = body;
+    const { concurso, cargo, banca = 'Banca Examinadora', materia, topico, quantidade = 20 } = body;
 
     if (!materia || !topico) {
       return new Response(JSON.stringify({ error: 'Materia e Topico são obrigatórios.' }), {
@@ -43,8 +43,10 @@ export async function onRequestPost(context) {
       });
     }
 
+    const cardCount = Math.max(3, Math.min(25, Number(quantidade) || 20));
+
     const systemPrompt = `Você é o Engenheiro Tático-Pedagógico da CRIVOS.
-Produza um dossiê conciso e cirúrgico com Flashcards SM-2 sobre o tópico do edital.
+Produza um dossiê conciso e cirúrgico com exatamente ${cardCount} Flashcards SM-2 de alta precisão sobre o tópico do edital para o concurso "${concurso}" (${banca}).
 Retorne ESTRITAMENTE um objeto JSON válido (sem tags markdown):
 {
   "resumo_tatico": "Síntese em 2 parágrafos objetivos sobre o núcleo essencial deste assunto...",
@@ -59,18 +61,8 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem tags markdown):
   },
   "cards": [
     {
-      "f": "Pergunta cirúrgica de Active Recall?",
-      "v": "Resposta direta e memorizável.",
-      "cat": "${materia}"
-    },
-    {
-      "f": "Pergunta sobre a exceção ou pegadinha da banca?",
-      "v": "Resposta com o fundamento exato.",
-      "cat": "${materia}"
-    },
-    {
-      "f": "Pergunta de aplicação prática ou prazo legal?",
-      "v": "Resposta precisa.",
+      "f": "Pergunta cirúrgica de Active Recall (exatamente ${cardCount} cards)?",
+      "v": "Resposta direta e memorizável com dispositivo legal ou súmula.",
       "cat": "${materia}"
     }
   ]
@@ -81,7 +73,8 @@ Retorne ESTRITAMENTE um objeto JSON válido (sem tags markdown):
 - Cargo: ${cargo || 'Candidato'}
 - Banca Examinadora: ${banca}
 - Disciplina: ${materia}
-- Assunto: ${topico}`;
+- Assunto: ${topico}
+- Solicitação: Dossiê tático + exatamente ${cardCount} flashcards inéditos e cirúrgicos de active recall cobrindo regras, prazos, exceções e pegadinhas da banca.`;
 
     const aiResponse = await callExperientialAI(env, {
       messages: [

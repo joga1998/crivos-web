@@ -1,4 +1,4 @@
-import { getCorsHeaders, supabaseRest, supabaseStorageUpload } from './_supabase.js';
+import { getCorsHeaders, getSupabaseConfig, supabaseRest, supabaseStorageUpload } from './_supabase.js';
 
 export async function onRequestPost(context) {
   const { request, env } = context;
@@ -25,16 +25,29 @@ export async function onRequestPost(context) {
 
     // Validação estrita de plano: o upload autônomo no painel é restrito ao plano Prime
     let userPanel = null;
-    if (panelId) {
-      const panels = await supabaseRest(env, `/user_panels?id=eq.${encodeURIComponent(panelId)}`);
-      if (Array.isArray(panels) && panels.length > 0) userPanel = panels[0];
+    if (panelId && panelId !== 'default-panel') {
+      try {
+        const panels = await supabaseRest(env, `/user_panels?id=eq.${encodeURIComponent(panelId)}`);
+        if (Array.isArray(panels) && panels.length > 0) userPanel = panels[0];
+      } catch (_) {}
     }
-    if (!userPanel) {
-      const panels = await supabaseRest(env, `/user_panels?user_id=eq.${encodeURIComponent(userId)}&order=created_at.desc&limit=1`);
-      if (Array.isArray(panels) && panels.length > 0) userPanel = panels[0];
+    if (!userPanel && userId && userId !== 'default-user') {
+      try {
+        const panels = await supabaseRest(env, `/user_panels?user_id=eq.${encodeURIComponent(userId)}&order=created_at.desc&limit=1`);
+        if (Array.isArray(panels) && panels.length > 0) userPanel = panels[0];
+      } catch (_) {}
     }
 
-    const planTier = (userPanel?.plan_tier || '').toLowerCase();
+    // Se ainda não encontrou o painel, busca na tabela de ordens de pagamento
+    let userOrder = null;
+    if (!userPanel && userId && userId !== 'default-user') {
+      try {
+        const orders = await supabaseRest(env, `/orders?user_id=eq.${encodeURIComponent(userId)}&order=created_at.desc&limit=1`);
+        if (Array.isArray(orders) && orders.length > 0) userOrder = orders[0];
+      } catch (_) {}
+    }
+
+    const planTier = (userPanel?.plan_tier || userOrder?.plan_tier || '').toLowerCase();
     const isEditalCategory = String(category || '').toLowerCase() === 'edital';
     if (planTier !== 'prime' && !isEditalCategory) {
       return new Response(JSON.stringify({ 
@@ -45,9 +58,12 @@ export async function onRequestPost(context) {
       });
     }
 
+    const resolvedUserId = (userId && userId !== 'default-user') ? userId : (userPanel?.user_id || userOrder?.user_id || userId);
+    const resolvedPanelId = (panelId && panelId !== 'default-panel') ? panelId : (userPanel?.id || null);
+
     const filename = file.name || 'material_candidato.pdf';
     const sanitizedFileName = filename.replace(/[^a-zA-Z0-9._-]/g, '_');
-    const storagePath = `${userId}/${Date.now()}_${sanitizedFileName}`;
+    const storagePath = `${resolvedUserId}/${Date.now()}_${sanitizedFileName}`;
     const mimeType = file.type || 'application/pdf';
     const buffer = await file.arrayBuffer();
     const fileBytes = new Uint8Array(buffer);
@@ -61,15 +77,13 @@ export async function onRequestPost(context) {
       mimeType
     );
 
-    const { url } = {
-      url: env?.SUPABASE_URL || 'https://dmmtmfjlieqeqwlhtgrr.supabase.co'
-    };
+    const { url } = getSupabaseConfig(env);
     const publicUrl = `${url.replace(/\/+$/, '')}/storage/v1/object/public/user-materials/${storagePath}`;
 
     // Cadastra o registro em user_files
     const insertPayload = {
-      user_id: userId,
-      panel_id: panelId || null,
+      user_id: resolvedUserId,
+      panel_id: resolvedPanelId,
       category: category,
       title: title || filename.replace(/\.[^/.]+$/, '').replace(/_/g, ' '),
       filename: filename,
@@ -97,7 +111,10 @@ export async function onRequestPost(context) {
   } catch (err) {
     console.error('[upload-student-file] Erro ao enviar arquivo:', err);
     return new Response(
-      JSON.stringify({ error: 'Falha interna ao processar upload do arquivo.', details: err.message }),
+      JSON.stringify({ 
+        error: err.message || 'Falha interna ao processar upload do arquivo.', 
+        details: err.stack || err.details || err.message 
+      }),
       { status: 500, headers: corsHeaders }
     );
   }

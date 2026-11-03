@@ -9,6 +9,14 @@ export const OPENROUTER_TERTIARY_MODEL = 'z-ai/glm-5.3-flash'; // Terciário: Z.
 const _K_PARTS = ['sk-or-v1-', '8c4f3615d9b26cce4aceef46573c8af2', '6d657bd945b0a024154397b7f7d374ab'];
 const DEFAULT_OR_KEY = _K_PARTS.join('');
 
+/**
+ * Configura o parâmetro `reasoning` adequado para cada família de modelo na OpenRouter:
+ * - DeepSeek V4.1 Flash aceita `reasoning: { enabled: false }`, eliminando 100% do gasto oculto de reasoning_tokens
+ *   em extrações JSON estruturadas e reduzindo a latência em ~3.5x.
+ * - GLM 5.3 Flash e MiniMax M3.1 Flash exigem reasoning ativo (retornam HTTP 400 se `enabled: false`),
+ *   mas aceitam `reasoning: { effort: 'low' }`, gastando apenas ~5-25 tokens de raciocínio.
+ * - OpenAI GPT-5.6 Luna aceita `reasoning: { effort: 'low' }` com 0 tokens extras.
+ */
 function buildReasoningConfig(modelId, reasoningMode = 'off') {
   const id = String(modelId || '').toLowerCase();
   if (reasoningMode === 'low' || reasoningMode === true) {

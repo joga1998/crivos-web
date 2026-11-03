@@ -312,9 +312,13 @@ function buildGuia12SeçõesHtmlDocument(ctx) {
   }
   .page-break {
     page-break-before: always;
-    margin-top: 36px;
-    padding-top: 18px;
-    border-top: 2px dashed #CCC;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 2px solid #111111;
+  }
+  .card, table, .alert, .meta-grid, tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
   @media print {
     body { background: #FFFFFF; padding: 0; }
@@ -424,10 +428,22 @@ function buildGuia12SeçõesHtmlDocument(ctx) {
         <table>
           <thead><tr><th>INSTITUTO JURÍDICO / TÉCNICO A</th><th>INSTITUTO JURÍDICO / TÉCNICO B</th><th>DIFERENÇA DECISIVA PARA A PROVA</th></tr></thead>
           <tbody>
-            <tr><td><b>Anulação do Ato</b> (Ilegalidade · Efeito Ex Tunc)</td><td><b>Revogação do Ato</b> (Conveniência · Efeito Ex Nunc)</td><td>Judiciário só ANULA ato ilegal. Judiciário NUNCA revoga ato do Executivo por mérito.</td></tr>
-            <tr><td><b>Desistência Voluntária</b> (Atos em andamento)</td><td><b>Arrependimento Eficaz</b> (Atos esgotados)</td><td>Na desistência o agente para antes. No arrependimento ele age ativamente para impedir o dano.</td></tr>
-            <tr><td><b>Competência Privativa União</b> (Art. 22)</td><td><b>Competência Concorrente</b> (Art. 24)</td><td>Tributário, Financeiro, Penitenciário e Urbanístico são CONCORRENTES (Estados podem legislar).</td></tr>
-            <tr><td><b>Governador / Diretoria</b> (Governança)</td><td><b>Gerentes / Executores</b> (Gestão)</td><td>Governança DIRECIONA e AVALIA; Gestão PLANEJA e EXECUTA o cotidiano administrativo.</td></tr>
+            <tr><td><b>Anulação do Ato</b> (Ilegalidade – Efeito Ex Tunc)</td><td><b>Revogação do Ato</b> (Conveniência – Efeito Ex Nunc)</td><td>Judiciário só ANULA ato ilegal (com ou sem provocação nos limites da lide). Judiciário NUNCA revoga ato do Executivo por mérito administrativo (conveniência e oportunidade).</td></tr>
+            <tr><td><b>Desistência Voluntária</b> (Tentativa Abandonada)</td><td><b>Arrependimento Eficaz</b> (Prevenção Consumativa)</td><td>Na desistência o agente cessa a execução quando ainda podia prosseguir ("posso, mas não quero"). No arrependimento eficaz, ele esgota a execução mas atua ativamente para impedir a consumação. Em ambos, responde apenas pelos atos já praticados (ponte de ouro).</td></tr>
+            <tr><td><b>Competência Privativa União</b> (Art. 22 CF)</td><td><b>Competência Concorrente</b> (Art. 24 CF)</td><td>Competência CONCORRENTE (Art. 24) = "PUTTE F" (Penitenciário, Urbanístico, Tributário, Tributário, Econômico e Financeiro) — Estados legislam supletivamente. Competência PRIVATIVA da União (Art. 22) = Civil, Penal, Processual, Trabalho, Eleitoral, etc.</td></tr>
+            <tr><td><b>Governança Pública</b> (Instâncias Superiores)</td><td><b>Gestão Pública</b> (Instâncias Operacionais)</td><td>Governança DIRECIONA, MONITORA e AVALIA estratégias e políticas públicas; Gestão PLANEJA, COORDENA e EXECUTA as ações diárias para atingir os objetivos traçados.</td></tr>
+            <tr><td><b>Desconcentração Administrativa</b> (Interna)</td><td><b>Descentralização Administrativa</b> (Externa)</td><td>Desconcentração cria ÓRGÃOS despersonalizados dentro da mesma pessoa jurídica (relação de hierarquia e subordinação). Descentralização cria ou delega para OUTRA PESSOA JURÍDICA (autarquias, fundações ou concessionárias) — sem subordinação hierárquica, apenas tutela/vinculação.</td></tr>
+            <tr><td><b>Poder de Polícia Originário</b> (Direto)</td><td><b>Poder de Polícia Delegado</b> (Indireto)</td><td>Originário decorre do poder de império estatal exercido pela Administração Direta. Poder de polícia delegado só pode ser conferido a pessoas jurídicas de direito público ou a estatais prestadoras de serviço em regime não concorrencial (STF Tema 532).</td></tr>
+            <tr><td><b>Improbidade Administrativa</b> (Lei 14.230/21)</td><td><b>Mera Irregularidade Funcional</b> (Infração Administrativa)</td><td>A Lei 14.230/2021 EXTINGUIU a modalidade culposa em todos os artigos de improbidade (Arts. 9, 10 e 11). Exige-se DOLO ESPECÍFICO comprovado (vontade livre e consciente de alcançar o resultado ilícito). A divergência interpretativa da lei não configura improbidade.</td></tr>
+            <tr><td><b>Inexigibilidade de Licitação</b> (Art. 74 Lei 14.133)</td><td><b>Dispensa de Licitação</b> (Art. 75 Lei 14.133)</td><td>Inexigibilidade ocorre quando a competição é INVIÁVEL (fornecedor exclusivo, profissional de notória especialização, credenciamento). Dispensa ocorre quando a competição é VIÁVEL mas a lei autoriza ou determina a não realização (baixo valor, emergência, licitação deserta).</td></tr>
+            <tr><td><b>Concessão Comum</b> (Lei 8.987/95)</td><td><b>Parceria Público-Privada (PPP)</b> (Lei 11.079/04)</td><td>Na concessão comum a remuneração advém da TARIFA paga pelo usuário. Na PPP Patrocinada há tarifa do usuário + contraprestação pecuniária do parceiro público. Na PPP Administrativa a Administração é a usuária direta/indireta e arca com 100% da contraprestação.</td></tr>
+            <tr><td><b>Responsabilidade Civil Objetiva</b> (Art. 37, § 6º)</td><td><b>Responsabilidade por Omissão Genérica</b></td><td>Ação comissiva do Estado responde OBJETIVAMENTE (teoria do risco administrativo — dispensa comprovação de culpa). Na omissão genérica (falha do serviço público 'faute du service'), a jurisprudência dominante do STF/STJ exige demonstração de culpa administrativa (negligência, imperícia ou retardo inescusável).</td></tr>
+            <tr><td><b>Mandado de Segurança</b> (Art. 5º, LXIX CF)</td><td><b>Habeas Data</b> (Art. 5º, LXXII CF)</td><td>MS protege direito líquido e certo não amparado por HC ou HD, exigindo prova pré-constituída documental. O Habeas Data é ação personalíssima exclusiva para assegurar o conhecimento ou retificação de informações relativas à pessoa do impetrante constantes de bancos de dados públicos/governamentais.</td></tr>
+            <tr><td><b>Crime Próprio</b> (Código Penal)</td><td><b>Crime de Mão Própria</b> (Código Penal)</td><td>Crime próprio exige qualidade especial do agente (ex: funcionário público no peculato), admitindo coautoria e participação de particulares que conheçam a condição (Art. 30 CP). Crime de mão própria (ex: falso testemunho) só pode ser executado pessoalmente pelo autor da conduta, admitindo apenas participação moral, mas nunca coautoria executiva.</td></tr>
+            <tr><td><b>Prescrição da Pretensão Punitiva</b> (Direito Penal)</td><td><b>Prescrição Intercorrente</b> (Lei 14.230 e Processo Penal)</td><td>A pretensão punitiva é calculada pela pena em abstrato ou em concreto antes do trânsito em julgado. A prescrição intercorrente opera-se no curso do processo após a interrupção inicial; na Lei de Improbidade (Art. 23, § 5º), prescreve a pretensão punitiva se decorrerem 4 anos entre os marcos interruptivos.</td></tr>
+            <tr><td><b>Orçamento Tradicional</b> (Clássico)</td><td><b>Orçamento-Programa</b> (Moderno)</td><td>O tradicional é mero instrumento contábil de controle financeiro/legal sem vínculo com planos de governo. O Orçamento-Programa integra planejamento e orçamento, vinculando receitas e despesas a metas físicas, objetivos setoriais e indicadores mensuráveis de eficiência pública.</td></tr>
+            <tr><td><b>Restos a Pagar Processados</b></td><td><b>Restos a Pagar Não Processados</b></td><td>Processados são despesas legalmente empenhadas e LIQUIDADAS no exercício anterior, pendentes apenas de pagamento formal. Não processados são despesas empenhadas cuja liquidação física e ateste de fornecimento ainda NÃO ocorreram até 31 de dezembro.</td></tr>
+            <tr><td><b>Créditos Suplementares</b></td><td><b>Créditos Especiais vs Extraordinários</b></td><td>Suplementares reforçam dotação orçamentária existente. Especiais criam nova dotação para programa não previsto na LOA. Extraordinários atendem despesas imprevisíveis e urgentes (guerra, comoção interna ou calamidade pública) abertos por Medida Provisória (Art. 167, § 3º CF).</td></tr>
           </tbody>
         </table>
       </div>
@@ -436,18 +452,56 @@ function buildGuia12SeçõesHtmlDocument(ctx) {
     <!-- SEÇÃO 06 -->
     <div class="page-break">
       <h2 class="section-title">06 · COMO ESCREVER A RESPOSTA DISSERTATIVA / ESTRATÉGIA DE PROVA</h2>
+            <div class="card">
+        <div class="card-head">GESTÃO DE TEMPO NA PROVA DISCURSIVA // PROTOCOLO DE 70 MINUTOS</div>
+        <table>
+          <thead><tr><th>ETAPA</th><th>JANELA DE TEMPO</th><th>ATIVIDADE EXECUTIVA</th><th>OBJETIVO TÁTICO</th></tr></thead>
+          <tbody>
+            <tr><td><b>Tempo 01</b></td><td>00 a 15 min</td><td>Leitura analítica do comando + tempestade de ideias + esqueleto de 4 tópicos na folha de rascunho.</td><td>Garante enfrentamento de todos os itens do espelho sem risco de fuga parcial ao tema.</td></tr>
+            <tr><td><b>Tempo 02</b></td><td>15 a 50 min</td><td>Desenvolvimento do texto definitivo parágrafo por parágrafo, articulando tese e norma.</td><td>Produção de 25 a 30 linhas com caligrafia legível, sem rasuras e com recuo padrão de parágrafo.</td></tr>
+            <tr><td><b>Tempo 03</b></td><td>50 a 62 min</td><td>Conferência da grade de critérios (concordância verbal, regência, crase e precisão terminológica).</td><td>Elimina penalidades gramaticais que corroem a nota final de conteúdo.</td></tr>
+            <tr><td><b>Tempo 04</b></td><td>62 a 70 min</td><td>Transposição final e conferência de segurança antes de lacrar o caderno.</td><td>Evita atropelo nas linhas finais e garante assinatura apenas no campo autorizado.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
       <div class="card">
         <div class="card-head">ARQUITETURA DA RESPOSTA EM 4 PARTES // MÉTODO CRIVOS</div>
-        <p>Para obter pontuação máxima na prova discursiva da banca ${banca}, estruture sua resposta obrigatoriamente neste padrão:</p>
+        <p>Para obter nota máxima na grade de correção da banca ${banca}, estruture sua dissertação rigorosamente em 4 blocos articulados:</p>
         <ol>
-          <li><b>Parágrafo 1 · Tese e Enquadramento Direto:</b> Responda positivamente ou negativamente ao comando nas duas primeiras linhas.</li>
-          <li><b>Parágrafo 2 · Fundamentação Normativa e Doutrinária:</b> Cite os dispositivos legais, princípios constitucionais e teses pacificadas.</li>
-          <li><b>Parágrafo 3 · Solução Prática e Contextualização:</b> Demonstre como a solução técnica se aplica à rotina funcional do cargo de ${cargo}.</li>
-          <li><b>Parágrafo 4 · Conclusão e Recomendações:</b> Proponha indicadores de controle, governança preventiva e feche a resposta com clareza.</li>
+          <li><b>Parágrafo 1 – Tese e Enquadramento Direto (4 a 6 linhas):</b> Responda pontualmente e sem evasivas ao questionamento principal da banca logo nas primeiras duas linhas. Fixe a tese jurídica ou técnica que guiará a argumentação.</li>
+          <li><b>Parágrafo 2 – Fundamentação Normativa e Jurisprudencial (7 a 9 linhas):</b> Articule os dispositivos legais (CF/88, leis ordinárias, súmulas vinculantes ou teses de repercussão geral) sem necessidade de consulta física, utilizando a técnica da paráfrase atribuída ("consoante o magistério constitucional...", "na esteira da jurisprudência pacificada do Pretório Excelso...").</li>
+          <li><b>Parágrafo 3 – Solução Técnica e Aplicação Funcional (7 a 9 linhas):</b> Conecte a norma à realidade prática e aos desafios concretos do cargo de ${cargo}, demonstrando viabilidade orçamentária, administrativa ou regulatória.</li>
+          <li><b>Parágrafo 4 – Conclusão, Governança e Diretrizes Finais (4 a 6 linhas):</b> Sintetize o parecer, proponha indicadores de monitoramento (eficiência, transparência, integridade pública) e encerre com comando afirmativo definitivo.</li>
         </ol>
-        <div class="alert">
-          <b>BANCO DE CONECTIVOS FORMAIS DE ALTO NÍVEL:</b> "Nesse diapasão...", "Destarte...", "Sob o prisma constitucional...", "Impende destacar que...", "Em consonância com o ordenamento pátrio...".
-        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">ESPELHO DE CORREÇÃO OFICIAL // GRADE PADRÃO DE CRITÉRIOS (0 A 100 PONTOS)</div>
+        <table>
+          <thead><tr><th>CRITÉRIO ANALÍTICO</th><th>PESO</th><th>O QUE O EXAMINADOR AVALIA</th><th>LINHA DE BLINDAGEM DO CANDIDATO</th></tr></thead>
+          <tbody>
+            <tr><td><b>I. Domínio do Conteúdo Técnico</b></td><td>50%</td><td>Precisão conceitual, conhecimento da matéria, pertinência doutrinária e resposta exaustiva ao comando.</td><td>Enfrentamento de cada subtópico do edital em ordem direta, citando nomes técnicos exatos.</td></tr>
+            <tr><td><b>II. Progressão Lógica e Coesão</b></td><td>25%</td><td>Sequência lógica de ideias, ausência de contradições, transições suaves entre parágrafos e fluidez.</td><td>Utilização diversificada de operadores argumentativos e conectivos formais interparágrafos.</td></tr>
+            <tr><td><b>III. Estrutura Textual & Adequação</b></td><td>15%</td><td>Formatação em prosa dissertativa-argumentativa ou parecer técnico, divisão equilibrada de parágrafos.</td><td>Parágrafos de 5 a 8 linhas cada; respeitar margens direita e esquerda sem hifenização errônea.</td></tr>
+            <tr><td><b>IV. Correção Gramatical & Norma Culta</b></td><td>10%</td><td>Concordância nominal e verbal, regência, acentuação, ortografia oficial e vocabulário formal.</td><td>Evitar repetições viciosas de palavras, oralismos, coloquialismos ou gírias administrativas.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-head">BANCO OFICIAL DE 40+ CONECTIVOS FORMAIS DE ALTO NÍVEL</div>
+        <table>
+          <thead><tr><th>FUNÇÃO ARGUMENTATIVA</th><th>CONECTIVOS DE ALTO IMPACTO (DISCURSIVAS & PEÇAS TÉCNICAS)</th></tr></thead>
+          <tbody>
+            <tr><td><b>Conclusão & Fechamento</b></td><td>Destarte; Dessarte; Por conseguinte; Em suma; Nesse diapasão; Em última análise; Depreende-se, portanto, que; Ex positis.</td></tr>
+            <tr><td><b>Causa & Efeito</b></td><td>Haja vista que; Em virtude de; Conquanto decorra de; Visto que; Porquanto; Como corolário de; Em razão do exposto.</td></tr>
+            <tr><td><b>Oposição & Contraponto</b></td><td>Não obstante; Malgrado; Em que pese a; Nada obstante; A despeito de; Se por um lado..., por outro...; Em contrapartida; Sem embargo.</td></tr>
+            <tr><td><b>Adição & Continuidade</b></td><td>Outrossim; Ademais; Soma-se a isso o fato de que; Cumpre salientar que; Não menos importante; Paralelamente; Sob igual prisma.</td></tr>
+            <tr><td><b>Conformidade & Base Legal</b></td><td>Em consonância com; Consoante preceitua; Ao encontro do estatuído no Artigo...; À luz do princípio da...; Sob a égide de.</td></tr>
+            <tr><td><b>Ênfase & Esclarecimento</b></td><td>Impende ressaltar que; É forçoso reconhecer que; Urge asseverar; Notadamente; Cumpre rememorar; Iniludivelmente; Por oportuno.</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
@@ -462,7 +516,7 @@ function buildGuia12SeçõesHtmlDocument(ctx) {
       <h2 class="section-title">08 · CASOS CONCRETOS E PEGADINHAS CRÍTICAS DA BANCA COMENTADAS</h2>
       <div class="card">
         <div class="card-head">SELEÇÃO DE CASOS CRÍTICOS DA BANCA (${banca})</div>
-        ${pegadinhas50.slice(0, 8).map(p => `
+        ${pegadinhas50.map(p => `
           <div style="border-bottom:1px solid #EEE;padding-bottom:10px;margin-bottom:10px;">
             <b style="color:#D92B2B;font-family:'JetBrains Mono',monospace;">[CASO CRÍTICO #${p.num}] ${escapeHtml(p.topico)}</b>
             <p style="margin:4px 0;font-size:12.5px;"><b>Armadilha da Banca:</b> ${escapeHtml(p.armadilha)}</p>
@@ -568,7 +622,16 @@ function buildD7HtmlDocument(ctx) {
   th, td { border: 1px solid #111; padding: 8px 10px; text-align: left; vertical-align: top; }
   th { background: #F4F4F0; font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 800; text-transform: uppercase; }
   .badge { display: inline-block; padding: 2px 7px; font-family: 'JetBrains Mono', monospace; font-size: 9.5px; font-weight: 800; border: 1px solid #111; background: #F4F4F0; text-transform: uppercase; }
-  .page-break { page-break-before: always; margin-top: 36px; padding-top: 18px; border-top: 2px dashed #CCC; }
+  .page-break {
+    page-break-before: always;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 2px solid #111111;
+  }
+  .card, table, .alert, .meta-grid, tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
   @media print {
     body { background: #FFF; padding: 0; }
     .print-bar { display: none !important; }

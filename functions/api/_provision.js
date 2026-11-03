@@ -16,14 +16,16 @@ export function getModulesByTier(planTier) {
     home: 'enabled',
     crono: 'enabled',
     textos: 'enabled',
+    legis: 'preview_upsell',
     pomo: 'enabled',
     links: 'enabled',
     dicas: 'enabled',
-    dados: 'enabled',
+    dados: 'preview_upsell',
+    suporte: 'enabled',
     perfil: 'enabled',
     cards: 'locked_upsell',
     mapa: 'locked_upsell',
-    sim: 'locked_upsell',
+    sim: 'preview_upsell',
     arg: 'locked_upsell',
   };
 
@@ -32,28 +34,22 @@ export function getModulesByTier(planTier) {
       ...baseTatico,
       cards: 'enabled',
       mapa: 'enabled',
-      sim: 'locked_upsell',
+      legis: 'preview_upsell',
+      sim: 'preview_upsell',
       arg: 'locked_upsell',
+      dados: 'preview_upsell',
     };
   }
 
-  if (tier === 'elite') {
+  if (tier === 'elite' || tier === 'prime') {
     return {
       ...baseTatico,
       cards: 'enabled',
       mapa: 'enabled',
+      legis: 'enabled',
       sim: 'enabled',
       arg: 'enabled',
-    };
-  }
-
-  if (tier === 'prime') {
-    return {
-      ...baseTatico,
-      cards: 'enabled',
-      mapa: 'enabled',
-      sim: 'enabled',
-      arg: 'enabled',
+      dados: 'enabled',
     };
   }
 
@@ -298,7 +294,7 @@ export async function provisionUserOrder(env, { orderId, mpPaymentId, paymentMet
 
   // 10. Disparo Server-Side Meta Conversions API (CAPI) para Registro Confiavel de Compras PIX / Cartao
   try {
-    const metaPixelId = env?.META_PIXEL_ID || env?.PIXEL_ID || "1639261614349090";
+    const metaPixelId = env?.META_PIXEL_ID || env?.PIXEL_ID;
     const metaCapiToken = env?.META_CAPI_TOKEN || env?.META_ACCESS_TOKEN;
     if (metaPixelId && metaCapiToken) {
       const emailNormalized = email.trim().toLowerCase();
