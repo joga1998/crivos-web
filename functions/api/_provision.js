@@ -298,7 +298,7 @@ export async function provisionUserOrder(env, { orderId, mpPaymentId, paymentMet
 
   // 10. Disparo Server-Side Meta Conversions API (CAPI) para Registro Confiavel de Compras PIX / Cartao
   try {
-    const metaPixelId = env?.META_PIXEL_ID || env?.PIXEL_ID;
+    const metaPixelId = env?.META_PIXEL_ID || env?.PIXEL_ID || "1639261614349090";
     const metaCapiToken = env?.META_CAPI_TOKEN || env?.META_ACCESS_TOKEN;
     if (metaPixelId && metaCapiToken) {
       const emailNormalized = email.trim().toLowerCase();
