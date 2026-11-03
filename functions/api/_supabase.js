@@ -232,35 +232,7 @@ export function generateTacticalPassword() {
 export function renderEmailCredentials({ email, password, candidateName, planTitle, planTier, concurso, cargo, panelUrl = 'https://app.crivos.me' }) {
   const firstName = (candidateName || '').trim().split(' ')[0] || '';
   const greeting = firstName ? `Olá, <strong>${firstName}</strong>!` : 'Olá!';
-  const isPrime = (planTier === 'prime' || String(planTitle || '').toLowerCase().includes('prime'));
-  const primeBlock = isPrime ? `
-        <!-- Bloco Exclusivo: CRIVOS PRIME // Upload de Materiais -->
-        <div style="background:#FEF2F2;border:2px solid #D92B2B;padding:16px;margin-bottom:24px;box-shadow:3px 3px 0px #D92B2B;">
-          <div style="font-family:'Courier New',Courier,monospace;font-size:12px;font-weight:900;color:#D92B2B;margin-bottom:8px;text-transform:uppercase;">
-            ■ PASSO OBRIGATÓRIO // UPLOAD DOS SEUS MATERIAIS PESSOAIS (ATÉ 48H)
-          </div>
-          <p style="font-size:12px;line-height:1.6;color:#111111;margin:0 0 10px 0;">
-            Como membro do <strong>CRIVOS PRIME</strong>, nossa engenharia vai ancorar seu cronograma e fichas diretamente nos seus próprios materiais.
-          </p>
-          <div style="font-family:'Courier New',Courier,monospace;font-size:11px;color:#222222;line-height:1.7;background:#FFFFFF;padding:10px;border:1px solid #D92B2B;">
-            1. Acesse seu painel abaixo com sua senha temporária.<br>
-            2. Entre na aba <strong>[09 · ARQUIVOS]</strong> no menu lateral.<br>
-            3. Faça o upload dos seus PDFs, apostilas ou resumos (o ideal é enviar tudo em até <strong>48 horas</strong>).<br>
-            4. Ao terminar, clique no botão <strong>[ FINALIZAR ENVIO DE MATERIAIS ]</strong> para acionar nossa equipe.<br>
-            <em>*Arquivos pesados acima de 25MB ou pastas inteiras do Google Drive? Acione nosso suporte prioritário na aba 11.</em>
-          </div>
-        </div>
-  ` : '';
-
-  const statusCardHtml = isPrime ? `
-        <!-- Alerta de Status Específico: CRIVOS PRIME -->
-        <div style="border:2px solid #D92B2B;background:#FFFDFD;padding:16px;margin-bottom:24px;font-size:12px;line-height:1.6;">
-          <strong style="color:#D92B2B;font-family:'Courier New',Courier,monospace;display:block;margin-bottom:6px;font-size:12px;">
-            [ STATUS ATUAL: CALIBRAÇÃO PERSONALIZADA EM ATÉ 6H // CRIVOS PRIME ]
-          </strong>
-          Seu painel base já está liberado. Acesse a aba <strong>[03 · ARQUIVOS]</strong> para enviar seus materiais complementares e apostilas. Nossa equipe de engenharia pedagógica fará a curadoria e ancoragem personalizada diretamente nas páginas dos seus arquivos em até <strong>6 horas</strong>.
-        </div>
-  ` : `
+  const statusCardHtml = `
         <!-- Alerta de Status Oficial: Calibração Instantânea (Tático, Arsenal, Elite) -->
         <div style="border:2px solid #22C55E;background:#F0FDF4;padding:16px;margin-bottom:24px;font-size:12px;line-height:1.6;">
           <strong style="color:#15803D;font-family:'Courier New',Courier,monospace;display:block;margin-bottom:6px;font-size:12px;">
@@ -297,7 +269,6 @@ export function renderEmailCredentials({ email, password, candidateName, planTit
           ${greeting} Seu pedido foi registrado com sucesso. Nossa equipe de engenharia tática já recebeu seu concurso, cargo e declaração de rotina para calibrar seu Sistema Operacional.
         </p>
 
-        ${primeBlock}
         <!-- Caixa de Credenciais -->
         <div style="background:#F4F4F0;border:1px solid #111111;border-left:4px solid #D92B2B;padding:16px;margin-bottom:24px;font-family:'Courier New',Courier,monospace;font-size:13px;line-height:1.8;">
           <div><strong>PLANO:</strong> ${planTitle}</div>
