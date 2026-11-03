@@ -4,9 +4,10 @@
 // Mapa de Conexões e Guia de Estudos Pós-Edital (PDF/HTML A4) + Dossiê D-7.
 
 import { getCorsHeaders, getSupabaseConfig, supabaseRest, supabaseStorageUpload, sendResendEmail, renderEmailPanelReady } from '../_supabase.js';
-import { callExperientialAI } from '../_ai.js';
+import { callExperientialAI, searchLiveEditalWeb } from '../_ai.js';
 import { getModulesByTier } from '../_provision.js';
 import { buildFullSwissGuideDocument } from './guide-builder.js';
+import { findCanonicalExam, findCanonicalCargoDetails, buildCanonicalContextText } from '../data/canonical-index.js';
 
 // Calendário de referência de editais abertos (usado como âncora caso o candidato não anexe PDF)
 const OFFICIAL_EDITAL_CALENDAR = [
@@ -121,6 +122,13 @@ const OFFICIAL_EDITAL_CALENDAR = [
     provaObjetiva: '2027-01-24',
     ultimaProva: '2027-01-24',
     etapaComplementar: ['Exame de Aptidão Física (TAF)', '2027-02-28']
+  },
+  {
+    match: /trf[-\s]*3|tribunal\s*regional\s*federal.*3/i,
+    banca: 'VUNESP',
+    inscricoesFim: '2026-11-23',
+    provaObjetiva: '2027-01-31',
+    ultimaProva: '2027-01-31'
   }
 ];
 
@@ -403,13 +411,13 @@ export function extractHighSignalEditalSections(rawText, cargo = '') {
   if (chunks[0]) selected.set(chunks[0].index, chunks[0].text);
   dateBuckets.slice(0, 2).forEach(c => selected.set(c.index, c.text));
   examBuckets.slice(0, 2).forEach(c => selected.set(c.index, c.text));
-  syllabusBuckets.slice(0, 5).forEach(c => selected.set(c.index, c.text));
+  syllabusBuckets.slice(0, 14).forEach(c => selected.set(c.index, c.text));
 
   const ordered = Array.from(selected.entries())
     .sort((a, b) => a[0] - b[0])
     .map(e => e[1]);
 
-  return ordered.join('\n\n--- [TRECHO DO EDITAL] ---\n\n').slice(0, 12000);
+  return ordered.join('\n\n--- [TRECHO DO EDITAL] ---\n\n').slice(0, 20000);
 }
 
 async function fetchEditalTextFromStorage(env, order, userPanel, userId) {
@@ -802,34 +810,83 @@ export async function runCalibrationEngine(env, body = {}) {
     hasOrderBump = true;
   }
 
-  // 2. Extrai o conteúdo real do Edital (do body.editalText, order.notes, intake-editais ou user_files)
+  // 2. Extração de Conteúdo Programático e Edital em 3 Camadas Oficiais:
+  // Camada 1: Catálogo Canônico CRIVOS Auditado (concursos-base.json via crivo-update) — $0 tokens, instantâneo
+  // Camada 2: Arquivo enviado pelo Aluno (PDF extraído no Supabase Storage ou intake) — fidelidade a retificações próprias
+  // Camada 3: Pesquisa em Tempo Real na Web (OpenRouter Web Plugin) — retaguarda de contingência para certames novos
   let rawEditalContent = String(editalText || '').trim();
   if (!rawEditalContent) {
     rawEditalContent = await fetchEditalTextFromStorage(env, order, panel, targetUserId);
   }
-  const filteredEditalContent = rawEditalContent
+
+  const canonicalExam = findCanonicalExam(finalConcurso);
+  const canonicalCargo = canonicalExam ? findCanonicalCargoDetails(canonicalExam, finalCargo) : null;
+  const canonicalText = canonicalExam ? buildCanonicalContextText(canonicalExam, canonicalCargo) : '';
+
+  let sourceOrigin = 'custom';
+  if (rawEditalContent && rawEditalContent.length > 80) {
+    sourceOrigin = 'user_upload';
+    // Se temos dados canônicos e o upload do usuário, combinamos os dois com prioridade às disciplinas do canônico auditado
+    if (canonicalText) {
+      rawEditalContent = `${canonicalText}\n\n=== EDITAL ANEXADO PELO ALUNO / COMPLEMENTO ===\n${rawEditalContent}`;
+    }
+  } else if (canonicalText) {
+    sourceOrigin = 'canonical_catalog';
+    rawEditalContent = canonicalText;
+    console.log(`[calibrate] Certame "${finalConcurso}" localizado no Catálogo Canônico CRIVOS (${canonicalExam.nome}). 0 tokens de busca web gastos.`);
+  } else {
+    // Camada 3: Edital não cadastrado e não anexado -> Busca Web em tempo real
+    console.log(`[calibrate] Certame não localizado no catálogo canônico nem anexado. Acionando busca web em tempo real para "${finalConcurso}" — "${finalCargo}"...`);
+    try {
+      const liveWebData = await searchLiveEditalWeb(env, finalConcurso, finalCargo);
+      if (liveWebData && liveWebData.length > 80) {
+        rawEditalContent = liveWebData;
+        sourceOrigin = 'web_search';
+        console.log(`[calibrate] Edital obtido com sucesso via busca Web em tempo real (${rawEditalContent.length} chars).`);
+      }
+    } catch (searchErr) {
+      console.warn('[calibrate] Falha na busca Web de edital:', searchErr.message);
+    }
+  }
+
+  const filteredEditalContent = (sourceOrigin === 'user_upload' && rawEditalContent)
     ? extractHighSignalEditalSections(rawEditalContent, finalCargo)
     : '';
 
-  const hasSubmittedEdital = filteredEditalContent.length > 60;
-  const isCebraspeHint = (finalBanca || '').toUpperCase().includes('CEBRASPE');
+  const hasSubmittedEdital = Boolean(rawEditalContent && rawEditalContent.length > 60);
+  const isCebraspeHint = (finalBanca || canonicalExam?.banca || '').toUpperCase().includes('CEBRASPE');
 
   // 3. Arquitetura Paralela 100% via API (2 chamadas simultâneas em Promise.all no DeepSeek V4.1 Flash 1017):
   // - Chamada A: Datas Oficiais, Marcos, Matriz de Assuntos, Dossiês Táticos e Blocos do Cronograma (~9-11s)
   // - Chamada B: Flashcards SM-2, Questões Objetivas Inéditas, Simulados Discursivos, Arguição, Mapa e Guia PDF (~9-11s)
   // Isso garante zero truncamento de JSON, máxima densidade em todos os módulos e conclusão total em ~10-12s!
 
-  const refDatesHint = catalogRef
-    ? `- Referência Oficial do Calendário deste Certame: Fim das Inscrições em ${catalogRef.inscricoesFim}, Prova Objetiva em ${catalogRef.provaObjetiva}, Última Prova em ${catalogRef.ultimaProva}.\n`
+  // Se veio do canônico, o calendário de referência é 100% oficial e preciso
+  const resolvedCatalog = canonicalExam?.calendario
+    ? {
+        inscricoesFim: canonicalExam.calendario.inscricoes_fim,
+        provaObjetiva: canonicalExam.calendario.prova_objetiva,
+        ultimaProva: canonicalExam.calendario.ultima_prova || canonicalExam.calendario.prova_objetiva,
+        etapaComplementar: canonicalExam.calendario.etapa_complementar || null,
+        banca: canonicalExam.banca
+      }
+    : catalogRef;
+
+  const refDatesHint = resolvedCatalog
+    ? `- Referência Oficial do Calendário deste Certame: Fim das Inscrições em ${resolvedCatalog.inscricoesFim}, Prova Objetiva em ${resolvedCatalog.provaObjetiva}, Última Prova em ${resolvedCatalog.ultimaProva}.\n`
     : '';
 
+  const editalSourceText = (filteredEditalContent.length > 60) ? filteredEditalContent : rawEditalContent;
+
   const baseContextBlock = `- Data de Hoje: ${todayIso}
-- Concurso: ${finalConcurso}
-- Cargo: ${finalCargo}
-- Banca: ${finalBanca || 'Identificar banca oficial do certame'}
+- Concurso/Exame: ${finalConcurso}
+- Cargo/Especialidade: ${finalCargo}
+- Banca: ${finalBanca || resolvedCatalog?.banca || 'Identificar banca oficial do certame'}
 - Plano: ${finalTier.toUpperCase()}
 - Disponibilidade Diária: ${effectiveHours}h/dia
-${examDate ? `- Data da Última Prova Informada: ${examDate}\n` : refDatesHint}${hasSubmittedEdital ? `\nTRECHO DO EDITAL OFICIAL:\n"""\n${filteredEditalContent.slice(0, 8000)}\n"""` : `\nUse a matriz programática oficial vigente e o calendário real do edital para "${finalConcurso}" — "${finalCargo}".`}`;
+${examDate ? `- Data da Última Prova Informada: ${examDate}\n` : refDatesHint}${hasSubmittedEdital ? `\nINFORMAÇÕES OFICIAIS DO CERTAME/EDITAL (FONTE: ${sourceOrigin.toUpperCase()}):\n"""\n${editalSourceText.slice(0, 16000)}\n"""` : `\nUse a matriz programática oficial vigente e o calendário real do edital para "${finalConcurso}" — "${finalCargo}".`}`;
+
+
 
   const systemPromptCore = `Você é o Engenheiro Pedagógico Chefe da CRIVOS.
 Extraia os dados reais do edital/certame para o cargo "${finalCargo}" no concurso "${finalConcurso}" (Hoje: ${todayIso}).
@@ -855,9 +912,9 @@ Retorne EXCLUSIVAMENTE JSON válido:
   ],
   "assuntos": [
     {
-      "materia": "Nome da Disciplina (exatamente 5 disciplinas reais do cargo)",
+      "materia": "Nome da Disciplina (extraia TODAS as disciplinas do edital, até 12 disciplinas)",
       "topicos": [
-        { "id": "top_1", "t": "Tópico real 1 (exatamente 3 por disciplina, top_1 a top_15)", "prio": "ESSENCIAL", "peso": "ALTO" }
+        { "id": "top_1", "t": "Tópico programático real (listar de 4 a 6 tópicos por disciplina, cobrindo integralmente o conteúdo programático)", "prio": "ESSENCIAL", "peso": "ALTO" }
       ]
     }
   ],
@@ -990,7 +1047,7 @@ Retorne EXCLUSIVAMENTE JSON válido:
         { role: 'user', content: `CALIBRAR NÚCLEO, DATAS, ASSUNTOS E CRONOGRAMA:\n${baseContextBlock}` }
       ],
       temperature: 0.2,
-      maxTokens: 4500,
+      maxTokens: 6000,
       responseFormat: { type: 'json_object' }
     }),
     callExperientialAI(env, {
@@ -1028,10 +1085,10 @@ Retorne EXCLUSIVAMENTE JSON válido:
     escrita: aiPractice.escrita || aiCore.escrita || ''
   };
 
-  const detectedBanca = aiData.banca_identificada || finalBanca || 'Banca Oficial';
+  const detectedBanca = canonicalExam?.banca || aiData.banca_identificada || finalBanca || 'Banca Oficial';
 
   // 4. Resolve a data da última prova do edital e os marcos temporais sincronizados
-  const dateInfo = resolveExamDatesAndMarcos(aiData, examDate, catalogRef, todayIso);
+  const dateInfo = resolveExamDatesAndMarcos(aiData, examDate, resolvedCatalog, todayIso);
 
   const rawAssuntos = Array.isArray(aiData.assuntos) ? aiData.assuntos : [];
   const rawTextos = Array.isArray(aiData.textos) ? aiData.textos : [];

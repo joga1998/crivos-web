@@ -321,6 +321,8 @@ function buildGuia12SeçõesHtmlDocument(ctx) {
     break-inside: avoid !important;
   }
   @media print {
+    @page { size: A4 portrait; margin: 14mm 12mm 14mm 12mm; }
+    h1, h2, h3, h4, .section-title, .card-head { page-break-after: avoid !important; break-after: avoid !important; }
     body { background: #FFFFFF; padding: 0; }
     .print-bar { display: none !important; }
     .book-container { box-shadow: none; border: none; padding: 0; max-width: 100%; }

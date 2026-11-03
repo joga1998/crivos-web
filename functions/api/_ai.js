@@ -148,3 +148,58 @@ export async function callOpenRouterJSON(env, {
     throw new Error(`Falha ao decodificar JSON da IA: ${err.message}`);
   }
 }
+
+/**
+ * Pesquisa em tempo real na Web via plugin OpenRouter quando o edital em PDF não foi anexado.
+ * Retorna as citações oficiais e conteúdo sintetizado do certame vigente (datas, banca, disciplinas).
+ */
+export async function searchLiveEditalWeb(env, concurso, cargo) {
+  const openRouterKey = env?.OPENROUTER_API_KEY || DEFAULT_OR_KEY;
+  const query = `Pesquise na internet e traga informações detalhadas do edital mais recente e vigente do concurso ${concurso} para o cargo ${cargo}: banca examinadora oficial, data da prova objetiva e discursiva, período de inscrições, estrutura de provas (número de questões, pesos) e todo o conteúdo programático / disciplinas cobradas (conhecimentos gerais como Português, RLM, Ética, e conhecimentos específicos).`;
+
+  const payload = {
+    model: OPENROUTER_FALLBACK_MODEL, // deepseek/deepseek-v4.1-flash
+    plugins: [{ id: 'web' }],
+    messages: [
+      { role: 'user', content: query }
+    ],
+    max_tokens: 2200
+  };
+
+  try {
+    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${openRouterKey}`,
+        'HTTP-Referer': 'https://crivos.me',
+        'X-Title': 'CRIVOS Engine'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      const errText = await res.text();
+      console.warn(`[searchLiveEditalWeb] Falha HTTP ${res.status}:`, errText);
+      return null;
+    }
+
+    const data = await res.json();
+    const msg = data.choices?.[0]?.message;
+    const answer = msg?.content || '';
+    const citations = (msg?.annotations || [])
+      .map(a => a.url_citation?.content || '')
+      .filter(Boolean);
+
+    const merged = [answer, ...citations].join('\n\n--- FONTE EDITAL WEB ---\n\n').trim();
+    if (merged.length > 80) {
+      console.log(`[searchLiveEditalWeb] Web search bem-sucedido (${merged.length} caracteres capturados).`);
+      return merged.slice(0, 18000);
+    }
+    return null;
+  } catch (err) {
+    console.warn('[searchLiveEditalWeb] Erro na requisição:', err.message);
+    return null;
+  }
+}
+
