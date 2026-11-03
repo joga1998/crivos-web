@@ -39,6 +39,64 @@ window.CRIVOS_CONCURSOS_DATA = [
           "Direito Previdenciário",
           "Direito Tributário",
           "Direito Ambiental"
+        ],
+        "bibliografia": [
+          {
+            "autor": "Constituição da República Federativa do Brasil",
+            "titulo": "CF/88 e Emendas Constitucionais Vigentes",
+            "materia": "Direito Constitucional",
+            "prio": "ESSENCIAL",
+            "detalhe": "Arts. 1º a 17, 37 a 43, 92 a 126 (Poder Judiciário e Justiça Federal)."
+          },
+          {
+            "autor": "Código de Processo Civil",
+            "titulo": "Lei nº 13.105/2015 (CPC)",
+            "materia": "Direito Processual Civil",
+            "prio": "ESSENCIAL",
+            "detalhe": "Atos processuais, prazos, tutela provisória, cumprimento de sentença e recursos nos Tribunais."
+          },
+          {
+            "autor": "Regime Jurídico dos Servidores Públicos da União",
+            "titulo": "Lei nº 8.112/1990",
+            "materia": "Direito Administrativo",
+            "prio": "ESSENCIAL",
+            "detalhe": "Provimento, vacância, direitos, deveres, proibições e regime disciplinar dos servidores federais."
+          },
+          {
+            "autor": "Nova Lei de Licitações e Contratos Administrativos",
+            "titulo": "Lei nº 14.133/2021",
+            "materia": "Direito Administrativo",
+            "prio": "ESSENCIAL",
+            "detalhe": "Princípios, modalidades, inexigibilidade, dispensa, contratos e sanções da Administração Pública."
+          },
+          {
+            "autor": "Nova Lei de Improbidade Administrativa",
+            "titulo": "Lei nº 8.429/1992 com alterações da Lei nº 14.230/2021",
+            "materia": "Direito Administrativo",
+            "prio": "ESSENCIAL",
+            "detalhe": "Exigência de dolo específico, atos de improbidade e prescrição intercorrente."
+          },
+          {
+            "autor": "Código Penal Brasileiro",
+            "titulo": "Decreto-Lei nº 2.848/1940",
+            "materia": "Direito Penal",
+            "prio": "IMPORTANTE",
+            "detalhe": "Crimes contra a Administração Pública (Arts. 312 a 359-H)."
+          },
+          {
+            "autor": "Código Tributário Nacional",
+            "titulo": "Lei nº 5.172/1966 (CTN)",
+            "materia": "Direito Tributário",
+            "prio": "IMPORTANTE",
+            "detalhe": "Competência tributária, obrigação, crédito, suspensão e extinção do crédito tributário."
+          },
+          {
+            "autor": "Conselho da Justiça Federal (CJF)",
+            "titulo": "Provimento Consolidado e Normas da Corregedoria da JF 3ª Região",
+            "materia": "Legislação Institucional",
+            "prio": "ESSENCIAL",
+            "detalhe": "Organização judiciária do TRF-3, tramitação no PJe e regras das secretarias e varas."
+          }
         ]
       },
       {
@@ -64,6 +122,64 @@ window.CRIVOS_CONCURSOS_DATA = [
           "Direito Civil",
           "Direito Tributário e Execução Fiscal",
           "Legislação Especial e Normas da Corregedoria da JF"
+        ],
+        "bibliografia": [
+          {
+            "autor": "Código de Processo Civil",
+            "titulo": "Lei nº 13.105/2015 (Atos de Comunicação e Execução)",
+            "materia": "Direito Processual Civil",
+            "prio": "ESSENCIAL",
+            "detalhe": "Arts. 154, 212 a 259 (Citação e Intimação pelo Oficial), Arts. 824 a 903 (Penhora, Avaliação e Arrematação)."
+          },
+          {
+            "autor": "Lei de Execução Fiscal",
+            "titulo": "Lei nº 6.830/1980 (LEF)",
+            "materia": "Direito Processual Civil / Tributário",
+            "prio": "ESSENCIAL",
+            "detalhe": "Procedimento dos mandados de citação e penhora da Fazenda Nacional e indisponibilidade de bens."
+          },
+          {
+            "autor": "Código de Processo Penal",
+            "titulo": "Decreto-Lei nº 3.689/1941 (Prisão, Mandados e Busca)",
+            "materia": "Direito Processual Penal",
+            "prio": "ESSENCIAL",
+            "detalhe": "Cumprimento de mandados de busca e apreensão domiciliar, prisão cautelar e flagrante."
+          },
+          {
+            "autor": "Conselho Nacional de Justiça (CNJ)",
+            "titulo": "Resolução CNJ nº 354/2020 e Cumprimento Digital de Atos",
+            "materia": "Legislação Específica",
+            "prio": "ESSENCIAL",
+            "detalhe": "Citação e intimação eletrônica, atos por WhatsApp e videoconferência no âmbito da Justiça Federal."
+          },
+          {
+            "autor": "Constituição da República Federativa do Brasil",
+            "titulo": "CF/88 Art. 5º, XI (Inviolabilidade do Domicílio) e Art. 93",
+            "materia": "Direito Constitucional",
+            "prio": "ESSENCIAL",
+            "detalhe": "Limites constitucionais ao ingresso forçado em domicílio e cumprimento de ordens judiciais diurnas."
+          },
+          {
+            "autor": "Normas da Corregedoria Regional do TRF-3",
+            "titulo": "Manual de Práticas e Cumprimento de Mandados da Central de Mandados (CEMAN)",
+            "materia": "Legislação Institucional",
+            "prio": "ESSENCIAL",
+            "detalhe": "Prazos de devolução de mandados, certidões com fé pública e procedimentos de segurança do Oficial."
+          },
+          {
+            "autor": "Lei de Drogas e Organizações Criminosas",
+            "titulo": "Lei nº 11.343/2006 e Lei nº 12.850/2013",
+            "materia": "Legislação Penal Especial",
+            "prio": "IMPORTANTE",
+            "detalhe": "Procedimentos cautelares de apreensão de bens e cooperação em operações da Polícia Federal."
+          },
+          {
+            "autor": "Lei Maria da Penha e Estatuto do Idoso",
+            "titulo": "Lei nº 11.340/2006 e Lei nº 10.741/2003",
+            "materia": "Legislação Especial",
+            "prio": "IMPORTANTE",
+            "detalhe": "Medidas protetivas de urgência e prioridade no cumprimento de diligências processuais."
+          }
         ]
       },
       {

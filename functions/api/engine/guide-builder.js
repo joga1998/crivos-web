@@ -311,22 +311,72 @@ function buildGuia12SeçõesHtmlDocument(ctx) {
     border-color: #D92B2B;
   }
   .page-break {
-    page-break-before: always;
-    margin-top: 24px;
-    padding-top: 16px;
-    border-top: 2px solid #111111;
+    margin-top: 20px;
+    padding-top: 14px;
+    border-top: 1.5px solid #111111;
   }
   .card, table, .alert, .meta-grid, tr {
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  h1, h2, h3, h4, .section-title, .card-head {
+    break-after: avoid !important;
+    page-break-after: avoid !important;
   }
   @media print {
-    @page { size: A4 portrait; margin: 14mm 12mm 14mm 12mm; }
-    h1, h2, h3, h4, .section-title, .card-head { page-break-after: avoid !important; break-after: avoid !important; }
-    body { background: #FFFFFF; padding: 0; }
-    .print-bar { display: none !important; }
-    .book-container { box-shadow: none; border: none; padding: 0; max-width: 100%; }
-    .page-break { page-break-before: always; border: none; padding: 0; margin: 0; }
+    @page {
+      size: A4 portrait;
+      margin: 12mm 10mm 12mm 10mm;
+    }
+    body {
+      background: #FFFFFF !important;
+      padding: 0 !important;
+      font-size: 11pt !important;
+      line-height: 1.45 !important;
+    }
+    .print-bar {
+      display: none !important;
+    }
+    .book-container {
+      box-shadow: none !important;
+      border: none !important;
+      padding: 0 !important;
+      max-width: 100% !important;
+    }
+    .page-break {
+      /* Remove forçagem de quebra em branco antes de cada seção */
+      page-break-before: auto !important;
+      break-before: auto !important;
+      border-top: 1px solid #111111 !important;
+      margin-top: 16px !important;
+      padding-top: 12px !important;
+    }
+    .section-title {
+      break-after: avoid !important;
+      page-break-after: avoid !important;
+      break-inside: avoid !important;
+      page-break-inside: avoid !important;
+      margin-top: 20px !important;
+      margin-bottom: 10px !important;
+    }
+    .card {
+      break-inside: avoid !important;
+      page-break-inside: avoid !important;
+      margin-bottom: 12px !important;
+      padding: 12px 14px !important;
+    }
+    table {
+      break-inside: auto !important;
+      page-break-inside: auto !important;
+      font-size: 9.5pt !important;
+    }
+    tr {
+      break-inside: avoid !important;
+      page-break-inside: avoid !important;
+    }
+    thead {
+      display: table-header-group !important;
+    }
   }
 </style>
 </head>

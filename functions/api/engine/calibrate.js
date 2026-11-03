@@ -1219,6 +1219,17 @@ Retorne EXCLUSIVAMENTE JSON válido:
       resp: tx.crivo || 'Apresentar definição técnica direta + exceção/pegadinha da banca.'
     })),
     mapa: aiData.mapa || { nodes: [], edges: [] },
+    bibliografia: (canonicalCargo && Array.isArray(canonicalCargo.bibliografia) && canonicalCargo.bibliografia.length > 0)
+      ? canonicalCargo.bibliografia
+      : (Array.isArray(aiData.bibliografia) && aiData.bibliografia.length > 0)
+        ? aiData.bibliografia
+        : rawTextos.map(t => ({
+            autor: t.autor || 'Legislação / Doutrina',
+            titulo: t.titulo || t.t || 'Eixo do Edital',
+            detalhe: t.tese || 'Referência técnica exigida para este certame.',
+            prio: t.prio || 'ESSENCIAL',
+            materia: t.materia || t.sec || 'Geral'
+          })),
     artigos_legislacao: (() => {
       const aiList = Array.isArray(aiData.artigos_legislacao) ? aiData.artigos_legislacao : [];
       const defaultList = [
