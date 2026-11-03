@@ -892,8 +892,10 @@ ${examDate ? `- Data da Última Prova Informada: ${examDate}\n` : refDatesHint}$
 Extraia os dados reais do edital/certame para o cargo "${finalCargo}" no concurso "${finalConcurso}" (Hoje: ${todayIso}).
 REGRAS:
 1. Identifique a Banca, a data da Prova Objetiva ("data_prova_objetiva") e a DATA DA ÚLTIMA PROVA DO EDITAL ("data_ultima_prova", YYYY-MM-DD, sempre futura a ${todayIso}), mais os "marcos_temporais" sincronizados.
-2. Todo item de "textos" DEVE usar o mesmo "id" ("top_1" a "top_5") dos tópicos de "assuntos".
-3. Seja direto e cirúrgico (máximo 25 palavras por campo textual) e retorne JSON compacto.
+2. Em "assuntos", extraia TODAS as disciplinas do edital (até 12 disciplinas), listando de 4 a 6 tópicos reais por disciplina com IDs sequenciais (top_1, top_2...).
+3. Em "textos", elabore de 8 a 12 FICHAS ANALÍTICAS PROFUNDAS distribuídas OBRIGATORIAMENTE ENTRE DISCIPLINAS DIFERENTES DO EDITAL (1 por disciplina principal: Português, Raciocínio Lógico/Informática, Constitucional, Administrativo, Específicas do Cargo). NUNCA concentre as fichas em uma única matéria!
+4. Todo item de "textos" DEVE usar o mesmo "id" do tópico correspondente em "assuntos".
+5. Seja direto e cirúrgico (máximo 25 palavras por campo textual) e retorne JSON compacto.
 Retorne EXCLUSIVAMENTE JSON válido:
 {
   "banca_identificada": "Nome da Banca",
@@ -912,26 +914,26 @@ Retorne EXCLUSIVAMENTE JSON válido:
   ],
   "assuntos": [
     {
-      "materia": "Nome da Disciplina (extraia TODAS as disciplinas do edital, até 12 disciplinas)",
+      "materia": "Nome da Disciplina",
       "topicos": [
-        { "id": "top_1", "t": "Tópico programático real (listar de 4 a 6 tópicos por disciplina, cobrindo integralmente o conteúdo programático)", "prio": "ESSENCIAL", "peso": "ALTO" }
+        { "id": "top_1", "t": "Tópico programático real", "prio": "ESSENCIAL", "peso": "ALTO" }
       ]
     }
   ],
   "textos": [
     {
       "id": "top_1",
-      "materia": "Disciplina",
-      "titulo": "Tópico real 1 (exatamente 5 fichas: top_1 a top_5)",
-      "t": "Tópico real 1",
-      "autor": "Artigos de Lei / Súmulas",
+      "materia": "Nome da Disciplina (1 por matéria)",
+      "titulo": "Título do Tópico",
+      "t": "Título do Tópico",
+      "autor": "Artigos de Lei / Súmulas / Regra Gramatical",
       "prio": "ESSENCIAL",
       "sec": "area",
       "tese": "Síntese técnica densa em até 30 palavras com artigos e jurisprudência.",
       "crivo": "Pegadinha clássica da banca em 1 frase curta.",
       "conceitos": [
-        ["Dispositivo 1", "Regra exata de prova em 1 frase curta"],
-        ["Dispositivo 2", "Exceção ou prazo cobrado pela banca"]
+        ["Dispositivo / Conceito 1", "Regra exata de prova em 1 frase curta"],
+        ["Dispositivo / Conceito 2", "Exceção ou prazo cobrado pela banca"]
       ]
     }
   ],
@@ -950,6 +952,7 @@ Elabore a bateria de treinamento ativo, simulados, flashcards, arguição, mapa 
 REGRAS:
 1. Seja cirúrgico e conciso (máximo 25 palavras por campo textual) e retorne JSON compacto.
 2. Em "questoes_objetivas", gere 3 questões inéditas no formato exato da banca (${isCebraspeHint ? 'estilo CEBRASPE: gabarito "CERTO" ou "ERRADO", sem campo alternativas' : 'estilo Múltipla Escolha: 5 alternativas curtas A a E e gabarito com a letra correta'}).
+3. Em "artigos_legislacao", gere EXATAMENTE 20 artigos prioritários (leg_1 a leg_20) mais cobrados pela banca para o cargo, com marcações cloze {{PRAZO:...}}, {{EXCECAO:...}}, {{COMPETENCIA:...}} ou {{CONDICAO:...}}.
 Retorne EXCLUSIVAMENTE JSON válido:
 {
   "guia_estrategico": {
@@ -1019,7 +1022,7 @@ Retorne EXCLUSIVAMENTE JSON válido:
       "artigo": "Art. X, § Y",
       "prioridade": "CRITICO",
       "tema": "Tema Central do Dispositivo",
-      "texto": "Texto do artigo real com marcações cloze {{PRAZO:termo}}, {{EXCECAO:termo}}, {{COMPETENCIA:termo}} (gere 35 a 40 artigos nucleares mais quentes da banca com cloze: leg_1 a leg_35)"
+      "texto": "Texto do artigo real com marcações cloze {{PRAZO:termo}}, {{EXCECAO:termo}}, {{COMPETENCIA:termo}} (gere exatamente 20 artigos prioritários: leg_1 a leg_20)"
     }
   ],
   "jogos_fraudes": [
@@ -1047,7 +1050,7 @@ Retorne EXCLUSIVAMENTE JSON válido:
         { role: 'user', content: `CALIBRAR NÚCLEO, DATAS, ASSUNTOS E CRONOGRAMA:\n${baseContextBlock}` }
       ],
       temperature: 0.2,
-      maxTokens: 6000,
+      maxTokens: 6500,
       responseFormat: { type: 'json_object' }
     }),
     callExperientialAI(env, {
@@ -1056,7 +1059,7 @@ Retorne EXCLUSIVAMENTE JSON válido:
         { role: 'user', content: `CALIBRAR FLASHCARDS, SIMULADOS, QUESTÕES, ARGUIÇÃO, MAPA E GUIA:\n${baseContextBlock}` }
       ],
       temperature: 0.25,
-      maxTokens: 4500,
+      maxTokens: 6500,
       responseFormat: { type: 'json_object' }
     }).catch(err => {
       console.warn('[calibrate] Aviso na chamada paralela B (Prática):', err.message);
@@ -1151,6 +1154,106 @@ Retorne EXCLUSIVAMENTE JSON válido:
     }
   });
 
+  // Fallback determinístico para Flashcards caso a IA retorne pouca variedade entre as disciplinas
+  if (rawCards.length < 15 && rawAssuntos.length > 0) {
+    rawAssuntos.forEach((disc, dIdx) => {
+      const topicos = Array.isArray(disc.topicos) ? disc.topicos : [];
+      topicos.slice(0, 3).forEach((top, tIdx) => {
+        const topNome = typeof top === 'string' ? top : (top.t || top.titulo || 'Eixo do Edital');
+        const topId = top.id || `top_${dIdx + 1}_${tIdx + 1}`;
+        rawCards.push({
+          id: `dc_det_${dIdx}_${tIdx}`,
+          t: topId,
+          cat: disc.materia || 'Conhecimentos do Cargo',
+          f: `[${disc.materia || 'Disciplina'}] Qual a diretriz nuclear e regra de prova de "${topNome}" cobrada pela ${detectedBanca}?`,
+          v: `Exige domínio estrito do texto legal e jurisprudência pacificada da ${detectedBanca} para o cargo de ${finalCargo}, aplicando regra geral e exceções clássicas.`
+        });
+      });
+    });
+  }
+
+  // Fallback determinístico para Questões Objetivas
+  const resolvedQuestoes = (Array.isArray(aiData.questoes_objetivas) && aiData.questoes_objetivas.length > 0)
+    ? aiData.questoes_objetivas
+    : (rawAssuntos.slice(0, 3).map((disc, qIdx) => {
+        const firstTop = (Array.isArray(disc.topicos) && disc.topicos[0])
+          ? (typeof disc.topicos[0] === 'string' ? disc.topicos[0] : disc.topicos[0].t)
+          : disc.materia;
+        if (isCebraspeHint) {
+          return {
+            id: `q_cal_${qIdx + 1}`,
+            topico: `${disc.materia} — ${firstTop}`,
+            enunciado: `No que concerne a ${firstTop}, à luz da legislação vigente e da jurisprudência dominante aplicável ao certame (${finalConcurso}), julgue o item a seguir: O regime aplicável impõe cumprimento estrito dos preceitos normativos, sendo admitida flexibilização apenas mediante autorização legal expressa.`,
+            gabarito: "CERTO",
+            justificativa_gabarito: `Assertiva correta conforme entendimento sumulado e literalidade das normas que regem ${firstTop}.`
+          };
+        }
+        return {
+          id: `q_cal_${qIdx + 1}`,
+          topico: `${disc.materia} — ${firstTop}`,
+          enunciado: `Em relação a ${firstTop}, assinale a alternativa que expressa a diretriz técnica correta adotada pela banca ${detectedBanca}:`,
+          alternativas: [
+            { letra: "A", texto: `Constitui prerrogativa vinculada ao interesse público primário segundo a regra geral de ${disc.materia}.` },
+            { letra: "B", texto: "Depende de juízo discricionário discricionário exclusivo sem amparo normativo." },
+            { letra: "C", texto: "É vedada sua aplicação subsidiária aos procedimentos formais do cargo." },
+            { letra: "D", texto: "Exige provocação exclusiva da autoridade supervisora em qualquer hipótese." },
+            { letra: "E", texto: "Foi integralmente revogada pelo estatuto funcional subsequente." }
+          ],
+          gabarito: "A",
+          justificativa_gabarito: `A alternativa A reproduz a orientação dominante da banca examinadora ${detectedBanca} e a regra de incidência do edital.`
+        };
+      }));
+
+  // Fallback determinístico para Mapa de Conexões (garante nós interdisciplinares e conexões)
+  let resolvedMapa = (aiData.mapa && Array.isArray(aiData.mapa.nodes) && aiData.mapa.nodes.length >= 6)
+    ? aiData.mapa
+    : null;
+
+  if (!resolvedMapa) {
+    const mapNodes = [];
+    const mapEdges = [];
+    const subjectsToGraph = rawAssuntos.slice(0, 10);
+    subjectsToGraph.forEach((m, idx) => {
+      const topName = (Array.isArray(m.topicos) && m.topicos[0])
+        ? (typeof m.topicos[0] === 'string' ? m.topicos[0] : m.topicos[0].t)
+        : m.materia;
+      const nodeId = `n_${idx + 1}`;
+      mapNodes.push({
+        id: nodeId,
+        label: `${m.materia}: ${topName}`.slice(0, 36),
+        materia: m.materia || 'Disciplina',
+        prio: idx < 3 ? 'ESSENCIAL' : 'ALTO',
+        desc: `Núcleo de ${m.materia} cobrado na prova de ${finalCargo}.`
+      });
+      if (idx > 0) {
+        mapEdges.push([
+          `n_${idx}`,
+          nodeId,
+          'Interdisciplinaridade de Prova',
+          `A banca ${detectedBanca} correlaciona a aplicação prática de ${subjectsToGraph[idx - 1].materia} com ${m.materia}.`
+        ]);
+      }
+    });
+    if (mapNodes.length >= 4) {
+      mapEdges.push([
+        mapNodes[0].id,
+        mapNodes[mapNodes.length - 1].id,
+        'Eixo Transversal Integrado',
+        `Convergência temática essencial entre o primeiro e o último eixo do edital do cargo.`
+      ]);
+    }
+    resolvedMapa = { nodes: mapNodes, edges: mapEdges };
+  }
+
+  // Fallback determinístico para Guia Estratégico
+  const resolvedGuiaEstrategico = (aiData.guia_estrategico && aiData.guia_estrategico.raio_x_banca)
+    ? aiData.guia_estrategico
+    : {
+        raio_x_banca: `A banca ${detectedBanca} prioriza literalidade de artigos-chave, jurisprudência sumulada e precisão conceitual rigorosa para o cargo de ${finalCargo}.`,
+        plano_corte_80_20: `Concentre 80% do tempo líquido nos eixos nucleares com maior peso e volume de questões (${rawAssuntos.slice(0, 3).map(m => m.materia).join(', ') || 'Disciplinas Específicas'}).`,
+        armadilhas_fatais: `A banca costuma inverter exceções procedimentais, confundir prazos decadenciais com prescricionais e alterar palavras-chave de normas regulamentares.`
+      };
+
   const headerConfig = {
     title: finalConcurso.toUpperCase(),
     subtitle: `${finalCargo.toUpperCase()} · ${detectedBanca.toUpperCase()}`,
@@ -1194,14 +1297,14 @@ Retorne EXCLUSIVAMENTE JSON válido:
     },
     nota_corte_estimada: notaCorteEstimada,
     pesos_disciplinas: compiledPesos,
-    guia_estrategico: aiData.guia_estrategico || {},
+    guia_estrategico: resolvedGuiaEstrategico,
     sched,
     dates: dateInfo.marcos,
     assuntos: rawAssuntos,
     texts: rawTextos,
     textos: rawTextos,
     cards: rawCards,
-    questoes_objetivas: Array.isArray(aiData.questoes_objetivas) ? aiData.questoes_objetivas : [],
+    questoes_objetivas: resolvedQuestoes,
     sim: Array.isArray(aiData.sim) && aiData.sim.length > 0 ? aiData.sim : [
       {
         id: 'sim_1',
@@ -1218,7 +1321,7 @@ Retorne EXCLUSIVAMENTE JSON válido:
       alvo: tx.tese || 'Domínio conceitual e identificação da pegadinha clássica da banca.',
       resp: tx.crivo || 'Apresentar definição técnica direta + exceção/pegadinha da banca.'
     })),
-    mapa: aiData.mapa || { nodes: [], edges: [] },
+    mapa: resolvedMapa,
     bibliografia: (canonicalCargo && Array.isArray(canonicalCargo.bibliografia) && canonicalCargo.bibliografia.length > 0)
       ? canonicalCargo.bibliografia
       : (Array.isArray(aiData.bibliografia) && aiData.bibliografia.length > 0)
@@ -1522,7 +1625,7 @@ Retorne EXCLUSIVAMENTE JSON válido:
     "texto": "São modalidades de licitação: I - pregão; II - concorrência; III - concurso; IV - leilão; V - {{COMPETENCIA:diálogo competitivo}}. Parágrafo único. É {{EXCECAO:vedada a criação de outras modalidades de licitação}} ou a combinação das referidas neste artigo."
   }
 ];
-      if (aiList.length >= 35) return aiList;
+      if (aiList.length >= 20) return aiList;
       const seen = new Set(aiList.map(a => `${a.diploma}_${a.artigo}`));
       const merged = [...aiList];
       for (const def of defaultList) {
@@ -1530,7 +1633,7 @@ Retorne EXCLUSIVAMENTE JSON válido:
           merged.push(def);
           seen.add(`${def.diploma}_${def.artigo}`);
         }
-        if (merged.length >= 36) break;
+        if (merged.length >= 20) break;
       }
       return merged;
     })(),

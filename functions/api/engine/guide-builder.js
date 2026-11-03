@@ -70,8 +70,21 @@ function buildGuia12SeçõesHtmlDocument(ctx) {
   }).join('');
 
   // 2. Fichas Estruturantes (Gerais) vs Específicas
-  const fichasGerais = texts.slice(0, Math.ceil(texts.length / 2));
-  const fichasEspec = texts.slice(Math.ceil(texts.length / 2));
+  // Separa com inteligência disciplinas básicas/gerais das disciplinas de conhecimentos específicos
+  const isGeralSubject = (materia = '') => {
+    const norm = String(materia).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    return /portug|lingua portug|racioc|logica|matemat|informat|etica|atualid|administracao publica|constitucional|administrativo/i.test(norm);
+  };
+
+  let fichasGerais = texts.filter(t => isGeralSubject(t.materia));
+  let fichasEspec = texts.filter(t => !isGeralSubject(t.materia));
+
+  // Se a separação semântica ficar muito desbalanceada ou vazia de um dos lados, divide equitativamente
+  if (fichasGerais.length === 0 || fichasEspec.length === 0) {
+    const half = Math.ceil(texts.length / 2);
+    fichasGerais = texts.slice(0, half);
+    fichasEspec = texts.slice(half);
+  }
 
   const renderFichaHtml = (tx, idx, prefix = 'GERAL') => `
     <div class="card page-card">
