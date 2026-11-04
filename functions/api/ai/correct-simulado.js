@@ -1,6 +1,6 @@
 // Cloudflare Pages Function: Correção de Prova Discursiva / Redação via Banca IA
 import { getCorsHeaders } from '../_supabase.js';
-import { callExperientialAI } from '../_ai.js';
+import { callOpenRouterJSON } from '../_ai.js';
 
 export async function onRequestPost(context) {
   const { request, env } = context;
@@ -71,16 +71,11 @@ RESPOSTA REDIGIDA PELO CANDIDATO:
 ${textoAluno}
 """`;
 
-    const aiResponse = await callExperientialAI(env, {
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt }
-      ],
+    const parsedResult = await callOpenRouterJSON(env, {
+      systemPrompt,
+      userPrompt,
       temperature: 0.15,
-      responseFormat: { type: 'json_object' }
     });
-
-    const parsedResult = JSON.parse(aiResponse);
 
     return new Response(JSON.stringify({
       success: true,

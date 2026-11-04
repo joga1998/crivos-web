@@ -603,7 +603,7 @@
     function showFeedback(msg, isError = true) {
       feedback.style.display = 'block';
       feedback.className = 'login-feedback ' + (isError ? 'error' : 'success');
-      feedback.textContent = (isError ? '⚠ ' : '✓ ') + msg;
+      feedback.textContent = (isError ? '[!] ' : '[✓] ') + msg;
     }
 
     try {

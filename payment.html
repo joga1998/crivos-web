@@ -1102,7 +1102,7 @@
                   </div>
                 </div>
                 <div class="routine-kpi-badge" id="routine-kpi-badge">
-                  <span>⚡</span>
+                  <span style="font-family:var(--font-mono);color:var(--accent-color);">[■]</span>
                   <span id="routine-weekly-total">18h</span>
                   <span style="font-size:0.68rem;color:var(--text-muted);">/SEMANA</span>
                 </div>
@@ -1147,10 +1147,10 @@
                 3. TURNO PRINCIPAL PREDOMINANTE:
               </div>
               <div class="shifts-grid" id="shifts-grid">
-                <button type="button" class="shift-btn active" data-shift="noite">🌙 NOITE (PÓS-EXP)</button>
-                <button type="button" class="shift-btn" data-shift="manha">☀️ MANHÃ (CEDO)</button>
-                <button type="button" class="shift-btn" data-shift="tarde">⛅ TARDE</button>
-                <button type="button" class="shift-btn" data-shift="integral">⚡ INTEGRAL / MISTO</button>
+                <button type="button" class="shift-btn active" data-shift="noite">[N] NOITE (PÓS-EXP)</button>
+                <button type="button" class="shift-btn" data-shift="manha">[M] MANHÃ (CEDO)</button>
+                <button type="button" class="shift-btn" data-shift="tarde">[T] TARDE</button>
+                <button type="button" class="shift-btn" data-shift="integral">[+] INTEGRAL / MISTO</button>
               </div>
 
               <!-- Campo oculto para envio da especificação compilada -->
@@ -1173,7 +1173,8 @@
               <option value="tatico">Nível 1 · Tático — R$ 37,00 (Pagamento Único)</option>
               <option value="arsenal">Nível 2 · Arsenal (Com Motor SM-2) — R$ 67,00</option>
               <option value="elite">Nível 3 · Elite (Pacote Completo) — R$ 97,00</option>
-                          </select>
+              <option value="prime">Nível 4 · Prime (Curadoria Artesanal + Seus Materiais) — R$ 217,00</option>
+            </select>
           </div>
 
           <div id="plan-description-box" class="plan-description">
@@ -1185,7 +1186,7 @@
             <label for="edital-file">ANEXAR EDITAL (PDF / DOCUMENTO) <span style="font-size:10px;color:var(--text-muted);font-weight:normal;">[ OPCIONAL ]</span></label>
             <div class="upload-zone" onclick="document.getElementById('edital-file').click()">
               <input type="file" id="edital-file" accept=".pdf,.doc,.docx,.png,.jpg" style="display:none;" onchange="handleFileSelect(event)" />
-              <div>📎 Clique ou arraste o PDF do edital aqui (opcional)</div>
+              <div style="font-family:var(--font-mono);font-weight:700;">[+ ANEXAR ARQUIVO] Clique ou toque para enviar o PDF do edital (opcional)</div>
               <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">
                 Caso não tenha o arquivo em mãos agora, nossa equipe de engenharia localizará o documento oficial da banca examinadora com base no concurso e cargo informados.
               </div>
@@ -1235,10 +1236,10 @@
         <label>ESCOLHA O MÉTODO DE PAGAMENTO</label>
         <div class="tabs-header">
           <button type="button" class="tab-btn active" id="tab-pix-btn" onclick="switchPaymentMethod('pix')">
-            ⚡ PIX (IMEDIATO)
+            [■] PIX (IMEDIATO)
           </button>
           <button type="button" class="tab-btn" id="tab-card-btn" onclick="switchPaymentMethod('card')">
-            💳 CARTÃO DE CRÉDITO
+            [::] CARTÃO DE CRÉDITO
           </button>
         </div>
 
@@ -1258,7 +1259,7 @@
 
             <button type="submit" id="pix-submit-btn" class="submit-btn btn-pix">
               <span>[ GERAR QR CODE PIX // R$ <span class="current-price-label">37,00</span> ]</span>
-              <span>⚡</span>
+              <span>→</span>
             </button>
           </form>
 
@@ -1390,30 +1391,47 @@
         formatted: "97,00",
         desc: "<strong>[ NÍVEL 3: ELITE — ECOSSISTEMA COMPLETO ]</strong><br>O pacote integral de engenharia: Tático + Arsenal + Legislação Ativa (Modo Auditoria Cloze e Caçador de Fraudes) + Simulador PWA com Quarentena de Erros + Termômetro de Corte & Alavanca 80/20 + Discursivas."
       },
-          };
+      prime: {
+        title: "Nível 4 · Prime (Calibração Artesanal)",
+        price: "217.00",
+        formatted: "217,00",
+        desc: "<strong>[ NÍVEL 4: CRIVOS PRIME — CURADORIA ARTESANAL + SEUS MATERIAIS ]</strong><br>Inclui tudo do Nível Elite + integração artesanal dos seus próprios PDFs, apostilas, cadernos e simulados na aba [09 · Arquivos], calibração dedicada em até 6h e 30 dias de acompanhamento direto."
+      }
+    };
 
     const productSelect = document.getElementById('product-select');
     const descBox = document.getElementById('plan-description-box');
     const priceLabels = document.querySelectorAll('.current-price-label');
 
-    // Lê query param ?produto=tatico|arsenal|elite
+    // Lê query params ?produto=tatico|arsenal|elite|prime&concurso=...&cargo=...&email=...
     const urlParams = new URLSearchParams(window.location.search);
-    const produtoParam = (urlParams.get('produto') || '').toLowerCase();
+    const produtoParam = (urlParams.get('produto') || urlParams.get('plan') || '').toLowerCase();
     if (produtoParam && planData[produtoParam]) {
       productSelect.value = produtoParam;
     }
+    const concursoParam = urlParams.get('concurso');
+    if (concursoParam && document.getElementById('user-concurso')) {
+      document.getElementById('user-concurso').value = concursoParam;
+    }
+    const cargoParam = urlParams.get('cargo');
+    if (cargoParam && document.getElementById('user-cargo')) {
+      document.getElementById('user-cargo').value = cargoParam;
+    }
+    const emailParam = urlParams.get('email');
+    if (emailParam && document.getElementById('user-email')) {
+      document.getElementById('user-email').value = emailParam;
+    }
+    const nameParam = urlParams.get('name');
+    if (nameParam && document.getElementById('user-name')) {
+      document.getElementById('user-name').value = nameParam;
+    }
 
-    
     let orderBumpActive = false;
     const ORDER_BUMP_PRICE = 19.00;
 
     function toggleOrderBump(checkbox) {
       orderBumpActive = !!checkbox.checked;
-      const basePrice = parseFloat(planData[productSelect.value].price);
-      const finalPrice = orderBumpActive ? (basePrice + ORDER_BUMP_PRICE) : basePrice;
-      const formatted = finalPrice.toFixed(2).replace('.', ',');
-      
-      priceLabels.forEach(lbl => lbl.textContent = formatted);
+      updatePlanUI();
 
       // Recarrega o Brick de cartão com o novo valor se estiver aberto
       if (currentMethod === 'card' && cardBrickInitialized) {
@@ -1422,16 +1440,18 @@
     }
 
     function getCurrentTransactionAmount() {
-      const basePrice = parseFloat(planData[productSelect.value].price);
+      const basePrice = parseFloat((planData[productSelect.value] || planData.tatico).price);
       return orderBumpActive ? (basePrice + ORDER_BUMP_PRICE) : basePrice;
     }
 
     function updatePlanUI() {
       const key = productSelect.value;
-      const plan = planData[key];
+      const plan = planData[key] || planData.tatico;
       descBox.innerHTML = plan.desc;
-      priceLabels.forEach(lbl => lbl.textContent = plan.formatted);
-      return plan.price;
+      const total = getCurrentTransactionAmount();
+      const formattedTotal = total.toFixed(2).replace('.', ',');
+      priceLabels.forEach(lbl => lbl.textContent = formattedTotal);
+      return total.toFixed(2);
     }
 
     updatePlanUI();
@@ -1511,13 +1531,13 @@
       const textElem = document.getElementById('file-chosen-text');
       extractedEditalTextCache = '';
       if (file) {
-        textElem.textContent = `[⏳ LENDO E AUDITANDO EDITAL: ${file.name}...]`;
+        textElem.textContent = `[... LENDO E AUDITANDO EDITAL: ${file.name}...]`;
         try {
           const cargoVal = document.getElementById('user-cargo')?.value || '';
           const txt = await extractClientEditalText(file, cargoVal);
           extractedEditalTextCache = txt;
           if (txt && txt.length > 50) {
-            textElem.textContent = `[✓ EDITAL AUDITADO E PRONTO PARA IA: ${file.name}]`;
+            textElem.textContent = `[✓ EDITAL AUDITADO E PRONTO PARA CALIBRAÇÃO: ${file.name}]`;
           } else {
             textElem.textContent = `[✓ ARQUIVO SELECIONADO: ${file.name}]`;
           }
@@ -1551,7 +1571,7 @@
       
       if (isCard) {
         html += `<div style="margin-top:10px;padding-top:8px;border-top:1px dashed var(--accent-color);font-size:11px;line-height:1.4;">
-          ⚡ <strong>Alternativa Imediata:</strong> Para liberação instantânea sem depender de autorização ou limites da operadora de cartão, selecione a aba <strong>⚡ PIX (IMEDIATO)</strong> acima.
+          <strong>[■] Alternativa Imediata:</strong> Para liberação instantânea sem depender de autorização ou limites da operadora de cartão, selecione a aba <strong>[■] PIX (IMEDIATO)</strong> acima.
         </div>`;
       }
       
@@ -1787,7 +1807,6 @@
             docNumber: cpf,
             orderId: userOrderData.orderId || undefined,
             orderBump: orderBumpActive,
-            orderBump: orderBumpActive,
           }),
         });
 
@@ -1840,7 +1859,7 @@
 
           if (info.status === 'approved') {
             clearInterval(pixPollingInterval);
-            window.location.href = `/sucesso.html?id=${paymentId}`;
+            window.location.href = `/sucesso.html?id=${paymentId}&produto=${encodeURIComponent(productSelect.value)}`;
           }
         } catch (e) {
           console.warn("Polling Pix:", e);
@@ -1990,10 +2009,10 @@
                 }
 
                 if (response.ok && result.status === 'approved') {
-                  window.location.href = `/sucesso.html?id=${result.id}`;
+                  window.location.href = `/sucesso.html?id=${result.id}&produto=${encodeURIComponent(selectedPlan)}`;
                   resolve();
                 } else if (response.ok && result.status === 'in_process') {
-                  window.location.href = `/sucesso.html?id=${result.id}&status=in_process`;
+                  window.location.href = `/sucesso.html?id=${result.id}&status=in_process&produto=${encodeURIComponent(selectedPlan)}`;
                   resolve();
                 } else {
                   const friendlyError = result.user_message || result.error || 'O pagamento não foi aprovado pelo emissor do cartão.';

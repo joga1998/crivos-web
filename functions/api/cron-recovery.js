@@ -47,7 +47,7 @@ async function handleRecovery(context) {
     // =========================================================================
     // 1. RECUPERAÇÃO DE PIX GERADO E PENDENTE (> 5 MINUTOS, < 24 HORAS)
     // =========================================================================
-    const pixFilter = `/orders?status=eq.pending&payment_method=eq.pix&created_at=lte.${fiveMinutesAgo}&created_at=gte.${twentyFourHoursAgo}&select=id,status,payment_id,email,concurso_nome,cargo,plan_tier,created_at,notes&order=created_at.desc&limit=20`;
+    const pixFilter = `/orders?status=eq.pending&payment_method=eq.pix&created_at=lte.${fiveMinutesAgo}&created_at=gte.${twentyFourHoursAgo}&select=id,status,payment_id,email,concurso_nome,cargo,plan_tier,amount_cents,created_at,notes&order=created_at.desc&limit=20`;
     
     let pixOrders = [];
     try {
@@ -132,12 +132,16 @@ async function handleRecovery(context) {
         // Gera a imagem do QR Code em alta definição via API universal pública
         const qrCodeImgUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(qrCodeStr)}`;
 
+        const dynamicFormattedPrice = order.amount_cents
+          ? (order.amount_cents / 100).toFixed(2).replace('.', ',')
+          : planInfo.formatted;
+
         const html = renderEmailPixPending({
           email,
           planTitle: planInfo.title,
           concurso,
           cargo,
-          formattedPrice: planInfo.formatted,
+          formattedPrice: dynamicFormattedPrice,
           qrCodeStr,
           qrCodeImgUrl,
           ticketUrl,

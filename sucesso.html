@@ -578,11 +578,17 @@
 
   <script>
     (function() {
-      // Sincronização do ID da transação
+      // Sincronização do ID da transação e detecção de CRIVOS Prime
       const urlParams = new URLSearchParams(window.location.search);
       const id = urlParams.get('id') || urlParams.get('payment_id') || 'CRV-' + Math.floor(100000 + Math.random() * 900000);
+      const produtoParam = (urlParams.get('produto') || urlParams.get('plan') || '').toLowerCase();
       const txEl = document.getElementById('tx-id');
       if (txEl) txEl.textContent = '#' + id;
+
+      const primeAlert = document.getElementById('prime-upload-alert');
+      if (produtoParam === 'prime' && primeAlert) {
+        primeAlert.style.display = 'block';
+      }
 
       // Animação progressiva de calibração autônoma
       let prog = 25;
@@ -621,7 +627,10 @@
         fetch(`/api/check-payment/${id}`)
           .then(res => res.json())
           .then(data => {
-            if (data?.order?.id) {
+            if (data?.transaction_amount && Number(data.transaction_amount) >= 217 && primeAlert) {
+              primeAlert.style.display = 'block';
+            }
+            if (data?.order?.id && produtoParam !== 'prime' && !(data?.transaction_amount && Number(data.transaction_amount) >= 217)) {
               return fetch('/api/engine/calibrate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

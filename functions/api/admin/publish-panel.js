@@ -127,6 +127,7 @@ export async function onRequestPost(context) {
       tatico: 'Nível 1 · Tático',
       arsenal: 'Nível 2 · Arsenal (SM-2)',
       elite: 'Nível 3 · Elite (Completo)',
+      prime: 'Nível 4 · Prime (Calibração Artesanal)',
     };
 
     let emailSent = false;
@@ -135,6 +136,7 @@ export async function onRequestPost(context) {
         const targetPanelUrl = (env?.PANEL_URL || 'https://app.crivos.me').replace(/\/+$/, '');
         const htmlEmail = renderEmailPanelReady({
           email,
+          candidateName: profile?.full_name || order?.full_name || '',
           planTitle: planTitles[planTier] || 'Sistema CRIVOS',
           concurso,
           cargo,

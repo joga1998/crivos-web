@@ -2721,6 +2721,27 @@
                     </div>
                 </div>
 
+                <!-- FAIXA VIP: NÍVEL 04 // CRIVOS PRIME (CURADORIA ARTESANAL COM MATERIAIS DO ALUNO) -->
+                <div class="price-card-swiss" style="background: var(--bg-card); border: 2px solid var(--border-color); box-shadow: 6px 6px 0px var(--border-color); padding: 1.75rem 2rem; margin-top: 1.5rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.5rem;">
+                    <div style="flex: 1 1 480px;">
+                        <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 0.45rem;">
+                            <span style="font-family: var(--font-mono); font-size: 0.68rem; font-weight: 800; background: var(--text-main); color: var(--bg-main); padding: 3px 8px; text-transform: uppercase; letter-spacing: 0.08em;">[ NÍVEL 04 // SOB DEMANDA ]</span>
+                            <span style="font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700; color: var(--accent-red); text-transform: uppercase; letter-spacing: 0.06em;">CALIBRAÇÃO ARTESANAL EM ATÉ 6H</span>
+                        </div>
+                        <h3 style="font-size: 1.35rem; font-weight: 900; text-transform: uppercase; letter-spacing: -0.02em; margin-bottom: 0.4rem;">CRIVOS PRIME — INTEGRAÇÃO COM SEUS MATERIAIS E PDFs</h3>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; margin: 0;">
+                            Inclui tudo do <strong>Nível Elite</strong> + ancoragem artesanal das suas próprias apostilas, cadernos, grifos e simulados na sua conta exclusiva (via aba <strong>[09 · Arquivos]</strong>) e <strong>30 dias de acompanhamento direto</strong> com a coordenação pedagógica.
+                        </p>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
+                        <div style="text-align: right;">
+                            <div style="font-size: 2.2rem; font-weight: 900; line-height: 1;"><small style="font-size: 1rem; font-weight: 700;">R$</small> 217</div>
+                            <div style="font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; margin-top: 0.25rem;">PAGAMENTO ÚNICO // ENTREGA EM ATÉ 6H</div>
+                        </div>
+                        <a href="/payment.html?produto=prime" class="btn btn-secondary" style="padding: 0.9rem 1.5rem; white-space: nowrap; font-weight: 800;">Escolher Nível Prime →</a>
+                    </div>
+                </div>
+
                 </div>
         </section>
 <!-- ==========================================
@@ -3624,7 +3645,7 @@
             pomoBtn.addEventListener('click', () => {
                 pomoRunning = !pomoRunning;
                 if (pomoRunning) {
-                    pomoBtn.textContent = '[ ⏸ PAUSAR BLOCO ]';
+                    pomoBtn.textContent = '[ [II] PAUSAR BLOCO ]';
                     pomoBtn.classList.add('running');
                     pomoTimerId = setInterval(() => {
                         pomoSeconds = Math.max(0, pomoSeconds - 1);

@@ -264,9 +264,11 @@ export async function provisionUserOrder(env, { orderId, mpPaymentId, paymentMet
       elite: '97,00',
       prime: '217,00',
     };
-    const formattedPrice = planPrices[order.plan_tier] || (order.amount_cents ? (order.amount_cents / 100).toFixed(2).replace('.', ',') : '0,00');
+    const formattedPrice = order.amount_cents
+      ? (order.amount_cents / 100).toFixed(2).replace('.', ',')
+      : (planPrices[order.plan_tier] || '0,00');
 
-        const hasOrderBump = !!(parsedNotes.order_bump || (order.amount_cents && [5600, 8600, 11600, 23600].includes(order.amount_cents)));
+    const hasOrderBump = !!(parsedNotes.order_bump || (order.amount_cents && [5600, 8600, 11600, 23600].includes(order.amount_cents)));
     const bumpTitle = hasOrderBump ? (parsedNotes.order_bump_title || 'Dossiê de Véspera D-7 & Pegadinhas da Banca (+ R$ 19,00)') : 'Nenhum';
 
     await sendAdminSaleNotification(env, {
@@ -341,6 +343,12 @@ export async function provisionUserOrder(env, { orderId, mpPaymentId, paymentMet
     try {
       console.log(`[Provision Autônomo] Iniciando calibração instantânea via IA para ordem ${order.id}...`);
 
+      const availMatch = String(parsedNotes.availability || '').match(/(?:Meta Di[áa]ria:\s*|^)\s*([\d.,]+)/i);
+      const parsedAvailHours = availMatch ? parseFloat(availMatch[1].replace(',', '.')) : NaN;
+      const resolvedAvailHours = (!isNaN(parsedAvailHours) && parsedAvailHours > 0)
+        ? Math.min(Math.max(Math.round(parsedAvailHours), 1), 16)
+        : (order.horas_semanais ? Math.min(Math.max(Math.round(Number(order.horas_semanais) / 6), 1), 14) : 4);
+
       const calibratePayload = {
         orderId: order.id,
         userId,
@@ -348,7 +356,7 @@ export async function provisionUserOrder(env, { orderId, mpPaymentId, paymentMet
         concurso: concursoNome,
         cargo: cargoNome,
         planTier: order.plan_tier,
-        availabilityHours: (parsedNotes.availability && parseInt(parsedNotes.availability, 10)) || 4,
+        availabilityHours: resolvedAvailHours,
       };
 
       const calibPromise = runCalibrationEngine(env, calibratePayload)
