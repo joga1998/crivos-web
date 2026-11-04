@@ -1727,7 +1727,7 @@ Retorne EXCLUSIVAMENTE JSON válido:
     }
   }
 
-  // 7. Gera e publica automaticamente o Guia Tático Pós-Edital (e o Dossiê D-7 se Order Bump ou Elite/Prime) em `user_files`
+  // 7. Gera e publica automaticamente o Guia Tático Pós-Edital (e o Dossiê D-7 se Order Bump ou Elite) em `user_files`
   if (targetUserId && targetUserId !== 'default-user' && savedPanelId && savedPanelId !== 'default-panel') {
     try {
       const { url } = getSupabaseConfig(env);
@@ -1771,7 +1771,7 @@ Retorne EXCLUSIVAMENTE JSON válido:
       }
 
       const existingD7 = Array.isArray(existingFiles) ? existingFiles.find(f => String(f.filename || '').includes('Dossie_Vespera_D7')) : null;
-      if (hasOrderBump || finalTier === 'elite' || finalTier === 'prime') {
+      if (hasOrderBump || finalTier === 'elite') {
         const d7Html = buildStudyGuideHtmlDocument(contentData, headerConfig, 'd7');
         const d7Bytes = new TextEncoder().encode(d7Html);
         const d7StoragePath = `${targetUserId}/Dossie_Vespera_D7_${savedPanelId.slice(0, 8)}.html`;

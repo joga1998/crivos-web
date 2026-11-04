@@ -43,8 +43,6 @@ export async function onRequestPost(context) {
       tatico: { amount: 37.00, title: 'CRIVOS // Nível 1 · Tático' },
       arsenal: { amount: 67.00, title: 'CRIVOS // Nível 2 · Arsenal (SM-2)' },
       elite: { amount: 97.00, title: 'CRIVOS // Nível 3 · Elite (Completo)' },
-    
-      prime: { amount: 217.00, title: 'CRIVOS // Nível 4 · Prime (Calibração Artesanal)' }
     };
 
     const selected = planPrices[plan];

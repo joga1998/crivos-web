@@ -127,7 +127,6 @@ export async function onRequestPost(context) {
       tatico: 'Nível 1 · Tático',
       arsenal: 'Nível 2 · Arsenal (SM-2)',
       elite: 'Nível 3 · Elite (Completo)',
-      prime: 'Nível 4 · Prime (Calibração Artesanal)',
     };
 
     let emailSent = false;

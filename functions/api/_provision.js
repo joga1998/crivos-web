@@ -41,7 +41,7 @@ export function getModulesByTier(planTier) {
     };
   }
 
-  if (tier === 'elite' || tier === 'prime') {
+  if (tier === 'elite') {
     return {
       ...baseTatico,
       cards: 'enabled',
@@ -156,51 +156,40 @@ export async function provisionUserOrder(env, { orderId, mpPaymentId, paymentMet
     tatico: 'Nível 1 · Tático',
     arsenal: 'Nível 2 · Arsenal (SM-2)',
     elite: 'Nível 3 · Elite (Completo)',
-    prime: 'Nível 4 · Prime (Calibração Artesanal)',
   };
   const planTitle = planTitles[order.plan_tier] || 'Plano Tático';
 
-  // Nova sistemática oficial: Calibração Instantânea nos Planos Tático, Arsenal e Elite / Calibração Personalizada em até 6h no Plano Prime
-  const tierLower = (order.plan_tier || '').toLowerCase();
-  const isPrime = (tierLower === 'prime');
-  const deliveryHours = isPrime ? 6 : 0;
-  const deadline = isPrime
-    ? new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString()
-    : new Date().toISOString();
+  // Calibração Instantânea Autônoma em todos os planos (Tático, Arsenal, Elite)
+  const deadline = new Date().toISOString();
+  let panel = null;
 
-  // Verifica se já existe painel para esta ordem
-  const existingPanels = await supabaseRest(env, `/user_panels?order_id=eq.${encodeURIComponent(order.id)}`);
-  let panel = Array.isArray(existingPanels) && existingPanels.length > 0 ? existingPanels[0] : null;
+  const panelPayload = {
+    user_id: userId,
+    order_id: order.id,
+    status: 'ready',
+    plan_tier: order.plan_tier,
+    concurso: concursoNome,
+    cargo: cargoNome,
+    enabled_modules: enabledModules,
+    header_config: {
+      title: concursoNome,
+      subtitle: cargoNome,
+      badge: `// SISTEMA ${order.plan_tier.toUpperCase()}`,
+      dates: [
+        ['Acesso', 'Liberado Instantaneamente']
+      ],
+    },
+    content_data: {},
+    delivery_deadline_at: deadline,
+  };
 
-  if (!panel) {
-    const panelPayload = {
-      user_id: userId,
-      order_id: order.id,
-      status: isPrime ? 'calibrating' : 'ready',
-      plan_tier: order.plan_tier,
-      concurso: concursoNome,
-      cargo: cargoNome,
-      enabled_modules: enabledModules,
-      header_config: {
-        title: concursoNome,
-        subtitle: cargoNome,
-        badge: `// SISTEMA ${order.plan_tier.toUpperCase()}`,
-        dates: [
-          [isPrime ? 'Curadoria de Materiais' : 'Acesso', isPrime ? deadline.slice(0, 16).replace('T', ' ') : 'Liberado Instantaneamente']
-        ],
-      },
-      content_data: {},
-      delivery_deadline_at: deadline,
-    };
+  const panels = await supabaseRest(env, '/user_panels', {
+    method: 'POST',
+    body: panelPayload,
+    prefer: 'return=representation',
+  });
 
-    const panels = await supabaseRest(env, '/user_panels', {
-      method: 'POST',
-      body: panelPayload,
-      prefer: 'return=representation',
-    });
-
-    panel = Array.isArray(panels) ? panels[0] : panels;
-  }
+  panel = Array.isArray(panels) ? panels[0] : panels;
 
   // 6. Inicializa o `user_progress` vazio caso o usuário ainda não possua registro
   if (panel?.id) {
@@ -262,13 +251,12 @@ export async function provisionUserOrder(env, { orderId, mpPaymentId, paymentMet
       tatico: '37,00',
       arsenal: '67,00',
       elite: '97,00',
-      prime: '217,00',
     };
     const formattedPrice = order.amount_cents
       ? (order.amount_cents / 100).toFixed(2).replace('.', ',')
       : (planPrices[order.plan_tier] || '0,00');
 
-    const hasOrderBump = !!(parsedNotes.order_bump || (order.amount_cents && [5600, 8600, 11600, 23600].includes(order.amount_cents)));
+    const hasOrderBump = !!(parsedNotes.order_bump || (order.amount_cents && [5600, 8600, 11600].includes(order.amount_cents)));
     const bumpTitle = hasOrderBump ? (parsedNotes.order_bump_title || 'Dossiê de Véspera D-7 & Pegadinhas da Banca (+ R$ 19,00)') : 'Nenhum';
 
     await sendAdminSaleNotification(env, {
@@ -339,7 +327,7 @@ export async function provisionUserOrder(env, { orderId, mpPaymentId, paymentMet
 
   // 11. AUTOMAÇÃO DE CALIBRAÇÃO IMEDIATA (TÁTICO, ARSENAL, ELITE)
   // Planos sem upload de materiais pessoais são calibrados instantaneamente via motor CRIVOS
-  if (!isPrime && panel?.id) {
+  if (panel?.id) {
     try {
       console.log(`[Provision Autônomo] Iniciando calibração instantânea via IA para ordem ${order.id}...`);
 
