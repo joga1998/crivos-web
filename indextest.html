@@ -1,0 +1,1625 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>CRIVOS // Inteligência para Concursos e Exames</title>
+    <meta name="description" content="Engenharia reversa de editais, cronograma elástico adaptado à sua rotina real, legislação com modo auditoria cloze e repetição espaçada SM-2. Liberação instantânea.">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="alternate icon" type="image/png" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- GSAP & ScrollTrigger for high-precision animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+    <style>
+        /* ==========================================================================
+           CRIVOS // DESIGN SYSTEM & TOKENS (SWISS BRUTALISM / HIGH PRECISION)
+           ========================================================================== */
+        :root {
+            --bg-primary: #F4F4F0;
+            --bg-surface: #FFFFFF;
+            --bg-elevated: #EAEAE4;
+            --bg-dark-block: #111111;
+            --text-primary: #111111;
+            --text-secondary: #383838;
+            --text-muted: #666666;
+            --text-on-dark: #F4F4F0;
+            --accent-red: #D92B2B;
+            --accent-red-hover: #B91C1C;
+            --accent-blue: #1D4ED8;
+            --accent-green: #16A34A;
+            --accent-amber: #D97706;
+            --border-color: #111111;
+            --border-subtle: rgba(17, 17, 17, 0.14);
+            --shadow-sm: 2px 2px 0px #111111;
+            --shadow-hard: 4px 4px 0px #111111;
+            --shadow-lg: 8px 8px 0px #111111;
+            --shadow-red: 5px 5px 0px #D92B2B;
+            --card-pad: clamp(1.4rem, 2.4vw, 2.2rem);
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0A0B0D;
+            --bg-surface: #121418;
+            --bg-elevated: #1A1D23;
+            --bg-dark-block: #060708;
+            --text-primary: #F4F4F0;
+            --text-secondary: #B2B8C4;
+            --text-muted: #747C8D;
+            --text-on-dark: #F4F4F0;
+            --accent-red: #E53935;
+            --accent-red-hover: #D32F2F;
+            --accent-blue: #3B82F6;
+            --accent-green: #22C55E;
+            --accent-amber: #F59E0B;
+            --border-color: #2D323E;
+            --border-subtle: rgba(244, 244, 240, 0.1);
+            --shadow-sm: 2px 2px 0px #000000;
+            --shadow-hard: 4px 4px 0px #000000;
+            --shadow-lg: 8px 8px 0px #000000;
+            --shadow-red: 5px 5px 0px #E53935;
+        }
+
+        /* Strict Zero Border-Radius Rule */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            border-radius: 0px !important;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            position: relative;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        ::selection {
+            background-color: var(--accent-red);
+            color: #FFFFFF;
+        }
+
+        /* Responsive Coordinate Canvas */
+        #coord-canvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            display: block;
+        }
+
+        .scroll-progress-track {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: transparent;
+            z-index: 1001;
+        }
+
+        .scroll-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--accent-red);
+        }
+
+        .page-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 0 1.75rem;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: var(--font-sans);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.035em;
+            line-height: 1.02;
+            color: var(--text-primary);
+        }
+
+        .mono-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 0.3rem 0.6rem;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-surface);
+            color: var(--text-primary);
+            letter-spacing: 0.04em;
+        }
+
+        .mono-tag.red {
+            background-color: var(--accent-red);
+            color: #FFFFFF;
+            border-color: var(--border-color);
+        }
+
+        .mono-tag.blue {
+            background-color: var(--accent-blue);
+            color: #FFFFFF;
+            border-color: var(--border-color);
+        }
+
+        .mono-tag.dark {
+            background-color: var(--bg-dark-block);
+            color: var(--text-on-dark);
+            border-color: var(--border-color);
+        }
+
+        [data-theme="dark"] .mono-tag.dark {
+            background-color: var(--bg-elevated);
+            border-color: var(--accent-red);
+        }
+
+        .section-header {
+            margin-bottom: 2.75rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .section-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .section-coord {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            letter-spacing: 0.05em;
+        }
+
+        .section-title {
+            font-size: clamp(1.85rem, 3.8vw, 3rem);
+            max-width: 880px;
+        }
+
+        .section-subtitle {
+            font-size: 1.02rem;
+            color: var(--text-secondary);
+            max-width: 740px;
+            font-weight: 500;
+            line-height: 1.6;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            font-family: var(--font-mono);
+            font-weight: 800;
+            font-size: 0.84rem;
+            text-transform: uppercase;
+            text-decoration: none;
+            padding: 0.95rem 1.45rem;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+            transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.12s ease, color 0.12s ease;
+            box-shadow: var(--shadow-hard);
+            letter-spacing: 0.03em;
+            position: relative;
+            text-align: center;
+        }
+
+        .btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px var(--border-color);
+        }
+
+        [data-theme="dark"] .btn:hover {
+            box-shadow: 6px 6px 0px #000000;
+        }
+
+        .btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 0px 0px 0px var(--border-color);
+        }
+
+        .btn-primary {
+            background-color: var(--accent-red);
+            color: #FFFFFF;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-red-hover);
+        }
+
+        .btn-secondary {
+            background-color: var(--bg-surface);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--bg-elevated);
+        }
+
+        .btn-dark {
+            background-color: var(--bg-dark-block);
+            color: var(--text-on-dark);
+        }
+
+        .btn-dark:hover {
+            background-color: var(--accent-red);
+            color: #FFFFFF;
+        }
+
+        /* Sticky Topbar */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background-color: var(--bg-primary);
+            border-bottom: 2px solid var(--border-color);
+            transition: background-color 0.2s ease;
+            width: 100%;
+        }
+
+        .topbar-container {
+            width: 100%;
+            padding: 0 clamp(1.2rem, 3.2vw, 3.5rem);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 68px;
+            gap: 1.5rem;
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.7rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            flex-shrink: 0;
+        }
+
+        .brand-sq {
+            width: 18px;
+            height: 18px;
+            aspect-ratio: 1 / 1;
+            background-color: var(--accent-red);
+            border: 1px solid #000000;
+            display: inline-block;
+            flex-shrink: 0;
+            transition: transform 0.2s ease;
+        }
+
+        .brand:hover .brand-sq {
+            transform: rotate(90deg);
+        }
+
+        .brand-name {
+            font-family: var(--font-sans);
+            font-weight: 900;
+            font-size: 1.35rem;
+            letter-spacing: -0.04em;
+            text-transform: uppercase;
+            line-height: 1;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: clamp(1rem, 1.8vw, 2.2rem);
+            flex: 1;
+        }
+
+        .nav-link {
+            font-family: var(--font-mono);
+            font-size: clamp(0.7rem, 0.85vw, 0.78rem);
+            font-weight: 700;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: var(--text-secondary);
+            transition: color 0.15s ease;
+            white-space: nowrap;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-red);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .nav-login {
+            font-family: var(--font-mono);
+            font-size: 0.74rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: var(--text-primary);
+            padding: 0.55rem 0.9rem;
+            border: 2px solid var(--border-color);
+            background: var(--bg-surface);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.12s ease;
+            white-space: nowrap;
+        }
+
+        .nav-login:hover {
+            background: var(--bg-elevated);
+            transform: translate(-1px, -1px);
+        }
+
+        .nav-cta {
+            font-family: var(--font-mono);
+            font-size: 0.74rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: #FFFFFF;
+            padding: 0.55rem 1rem;
+            border: 2px solid var(--border-color);
+            background: var(--accent-red);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.12s ease;
+            white-space: nowrap;
+        }
+
+        .nav-cta:hover {
+            background: var(--accent-red-hover);
+            transform: translate(-1px, -1px);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.74rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 0.55rem 0.9rem;
+            border: 2px solid var(--border-color);
+            background: var(--bg-surface);
+            color: var(--text-primary);
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .mobile-menu-btn.active {
+            background: var(--accent-red);
+            color: #FFFFFF;
+        }
+
+        .mobile-drawer {
+            position: fixed;
+            top: 68px;
+            left: 0;
+            width: 100%;
+            height: calc(100dvh - 68px);
+            background-color: var(--bg-surface);
+            border-bottom: 3px solid var(--border-color);
+            z-index: 998;
+            padding: 1.5rem 1.25rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow-y: auto;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+            transition: clip-path 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, visibility 0.3s;
+        }
+
+        .mobile-drawer.open {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: all;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        }
+
+        .mobile-drawer-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+            flex: 1;
+            margin-bottom: 1.5rem;
+        }
+
+        .mobile-drawer-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            padding: 1rem 1.15rem;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            box-shadow: 2px 2px 0px var(--border-color);
+            text-decoration: none;
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            font-weight: 800;
+        }
+
+        .mobile-drawer-link:hover {
+            background: var(--bg-elevated);
+            color: var(--accent-red);
+        }
+
+        /* Floating Theme Button */
+        .theme-floating-btn {
+            position: fixed !important;
+            bottom: 1.75rem !important;
+            right: 1.75rem !important;
+            z-index: 99999 !important;
+            width: 50px;
+            height: 50px;
+            background: var(--bg-surface);
+            border: 2px solid var(--border-color);
+            box-shadow: var(--shadow-hard);
+            color: var(--text-primary);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            user-select: none;
+        }
+
+        .theme-floating-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px var(--border-color);
+        }
+
+        [data-theme="dark"] .theme-floating-btn:hover {
+            box-shadow: 6px 6px 0px #000000;
+        }
+
+        .theme-icon-wrap {
+            font-family: var(--font-mono);
+            font-size: 1.35rem;
+            line-height: 1;
+        }
+
+        /* Ticker */
+        .ticker-wrap {
+            background-color: var(--bg-dark-block);
+            color: var(--text-on-dark);
+            border-bottom: 2px solid var(--border-color);
+            overflow: hidden;
+            padding: 0.75rem 0;
+            font-family: var(--font-mono);
+            font-size: 0.74rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .ticker-track {
+            display: inline-block;
+            animation: ticker-scroll 28s linear infinite;
+        }
+
+        .ticker-item {
+            display: inline-block;
+            margin-right: 2.8rem;
+        }
+
+        .ticker-sep {
+            color: var(--accent-red);
+            margin-right: 0.5rem;
+        }
+
+        @keyframes ticker-scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* General Sections */
+        .section {
+            padding: 5.5rem 0;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .section-alt {
+            background-color: var(--bg-surface);
+        }
+
+        /* Breakpoints */
+        @media (max-width: 1024px) {
+            .nav-links, .nav-actions .nav-login, .nav-actions .nav-cta {
+                display: none;
+            }
+            .mobile-menu-btn {
+                display: inline-flex;
+            }
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1.15rem;
+            }
+            .section {
+                padding: 3.75rem 0;
+            }
+            .hero-cta-group,
+            .hero a.btn {
+                width: 100%;
+            }
+            .tool-card {
+                padding: 1.25rem !important;
+            }
+        }
+
+        /* Tool card hover micro-interaction */
+        .tool-card {
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .tool-card:hover {
+            transform: translate(-3px, -3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(0.85); }
+        }
+    </style>
+
+    <!-- CRIVOS TRACKING INFRASTRUCTURE -->
+    <script>
+        window.CRIVOS_TRACKING = {
+            metaPixelId: window.META_PIXEL_ID || '1639261614349090',
+            clarityId: window.CLARITY_PROJECT_ID || null
+        };
+        if (window.CRIVOS_TRACKING.metaPixelId) {
+            !function(f,b,e,v,n,t,s)
+            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+            n.queue=[];t=b.createElement(e);t.async=!0;
+            t.src=v;s=b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t,s)}(window, document,'script',
+            'https://connect.facebook.net/en_US/fbevents.js');
+            fbq('init', window.CRIVOS_TRACKING.metaPixelId);
+            fbq('track', 'PageView');
+        }
+        if (window.CRIVOS_TRACKING.clarityId) {
+            (function(c,l,a,r,i,t,y){
+                c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+            })(window, document, "clarity", "script", window.CRIVOS_TRACKING.clarityId);
+        }
+    </script>
+</head>
+<body>
+
+    <!-- SCROLL PROGRESS & COORDINATE CANVAS -->
+    <div class="scroll-progress-track">
+        <div class="scroll-progress-bar" id="scroll-progress-bar"></div>
+    </div>
+    <canvas id="coord-canvas"></canvas>
+
+    <div class="page-wrapper" id="page-wrapper">
+
+        <!-- STICKY TOPBAR NAVIGATION -->
+        <header class="topbar">
+            <div class="topbar-container">
+                <a href="#" class="brand">
+                    <span class="brand-sq"></span>
+                    <span class="brand-name">CRIVOS</span>
+                </a>
+
+                <nav class="nav-links" aria-label="Navegação Principal">
+                    <a href="#ferramentas" class="nav-link">01. Ferramentas</a>
+                    <a href="#pilares" class="nav-link">02. Arquitetura</a>
+                    <a href="#como-funciona" class="nav-link">03. Como Funciona</a>
+                    <a href="#precos" class="nav-link">04. Planos</a>
+                    <a href="#faq" class="nav-link">05. Dúvidas</a>
+                </nav>
+
+                <div class="nav-actions">
+                    <a href="https://demo.crivos.me" target="_blank" rel="noopener" class="nav-login">Demo Ao Vivo ↗</a>
+                    <a href="/login.html" class="nav-login">Área do Candidato ↗</a>
+                    <a href="#precos" class="nav-cta">Montar Meu Plano →</a>
+                    <button class="mobile-menu-btn" id="mobile-menu-btn" type="button" aria-label="Abrir Menu">
+                        <span class="menu-icon">☰</span>
+                        <span>MENU</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- MOBILE DRAWER -->
+            <div class="mobile-drawer" id="mobile-drawer" aria-hidden="true">
+                <nav class="mobile-drawer-nav" aria-label="Navegação Mobile">
+                    <a href="#ferramentas" class="mobile-drawer-link">
+                        <span><strong style="color:var(--accent-red);">01.</strong> ECOSSISTEMA DE FERRAMENTAS</span>
+                        <span>↗</span>
+                    </a>
+                    <a href="#pilares" class="mobile-drawer-link">
+                        <span><strong style="color:var(--accent-red);">02.</strong> OS 4 PILARES DE ENGENHARIA</span>
+                        <span>↗</span>
+                    </a>
+                    <a href="#como-funciona" class="mobile-drawer-link">
+                        <span><strong style="color:var(--accent-red);">03.</strong> COMO FUNCIONA EM 3 ETAPAS</span>
+                        <span>↗</span>
+                    </a>
+                    <a href="#precos" class="mobile-drawer-link">
+                        <span><strong style="color:var(--accent-red);">04.</strong> PLANOS E INVESTIMENTO</span>
+                        <span>↗</span>
+                    </a>
+                    <a href="#faq" class="mobile-drawer-link">
+                        <span><strong style="color:var(--accent-red);">05.</strong> DÚVIDAS FREQUENTES</span>
+                        <span>↗</span>
+                    </a>
+                    <a href="https://demo.crivos.me" target="_blank" rel="noopener" class="mobile-drawer-link">
+                        <span><strong style="color:var(--accent-blue);">DEMO.</strong> TESTAR PAINEL AO VIVO</span>
+                        <span>↗</span>
+                    </a>
+                </nav>
+                <div style="display:flex; flex-direction:column; gap:0.75rem; padding-top:1.25rem; border-top:2px solid var(--border-color);">
+                    <a href="/login.html" class="btn btn-secondary" style="width: 100%;">Área do Candidato ↗</a>
+                    <a href="#precos" class="btn btn-primary" style="width: 100%;">Montar Meu Plano Agora →</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- 01. HERO SECTION (EDITORIAL SWISS / HIGH CONVERSION / SEM PAINEL PESADO) -->
+        <section class="hero" style="padding: clamp(3.5rem, 6vw, 5.8rem) 0 clamp(3.2rem, 5vw, 4.8rem); border-bottom: 2px solid var(--border-color); position: relative;">
+            <div class="container">
+                <div style="max-width: 980px; margin: 0 auto; text-align: center; display: flex; flex-direction: column; align-items: center;">
+
+                    <!-- Eyebrow Badges -->
+                    <div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 1.8rem;">
+                        <span class="mono-tag dark">
+                            <span style="width: 8px; height: 8px; background-color: var(--accent-green); display: inline-block; animation: pulse-dot 1.8s infinite;"></span>
+                            CALIBRAÇÃO INSTANTÂNEA // MOTOR CRIVOS 2026
+                        </span>
+                        <span class="mono-tag red">PAGAMENTO ÚNICO POR EDITAL</span>
+                        <span class="mono-tag">ZERO ASSINATURA</span>
+                    </div>
+
+                    <!-- Main Headline -->
+                    <h1 style="font-size: clamp(2.4rem, 5.5vw, 4.6rem); margin-bottom: 1.6rem; line-height: 0.98; letter-spacing: -0.04em; max-width: 960px;">
+                        SEU EDITAL <span style="color: var(--accent-red); text-decoration: underline; text-decoration-thickness: 4px; text-underline-offset: 6px;">DISSECADO</span>.<br>
+                        SUA ROTINA <span style="background-color: var(--bg-dark-block); color: var(--text-on-dark); padding: 0 0.35rem; display: inline-block; border: 1px solid var(--border-color);">BLINDADA.</span>
+                    </h1>
+
+                    <!-- Lead Paragraph -->
+                    <p style="font-size: clamp(1.05rem, 1.45vw, 1.25rem); color: var(--text-secondary); margin: 0 auto 2.4rem; max-width: 760px; font-weight: 500; line-height: 1.65;">
+                        Quando o edital sai, cada hora gasta com planilhas confusas ou tópicos com 1% de chance de cair custa a sua aprovação. A <strong>CRIVOS</strong> cruza o peso estatístico da sua banca com o seu tempo real de estudo e entrega seu <strong>sistema individual pronto em ~15 segundos</strong>.
+                    </p>
+
+                    <!-- CTAs de Ação Direta -->
+                    <div style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 1rem; width: 100%; margin-bottom: 2.8rem;">
+                        <a href="#precos" class="btn btn-primary" style="padding: 1.1rem 2rem; font-size: 0.92rem;">
+                            Montar Meu Plano Agora →
+                        </a>
+                        <a href="https://demo.crivos.me" target="_blank" rel="noopener" class="btn btn-secondary" style="padding: 1.1rem 1.8rem; font-size: 0.92rem;">
+                            Explorar Demonstração Ao Vivo ↗
+                        </a>
+                    </div>
+
+                    <!-- Telemetry Strip (4 Métricas Cirúrgicas) -->
+                    <div style="width: 100%; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); border: 2px solid var(--border-color); background: var(--bg-surface); box-shadow: var(--shadow-hard); text-align: left;">
+                        <div style="padding: 1.1rem 1.25rem; border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
+                            <span style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 900; color: var(--accent-red); display: block; line-height: 1.1; margin-bottom: 0.25rem;">~15 SEGUNDOS</span>
+                            <span style="font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Liberação Imediata Pós-Pagamento</span>
+                        </div>
+                        <div style="padding: 1.1rem 1.25rem; border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
+                            <span style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 900; color: var(--text-primary); display: block; line-height: 1.1; margin-bottom: 0.25rem;">CORTE 80/20</span>
+                            <span style="font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Pareto nos tópicos de maior peso</span>
+                        </div>
+                        <div style="padding: 1.1rem 1.25rem; border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
+                            <span style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 900; color: var(--accent-blue); display: block; line-height: 1.1; margin-bottom: 0.25rem;">ALGORITMO SM-2</span>
+                            <span style="font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Repetição espaçada com pico na prova</span>
+                        </div>
+                        <div style="padding: 1.1rem 1.25rem; border-bottom: 1px solid var(--border-color);">
+                            <span style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 900; color: var(--accent-green); display: block; line-height: 1.1; margin-bottom: 0.25rem;">CICLO ATÉ D+1</span>
+                            <span style="font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Acompanhamento até o pós-prova</span>
+                        </div>
+                    </div>
+
+                    <!-- Live Demo Notice -->
+                    <div style="margin-top: 1.6rem; display: flex; align-items: center; justify-content: center; gap: 0.6rem; font-family: var(--font-mono); font-size: 0.74rem; color: var(--text-muted); text-transform: uppercase;">
+                        <span>Quer ver o ecossistema operando com dados reais de edital?</span>
+                        <a href="https://demo.crivos.me" target="_blank" rel="noopener" style="color: var(--accent-red); font-weight: 800; text-decoration: underline; text-underline-offset: 3px;">
+                            Abrir Demo Interativa ↗
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- 02. TECHNICAL TICKER -->
+        <div class="ticker-wrap" aria-hidden="true">
+            <div class="ticker-track">
+                <span class="ticker-item"><span class="ticker-sep">■</span> CALIBRAÇÃO INSTANTÂNEA EM TODOS OS PLANOS</span>
+                <span class="ticker-item"><span class="ticker-sep">■</span> BANCAS AUDITADAS: CEBRASPE // FGV // FCC // VUNESP // CESGRANRIO // ENEM // OAB</span>
+                <span class="ticker-item"><span class="ticker-sep">■</span> CRONOGRAMA ELÁSTICO ADAPTATIVO: ZERO EFEITO BOLA DE NEVE</span>
+                <span class="ticker-item"><span class="ticker-sep">■</span> LEGISLAÇÃO ATIVA COM MODO AUDITORIA CLOZE E CAÇADOR DE FRAUDES</span>
+                <span class="ticker-item"><span class="ticker-sep">■</span> 7 DIAS GRÁTIS DE AJUSTE FINO DE ROTINA</span>
+                <!-- Loop -->
+                <span class="ticker-item"><span class="ticker-sep">■</span> CALIBRAÇÃO INSTANTÂNEA EM TODOS OS PLANOS</span>
+                <span class="ticker-item"><span class="ticker-sep">■</span> BANCAS AUDITADAS: CEBRASPE // FGV // FCC // VUNESP // CESGRANRIO // ENEM // OAB</span>
+                <span class="ticker-item"><span class="ticker-sep">■</span> CRONOGRAMA ELÁSTICO ADAPTATIVO: ZERO EFEITO BOLA DE NEVE</span>
+                <span class="ticker-item"><span class="ticker-sep">■</span> LEGISLAÇÃO ATIVA COM MODO AUDITORIA CLOZE E CAÇADOR DE FRAUDES</span>
+                <span class="ticker-item"><span class="ticker-sep">■</span> 7 DIAS GRÁTIS DE AJUSTE FINO DE ROTINA</span>
+            </div>
+        </div>
+
+        <!-- 03. VITRINE MODULAR DE FERRAMENTAS // ECOSSISTEMA APP.CRIVOS.ME (#ferramentas) -->
+        <section id="ferramentas" class="section section-alt">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-header-top">
+                        <span class="mono-tag red">01 // ECOSSISTEMA TÁTICO</span>
+                        <span class="section-coord">10 FERRAMENTAS NATIVAS // APP.CRIVOS.ME</span>
+                    </div>
+                    <h2 class="section-title">TODAS AS ARMAS QUE OPERAM NO SEU PAINEL INDIVIDUAL.</h2>
+                    <p class="section-subtitle">
+                        Cada ferramenta foi programada para resolver um ponto cego real da preparação para concurso: da ansiedade de não fechar o edital ao esquecimento na semana da prova. Veja a distribuição dos módulos de acordo com o nível do plano.
+                    </p>
+                </div>
+
+                <!-- Showcase Grid (10 Cards Técnicos com Destaque Igual e Badges Claras de Nível) -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; align-items: stretch;">
+
+                    <!-- FERRAMENTA 01: CRONOGRAMA ELÁSTICO -->
+                    <article class="tool-card" style="background: var(--bg-surface); border: 2px solid var(--border-color); box-shadow: var(--shadow-hard); padding: 1.75rem; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.1rem; padding-bottom: 0.65rem; border-bottom: 1px solid var(--border-color); gap: 0.5rem; flex-wrap: wrap;">
+                                <span style="font-family: var(--font-mono); font-size: 0.72rem; font-weight: 800; color: var(--accent-red);">MÓDULO // 01</span>
+                                <span class="mono-tag" style="font-size: 0.64rem;">TÁTICO · ARSENAL · ELITE</span>
+                            </div>
+                            <h3 style="font-size: 1.28rem; margin-bottom: 0.65rem;">Cronograma Diário Elástico</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.25rem;">
+                                Adaptado de segunda a domingo para as horas reais da sua rotina. Surgiu um imprevisto na quarta-feira? O sistema recalibra os dias seguintes sem empilhar tarefas ou gerar culpa.
+                            </p>
+                        </div>
+                        <!-- Micro Interface Preview -->
+                        <div style="background: var(--bg-primary); border: 1px solid var(--border-color); padding: 0.85rem; font-family: var(--font-mono); font-size: 0.72rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem; color: var(--text-muted);">
+                                <span>TERÇA // BLOCO 02</span>
+                                <span style="color: var(--accent-green); font-weight: 800;">CALIBRADO [3.5H]</span>
+                            </div>
+                            <div style="font-weight: 800; color: var(--text-primary);">Dir. Constitucional · Controle de Constitucionalidade (Art. 102)</div>
+                        </div>
+                    </article>
+
+                    <!-- FERRAMENTA 02: FICHAS DE ASSUNTOS -->
+                    <article class="tool-card" style="background: var(--bg-surface); border: 2px solid var(--border-color); box-shadow: var(--shadow-hard); padding: 1.75rem; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.1rem; padding-bottom: 0.65rem; border-bottom: 1px solid var(--border-color); gap: 0.5rem; flex-wrap: wrap;">
+                                <span style="font-family: var(--font-mono); font-size: 0.72rem; font-weight: 800; color: var(--accent-red);">MÓDULO // 02</span>
+                                <span class="mono-tag" style="font-size: 0.64rem;">TÁTICO · ARSENAL · ELITE</span>
+                            </div>
+                            <h3 style="font-size: 1.28rem; margin-bottom: 0.65rem;">Fichas de Assuntos & Matriz Reversa</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.25rem;">
+                                Cada matéria do seu edital dissecada por relevância estatística, jurisprudência vinculante e contexto de cobrança da banca, direto ao ponto sem enrolação acadêmica.
+                            </p>
+                        </div>
+                        <div style="background: var(--bg-primary); border: 1px solid var(--border-color); padding: 0.85rem; font-family: var(--font-mono); font-size: 0.72rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
+                                <span style="background: var(--accent-red); color: #FFF; padding: 1px 5px; font-weight: 800;">PESO HISTÓRICO: 28%</span>
+                                <span style="color: var(--text-muted);">BANCA CEBRASPE</span>
+                            </div>
+                            <div style="font-weight: 700; color: var(--text-primary);">Tese: Eficácia Plena vs. Contida (Requisitos de prova)</div>
+                        </div>
+                    </article>
+
+                    <!-- FERRAMENTA 03: POMODORO DE FOCO -->
+                    <article class="tool-card" style="background: var(--bg-surface); border: 2px solid var(--border-color); box-shadow: var(--shadow-hard); padding: 1.75rem; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.1rem; padding-bottom: 0.65rem; border-bottom: 1px solid var(--border-color); gap: 0.5rem; flex-wrap: wrap;">
+                                <span style="font-family: var(--font-mono); font-size: 0.72rem; font-weight: 800; color: var(--accent-red);">MÓDULO // 03</span>
+                                <span class="mono-tag" style="font-size: 0.64rem;">TÁTICO · ARSENAL · ELITE</span>
+                            </div>
+                            <h3 style="font-size: 1.28rem; margin-bottom: 0.65rem;">Pomodoro de Foco & Horas Líquidas</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.25rem;">
+                                Temporizador tático integrado à sua meta diária. Contabiliza exclusivamente o tempo líquido de concentração, gerando telemetria real do seu rendimento por matéria.
+                            </p>
+                        </div>
+                        <div style="background: var(--bg-primary); border: 1px solid var(--border-color); padding: 0.85rem; font-family: var(--font-mono); font-size: 0.72rem; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <span style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase;">BLOCO ATUAL</span>
+                                <div style="font-size: 1.15rem; font-weight: 900; color: var(--text-primary);">25:00 <small style="font-size: 0.7rem; color: var(--accent-red);">[EM EXECUÇÃO]</small></div>
+                            </div>
+                            <span style="border: 1px solid var(--border-color); background: var(--bg-surface); padding: 4px 8px; font-weight: 800;">+4.2H HOJE</span>
+                        </div>
+                    </article>
+
+                    <!-- FERRAMENTA 04: FLASHCARDS SM-2 -->
+                    <article class="tool-card" style="background: var(--bg-surface); border: 2px solid var(--border-color); box-shadow: var(--shadow-hard); padding: 1.75rem; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.1rem; padding-bottom: 0.65rem; border-bottom: 1px solid var(--border-color); gap: 0.5rem; flex-wrap: wrap;">
+                                <span style="font-family: var(--font-mono); font-size: 0.72rem; font-weight: 800; color: var(--accent-blue);">MÓDULO // 04</span>
+                                <span class="mono-tag blue" style="font-size: 0.64rem;">ARSENAL · ELITE</span>
+                            </div>
+                            <h3 style="font-size: 1.28rem; margin-bottom: 0.65rem;">Repetição Espaçada SM-2</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.25rem;">
+                                O algoritmo de repetição espaçada recalcula o intervalo de revisão com base na sua taxa de acerto. Todos os conceitos críticos convergem para o pico de memória na semana do exame.
+                            </p>
+                        </div>
+                        <div style="background: var(--bg-primary); border: 1px solid var(--border-color); padding: 0.85rem; font-family: var(--font-mono); font-size: 0.72rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem; color: var(--text-muted);">
+                                <span>INTERVALO SM-2</span>
+                                <span style="color: var(--accent-blue); font-weight: 800;">PRÓXIMO: 6 DIAS</span>
+                            </div>
+                            <div style="display: flex; gap: 4px;">
+                                <span style="flex:1; text-align:center; background:var(--bg-surface); border:1px solid var(--border-color); padding:2px;">ERREI (10m)</span>
+                                <span style="flex:1; text-align:center; background:var(--accent-blue); color:#FFF; border:1px solid var(--border-color); padding:2px; font-weight:800;">BOM (6d)</span>
+                                <span style="flex:1; text-align:center; background:var(--bg-surface); border:1px solid var(--border-color); padding:2px;">FÁCIL (14d)</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- FERRAMENTA 05: MAPA DE CONEXÕES -->
+                    <article class="tool-card" style="background: var(--bg-surface); border: 2px solid var(--border-color); box-shadow: var(--shadow-hard); padding: 1.75rem; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.1rem; padding-bottom: 0.65rem; border-bottom: 1px solid var(--border-color); gap: 0.5rem; flex-wrap: wrap;">
+                                <span style="font-family: var(--font-mono); font-size: 0.72rem; font-weight: 800; color: var(--accent-blue);">MÓDULO // 05</span>
+                                <span class="mono-tag blue" style="font-size: 0.64rem;">ARSENAL · ELITE</span>
+                            </div>
+                            <h3 style="font-size: 1.28rem; margin-bottom: 0.65rem;">Mapa de Conexões Interdisciplinares</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.25rem;">
+                                Grafo visual que mapeia como tópicos de matérias distintas se cruzam nas questões mais difíceis da banca (ex: Direito Administrativo cruzado com Legislação Especial).
+                            </p>
+                        </div>
+                        <div style="background: var(--bg-primary); border: 1px solid var(--border-color); padding: 0.85rem; font-family: var(--font-mono); font-size: 0.72rem;">
+                            <div style="color: var(--accent-blue); font-weight: 800; margin-bottom: 0.35rem;">[NÓ CENTRAL] LEI 14.133 (LICITAÇÕES)</div>
+                            <div style="color: var(--text-muted);">↳ Conecta com: Improbidade (Lei 8.429) + Crimes em Licitações (CPB)</div>
+                        </div>
+                    </article>
+
+                    <!-- FERRAMENTA 06: CADERNO DE REVISÃO ATIVA -->
+                    <article class="tool-card" style="background: var(--bg-surface); border: 2px solid var(--border-color); box-shadow: var(--shadow-hard); padding: 1.75rem; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.1rem; padding-bottom: 0.65rem; border-bottom: 1px solid var(--border-color); gap: 0.5rem; flex-wrap: wrap;">
+                                <span style="font-family: var(--font-mono); font-size: 0.72rem; font-weight: 800; color: var(--accent-blue);">MÓDULO // 06</span>
+                                <span class="mono-tag blue" style="font-size: 0.64rem;">ARSENAL · ELITE</span>
+                            </div>
+                            <h3 style="font-size: 1.28rem; margin-bottom: 0.65rem;">Caderno de Revisão Ativa</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.25rem;">
+                                Espaço centralizado para notas de auditoria e pegadinhas de questões recorrentes. Elimina anotações caóticas em cadernos de papel e sincroniza suas notas com os tópicos do edital.
+                            </p>
+                        </div>
+                        <div style="background: var(--bg-primary); border: 1px solid var(--border-color); padding: 0.85rem; font-family: var(--font-mono); font-size: 0.72rem;">
+                            <div style="display: flex; justify-content: space-between; color: var(--accent-red); font-weight: 800; margin-bottom: 0.25rem;">
+                                <span>[PEGADINHA FREQUENTE]</span>
+                                <span>+18 NOTAS SALVAS</span>
+                            </div>
+                            <div style="color: var(--text-secondary);">Atenção: Prazo de recurso administrativo na Lei 14.133 é de 3 dias úteis!</div>
+                        </div>
+                    </article>
+
+                    <!-- FERRAMENTA 07: LEGISLAÇÃO ATIVA (CLOZE & FRAUDES) -->
+                    <article class="tool-card" style="background: var(--bg-surface); border: 2px solid var(--accent-red); box-shadow: var(--shadow-red); padding: 1.75rem; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.1rem; padding-bottom: 0.65rem; border-bottom: 1px solid var(--border-color); gap: 0.5rem; flex-wrap: wrap;">
+                                <span style="font-family: var(--font-mono); font-size: 0.72rem; font-weight: 800; color: var(--accent-red);">MÓDULO // 07</span>
+                                <span class="mono-tag red" style="font-size: 0.64rem;">EXCLUSIVO ELITE</span>
+                            </div>
+                            <h3 style="font-size: 1.28rem; margin-bottom: 0.65rem;">Legislação Ativa (Modo Cloze & Fraudes)</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.25rem;">
+                                Ler lei seca não precisa dar sono. Prazos, exceções e competências viram tarjas pretas sólidas interativas (Cloze Deletion) + módulo Caçador de Fraudes que treina o olho contra pegadinhas de banca.
+                            </p>
+                        </div>
+                        <!-- Micro Interface Cloze -->
+                        <div style="background: var(--bg-primary); border: 1px solid var(--border-color); padding: 0.85rem; font-family: var(--font-mono); font-size: 0.72rem;">
+                            <div style="font-size: 0.65rem; color: var(--accent-red); font-weight: 800; margin-bottom: 0.35rem;">[MODO AUDITORIA CLOZE ATIVO]</div>
+                            <div style="line-height: 1.6; color: var(--text-primary);">
+                                Prazo para impugnação: até <span style="background: #111; color: #FFF; padding: 1px 6px; font-weight: 800; border: 1px solid #111;">[ 3 DIAS ÚTEIS ]</span> antes da data de abertura do certame.
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- FERRAMENTA 08: SIMULADOS & QUIZ -->
+                    <article class="tool-card" style="background: var(--bg-surface); border: 2px solid var(--accent-red); box-shadow: var(--shadow-red); padding: 1.75rem; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.1rem; padding-bottom: 0.65rem; border-bottom: 1px solid var(--border-color); gap: 0.5rem; flex-wrap: wrap;">
+                                <span style="font-family: var(--font-mono); font-size: 0.72rem; font-weight: 800; color: var(--accent-red);">MÓDULO // 08</span>
+                                <span class="mono-tag red" style="font-size: 0.64rem;">EXCLUSIVO ELITE</span>
+                            </div>
+                            <h3 style="font-size: 1.28rem; margin-bottom: 0.65rem;">Simulados & Quarentena de Erros</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.25rem;">
+                                Baterias de questões auditadas por peso de edital. Cada questão errada entra automaticamente para a fila de "Quarentena", forçando um re-teste obrigatório após 7 dias para eliminar lacunas.
+                            </p>
+                        </div>
+                        <div style="background: var(--bg-primary); border: 1px solid var(--border-color); padding: 0.85rem; font-family: var(--font-mono); font-size: 0.72rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem; font-weight: 800;">
+                                <span style="color: var(--accent-red);">FILA DE RE-TESTE ATIVA</span>
+                                <span style="color: var(--text-primary);">8 ERROS EM QUARENTENA</span>
+                            </div>
+                            <div style="color: var(--text-muted);">Re-teste programado para a próxima rodada de consolidação.</div>
+                        </div>
+                    </article>
+
+                    <!-- FERRAMENTA 09: ARGUIÇÃO FEYNMAN -->
+                    <article class="tool-card" style="background: var(--bg-surface); border: 2px solid var(--accent-red); box-shadow: var(--shadow-red); padding: 1.75rem; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.1rem; padding-bottom: 0.65rem; border-bottom: 1px solid var(--border-color); gap: 0.5rem; flex-wrap: wrap;">
+                                <span style="font-family: var(--font-mono); font-size: 0.72rem; font-weight: 800; color: var(--accent-red);">MÓDULO // 09</span>
+                                <span class="mono-tag red" style="font-size: 0.64rem;">EXCLUSIVO ELITE</span>
+                            </div>
+                            <h3 style="font-size: 1.28rem; margin-bottom: 0.65rem;">Arguição Rápida (Técnica Feynman)</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.25rem;">
+                                Perguntas orais e conceituais cronometradas em 60 segundos. Força a recuperação ativa e testa se você realmente dominou o núcleo da matéria para questões discursivas e orais.
+                            </p>
+                        </div>
+                        <div style="background: var(--bg-primary); border: 1px solid var(--border-color); padding: 0.85rem; font-family: var(--font-mono); font-size: 0.72rem;">
+                            <div style="display: flex; justify-content: space-between; color: var(--accent-amber); font-weight: 800; margin-bottom: 0.25rem;">
+                                <span>[TIMER 60S]</span>
+                                <span>RECUPERAÇÃO ATIVA</span>
+                            </div>
+                            <div style="color: var(--text-primary); font-weight: 700;">"Explique a diferença entre anulação e revogação do ato administrativo."</div>
+                        </div>
+                    </article>
+
+                    <!-- FERRAMENTA 10: TERMÔMETRO 80/20 -->
+                    <article class="tool-card" style="background: var(--bg-surface); border: 2px solid var(--accent-red); box-shadow: var(--shadow-red); padding: 1.75rem; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.1rem; padding-bottom: 0.65rem; border-bottom: 1px solid var(--border-color); gap: 0.5rem; flex-wrap: wrap;">
+                                <span style="font-family: var(--font-mono); font-size: 0.72rem; font-weight: 800; color: var(--accent-red);">MÓDULO // 10</span>
+                                <span class="mono-tag red" style="font-size: 0.64rem;">EXCLUSIVO ELITE</span>
+                            </div>
+                            <h3 style="font-size: 1.28rem; margin-bottom: 0.65rem;">Termômetro de Corte & Protocolo 80/20</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.25rem;">
+                                Reta final sem desespero. O termômetro calcula a linha de corte estatística da sua prova e ativa o protocolo de emergência 80/20 nas últimas semanas, priorizando os pontos que garantem a vaga.
+                            </p>
+                        </div>
+                        <div style="background: var(--bg-primary); border: 1px solid var(--border-color); padding: 0.85rem; font-family: var(--font-mono); font-size: 0.72rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem;">
+                                <span style="color: var(--accent-green); font-weight: 800;">PROBABILIDADE DE CORTE: 82%</span>
+                                <span style="color: var(--text-muted);">D-21 DIAS</span>
+                            </div>
+                            <div style="background: var(--bg-surface); height: 8px; border: 1px solid var(--border-color); width: 100%;">
+                                <div style="background: var(--accent-green); width: 82%; height: 100%;"></div>
+                            </div>
+                        </div>
+                    </article>
+
+                </div>
+
+                <!-- Footer da Seção com Link para Demo -->
+                <div style="margin-top: 2.75rem; padding: 1.5rem 1.8rem; border: 2px solid var(--border-color); background: var(--bg-surface); box-shadow: var(--shadow-hard); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.2rem;">
+                    <div>
+                        <div style="font-family: var(--font-mono); font-size: 0.7rem; font-weight: 800; color: var(--accent-red); text-transform: uppercase; margin-bottom: 0.25rem;">EXPERIÊNCIA DIRETA SEM CADASTRO</div>
+                        <div style="font-size: 1.05rem; font-weight: 900; text-transform: uppercase;">VEJA COMO ESTAS FERRAMENTAS FUNCIONAM AO VIVO NO PAINEL REAL</div>
+                    </div>
+                    <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                        <a href="https://demo.crivos.me" target="_blank" rel="noopener" class="btn btn-secondary" style="padding: 0.75rem 1.25rem; font-size: 0.78rem;">
+                            Abrir Demo Ao Vivo ↗
+                        </a>
+                        <a href="#precos" class="btn btn-primary" style="padding: 0.75rem 1.25rem; font-size: 0.78rem;">
+                            Escolher Meu Plano →
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 04. OS 4 PILARES DE ENGENHARIA DO SISTEMA (#pilares) -->
+        <section id="pilares" class="section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-header-top">
+                        <span class="mono-tag">02 // ARQUITETURA DE ESTUDO</span>
+                        <span class="section-coord">4 PILARES DE EXECUÇÃO PÓS-EDITAL</span>
+                    </div>
+                    <h2 class="section-title">POR QUE PLANILHAS ESTÁTICAS FALHAM NO PRIMEIRO IMPREVISTO.</h2>
+                    <p class="section-subtitle">
+                        Com a data da prova marcada, você não pode se dar ao luxo de perder dias reorganizando tabelas manuais. Seu sistema precisa absorver imprevistos da rotina e conduzir sua retenção até o domingo do concurso.
+                    </p>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+
+                    <article style="background: var(--bg-surface); border: 2px solid var(--border-color); box-shadow: var(--shadow-hard); padding: 2rem; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-color);">
+                                <span style="font-family: var(--font-mono); font-size: 0.76rem; font-weight: 800; color: var(--accent-red);">PILAR // 01</span>
+                                <span class="mono-tag" style="font-size: 0.65rem;">ROTA ELÁSTICA</span>
+                            </div>
+                            <h3 style="font-size: 1.35rem; margin-bottom: 0.75rem;">Cronograma Adaptativo</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.94rem; line-height: 1.65; margin-bottom: 1.4rem;">
+                                Surgiu um plantão no trabalho ou imprevisto familiar? O painel redistribui a pendência nos blocos seguintes respeitando o peso de cada disciplina, sem efeito bola de neve.
+                            </p>
+                        </div>
+                        <div style="font-family: var(--font-mono); font-size: 0.72rem; padding: 0.8rem; background: var(--bg-primary); border: 1px solid var(--border-color); border-left: 4px solid var(--accent-blue); font-weight: 700;">
+                            [ IMPACTO ] Zero culpa e zero tempo perdido refazendo planilhas no domingo.
+                        </div>
+                    </article>
+
+                    <article style="background: var(--bg-surface); border: 2px solid var(--border-color); box-shadow: var(--shadow-hard); padding: 2rem; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-color);">
+                                <span style="font-family: var(--font-mono); font-size: 0.76rem; font-weight: 800; color: var(--accent-red);">PILAR // 02</span>
+                                <span class="mono-tag" style="font-size: 0.65rem;">MATRIZ DE PESOS</span>
+                            </div>
+                            <h3 style="font-size: 1.35rem; margin-bottom: 0.75rem;">Corte de Pareto 80/20</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.94rem; line-height: 1.65; margin-bottom: 1.4rem;">
+                                Cruzamos os dias restantes até a prova com as suas horas líquidas. Isolamos os assuntos de alta incidência da banca e cortamos o excesso improdutivo que não cabe no calendário.
+                            </p>
+                        </div>
+                        <div style="font-family: var(--font-mono); font-size: 0.72rem; padding: 0.8rem; background: var(--bg-primary); border: 1px solid var(--border-color); border-left: 4px solid var(--accent-red); font-weight: 700;">
+                            [ IMPACTO ] Seu tempo escasso vai primeiro para onde estão 80% dos pontos da prova.
+                        </div>
+                    </article>
+
+                    <article style="background: var(--bg-surface); border: 2px solid var(--border-color); box-shadow: var(--shadow-hard); padding: 2rem; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-color);">
+                                <span style="font-family: var(--font-mono); font-size: 0.76rem; font-weight: 800; color: var(--accent-red);">PILAR // 03</span>
+                                <span class="mono-tag" style="font-size: 0.65rem;">RETENÇÃO SM-2</span>
+                            </div>
+                            <h3 style="font-size: 1.35rem; margin-bottom: 0.75rem;">Pico na Véspera da Prova</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.94rem; line-height: 1.65; margin-bottom: 1.4rem;">
+                                Flashcards táticos e gatilhos da legislação regidos pelo algoritmo SM-2. Os intervalos espaçados convergem para que todas as matérias críticas atinjam o ápice de consolidação na reta final.
+                            </p>
+                        </div>
+                        <div style="font-family: var(--font-mono); font-size: 0.72rem; padding: 0.8rem; background: var(--bg-primary); border: 1px solid var(--border-color); border-left: 4px solid var(--accent-blue); font-weight: 700;">
+                            [ IMPACTO ] O que você estudou no primeiro dia chega fresco na memória na prova.
+                        </div>
+                    </article>
+
+                    <article style="background: var(--bg-surface); border: 2px solid var(--border-color); box-shadow: var(--shadow-hard); padding: 2rem; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-color);">
+                                <span style="font-family: var(--font-mono); font-size: 0.76rem; font-weight: 800; color: var(--accent-red);">PILAR // 04</span>
+                                <span class="mono-tag" style="font-size: 0.65rem;">CICLO FECHADO</span>
+                            </div>
+                            <h3 style="font-size: 1.35rem; margin-bottom: 0.75rem;">Acesso até D+1 da Prova</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.94rem; line-height: 1.65; margin-bottom: 1.4rem;">
+                                Seu painel opera durante toda a sua preparação e permanece ativo até 24h após o exame (D+1) para conferência de gabarito e recursos, além do Guia Tático em PDF A4 que fica com você para sempre.
+                            </p>
+                        </div>
+                        <div style="font-family: var(--font-mono); font-size: 0.72rem; padding: 0.8rem; background: var(--bg-primary); border: 1px solid var(--border-color); border-left: 4px solid var(--accent-green); font-weight: 700;">
+                            [ IMPACTO ] Ciclo completo e sem cobrança surpresa de renovação.
+                        </div>
+                    </article>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- 05. COMO FUNCIONA EM 3 ETAPAS (#como-funciona) -->
+        <section id="como-funciona" class="section section-alt">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-header-top">
+                        <span class="mono-tag">03 // PROCESSO DE ENTRADA</span>
+                        <span class="section-coord">DO DIAGNÓSTICO À EXECUÇÃO</span>
+                    </div>
+                    <h2 class="section-title">SEU PLANO PRONTO EM 3 PASSOS SIMPLES.</h2>
+                    <p class="section-subtitle">
+                        Sem burocracia ou semanas configurando ferramentas em branco. O sistema é gerado com base nas suas horas e no seu edital.
+                    </p>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); border: 2px solid var(--border-color); background: var(--bg-surface); box-shadow: var(--shadow-hard);">
+
+                    <div style="padding: 2.2rem 1.8rem; border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1.25rem;">
+                                <span style="font-family: var(--font-mono); font-size: 3rem; font-weight: 900; line-height: 0.9; color: var(--text-primary); border-bottom: 4px solid var(--accent-red); padding-bottom: 2px;">01</span>
+                                <span class="mono-tag">LEVA 3 MINUTOS</span>
+                            </div>
+                            <h3 style="font-size: 1.25rem; margin-bottom: 0.75rem;">Diagnóstico de Rotina</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.92rem; line-height: 1.6;">
+                                Ao escolher seu plano, você indica seu concurso, suas horas livres reais de segunda a domingo e o nível de bagagem atual nas disciplinas da banca.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div style="padding: 2.2rem 1.8rem; border-right: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1.25rem;">
+                                <span style="font-family: var(--font-mono); font-size: 3rem; font-weight: 900; line-height: 0.9; color: var(--accent-red); border-bottom: 4px solid var(--accent-red); padding-bottom: 2px;">02</span>
+                                <span class="mono-tag dark">~15 SEGUNDOS</span>
+                            </div>
+                            <h3 style="font-size: 1.25rem; margin-bottom: 0.75rem;">Calibração do Edital</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.92rem; line-height: 1.6;">
+                                O motor cruza os pesos estatísticos da banca com o seu tempo até a prova e compila seu cronograma, metas de questões, flashcards e guia tático em PDF.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div style="padding: 2.2rem 1.8rem; border-bottom: 1px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1.25rem;">
+                                <span style="font-family: var(--font-mono); font-size: 3rem; font-weight: 900; line-height: 0.9; color: var(--text-primary); border-bottom: 4px solid var(--accent-green); padding-bottom: 2px;">03</span>
+                                <span class="mono-tag">7 DIAS GRÁTIS</span>
+                            </div>
+                            <h3 style="font-size: 1.25rem; margin-bottom: 0.75rem;">Acesso + Ajuste Fino</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.92rem; line-height: 1.6;">
+                                Você recebe o link exclusivo do painel imediatamente. Se durante a primeira semana sentir que o ritmo diário precisa de calibração, ajustamos sua rota sem custo.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- 06. PLANOS E INVESTIMENTO (#precos) -->
+        <section id="precos" class="section">
+            <div class="container">
+                <div class="section-header">
+                    <div class="section-header-top">
+                        <span class="mono-tag red">04 // PLANOS E INVESTIMENTO</span>
+                        <span class="section-coord">PAGAMENTO ÚNICO POR EDITAL // ZERO MENSALIDADE</span>
+                    </div>
+                    <h2 class="section-title">ESCOLHA O NÍVEL DE PROFUNDIDADE DO SEU SISTEMA.</h2>
+                    <p class="section-subtitle">
+                        Sem assinaturas que prendem o limite do seu cartão. Você adquire o sistema individual calibrado para o seu edital até o dia da prova.
+                    </p>
+                </div>
+
+                <!-- Grade de Preços em 3 Colunas -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 1.5rem; align-items: stretch; margin-top: 2rem;">
+
+                    <!-- PLANO 1: TÁTICO -->
+                    <div style="background: var(--bg-surface); border: 2px solid var(--border-color); box-shadow: var(--shadow-hard); padding: 2rem; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <div style="font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.4rem;">NÍVEL 01 // ESSENCIAL</div>
+                            <h3 style="font-size: 1.45rem; font-weight: 900; text-transform: uppercase; margin-bottom: 1rem;">CRIVOS TÁTICO</h3>
+                            <div style="padding: 1rem 0; border-top: 2px solid var(--border-color); border-bottom: 2px solid var(--border-color); margin-bottom: 1.4rem;">
+                                <div style="font-family: var(--font-mono); font-size: 2.7rem; font-weight: 900; line-height: 1;"><small style="font-size: 1.1rem; font-weight: 700;">R$</small> 37</div>
+                                <div style="font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-muted); margin-top: 0.35rem; text-transform: uppercase;">PAGAMENTO ÚNICO // LIBERAÇÃO IMEDIATA</div>
+                            </div>
+                            <ul style="list-style: none; padding: 0; margin: 0 0 1.5rem 0; font-size: 0.86rem; line-height: 1.7;">
+                                <li style="margin-bottom: 0.5rem;"><span style="color: var(--accent-red); font-family: var(--font-mono); font-weight: 800; margin-right: 6px;">[✓]</span> <strong>Cronograma Diário Elástico</strong> calibrado para sua rotina</li>
+                                <li style="margin-bottom: 0.5rem;"><span style="color: var(--accent-red); font-family: var(--font-mono); font-weight: 800; margin-right: 6px;">[✓]</span> <strong>Fichas de Assuntos</strong> com relevância estatística</li>
+                                <li style="margin-bottom: 0.5rem;"><span style="color: var(--accent-red); font-family: var(--font-mono); font-weight: 800; margin-right: 6px;">[✓]</span> <strong>Pomodoro Integrado</strong> e registro de horas líquidas</li>
+                                <li style="margin-bottom: 0.5rem;"><span style="color: var(--accent-red); font-family: var(--font-mono); font-weight: 800; margin-right: 6px;">[✓]</span> <strong>Guia Tático em PDF A4</strong> em alta definição</li>
+                                <li style="margin-bottom: 0.5rem;"><span style="color: var(--accent-red); font-family: var(--font-mono); font-weight: 800; margin-right: 6px;">[✓]</span> <strong>Acesso até D+1 pós-prova</strong> + 7 dias de ajuste fino</li>
+                            </ul>
+                        </div>
+                        <a href="/payment.html?produto=tatico" class="btn btn-secondary" style="width: 100%;">Escolher Nível Tático →</a>
+                    </div>
+
+                    <!-- PLANO 2: ARSENAL -->
+                    <div style="background: var(--bg-surface); border: 2px solid var(--border-color); box-shadow: var(--shadow-hard); padding: 2rem; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <div style="font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; color: var(--accent-blue); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.4rem;">NÍVEL 02 // RETENÇÃO ATIVA</div>
+                            <h3 style="font-size: 1.45rem; font-weight: 900; text-transform: uppercase; margin-bottom: 1rem;">CRIVOS ARSENAL</h3>
+                            <div style="padding: 1rem 0; border-top: 2px solid var(--border-color); border-bottom: 2px solid var(--border-color); margin-bottom: 1.4rem;">
+                                <div style="font-family: var(--font-mono); font-size: 2.7rem; font-weight: 900; line-height: 1;"><small style="font-size: 1.1rem; font-weight: 700;">R$</small> 67</div>
+                                <div style="font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-muted); margin-top: 0.35rem; text-transform: uppercase;">PAGAMENTO ÚNICO // LIBERAÇÃO IMEDIATA</div>
+                            </div>
+                            <ul style="list-style: none; padding: 0; margin: 0 0 1.5rem 0; font-size: 0.86rem; line-height: 1.7;">
+                                <li style="margin-bottom: 0.5rem;"><span style="color: var(--accent-blue); font-family: var(--font-mono); font-weight: 800; margin-right: 6px;">[✓]</span> <strong>Tudo do Nível Tático</strong> (Cronograma + Fichas + Pomodoro)</li>
+                                <li style="margin-bottom: 0.5rem;"><span style="color: var(--accent-blue); font-family: var(--font-mono); font-weight: 800; margin-right: 6px;">[+]</span> <strong>Decks de Flashcards SM-2</strong> com repetição espaçada</li>
+                                <li style="margin-bottom: 0.5rem;"><span style="color: var(--accent-blue); font-family: var(--font-mono); font-weight: 800; margin-right: 6px;">[+]</span> <strong>Mapa de Conexões</strong> entre as disciplinas do edital</li>
+                                <li style="margin-bottom: 0.5rem;"><span style="color: var(--accent-blue); font-family: var(--font-mono); font-weight: 800; margin-right: 6px;">[+]</span> <strong>Caderno de Revisão Ativa</strong> focado nos seus erros</li>
+                            </ul>
+                        </div>
+                        <a href="/payment.html?produto=arsenal" class="btn btn-secondary" style="width: 100%;">Escolher Nível Arsenal →</a>
+                    </div>
+
+                    <!-- PLANO 3: ELITE -->
+                    <div style="background: var(--bg-surface); border: 2px solid var(--accent-red); box-shadow: var(--shadow-red); padding: 2rem; display: flex; flex-direction: column; justify-content: space-between; position: relative;">
+                        <div style="position: absolute; top: -14px; right: 1.2rem; background: var(--accent-red); color: #FFF; font-family: var(--font-mono); font-size: 0.65rem; font-weight: 800; letter-spacing: 0.08em; padding: 4px 10px; text-transform: uppercase;">[ MAIS ESCOLHIDO ]</div>
+                        <div>
+                            <div style="font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; color: var(--accent-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.4rem;">NÍVEL 03 // PREPARAÇÃO TOTAL</div>
+                            <h3 style="font-size: 1.45rem; font-weight: 900; text-transform: uppercase; margin-bottom: 1rem;">CRIVOS ELITE</h3>
+                            <div style="padding: 1rem 0; border-top: 2px solid var(--border-color); border-bottom: 2px solid var(--border-color); margin-bottom: 1.4rem;">
+                                <div style="font-family: var(--font-mono); font-size: 2.7rem; font-weight: 900; line-height: 1; color: var(--accent-red);"><small style="font-size: 1.1rem; font-weight: 700;">R$</small> 97</div>
+                                <div style="font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-muted); margin-top: 0.35rem; text-transform: uppercase;">PAGAMENTO ÚNICO // LIBERAÇÃO IMEDIATA</div>
+                            </div>
+                            <ul style="list-style: none; padding: 0; margin: 0 0 1.5rem 0; font-size: 0.86rem; line-height: 1.7;">
+                                <li style="margin-bottom: 0.5rem;"><span style="color: var(--accent-red); font-family: var(--font-mono); font-weight: 800; margin-right: 6px;">[✓]</span> <strong>Tudo dos Níveis Tático e Arsenal</strong> (Sistema completo)</li>
+                                <li style="margin-bottom: 0.5rem;"><span style="color: var(--accent-red); font-family: var(--font-mono); font-weight: 800; margin-right: 6px;">[+]</span> <strong>Legislação Ativa</strong> (Modo Auditoria Cloze &amp; Caçador de Fraudes)</li>
+                                <li style="margin-bottom: 0.5rem;"><span style="color: var(--accent-red); font-family: var(--font-mono); font-weight: 800; margin-right: 6px;">[+]</span> <strong>Simulados &amp; Quarentena de Erros</strong> com re-teste</li>
+                                <li style="margin-bottom: 0.5rem;"><span style="color: var(--accent-red); font-family: var(--font-mono); font-weight: 800; margin-right: 6px;">[+]</span> <strong>Arguição Feynman</strong> (Perguntas conceituais cronometradas)</li>
+                                <li style="margin-bottom: 0.5rem;"><span style="color: var(--accent-red); font-family: var(--font-mono); font-weight: 800; margin-right: 6px;">[+]</span> <strong>Termômetro de Corte &amp; Protocolo 80/20</strong> de Reta Final</li>
+                            </ul>
+                        </div>
+                        <a href="/payment.html?produto=elite" class="btn btn-primary" style="width: 100%;">Escolher Nível Elite →</a>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- 07. FAQ OBJETIVO (#faq) -->
+        <section id="faq" class="section section-alt">
+            <div class="container" style="max-width: 920px;">
+                <div class="section-header">
+                    <div class="section-header-top">
+                        <span class="mono-tag">05 // DÚVIDAS FREQUENTES</span>
+                        <span class="section-coord">RESPOSTAS DIRETAS</span>
+                    </div>
+                    <h2 class="section-title">PERGUNTAS OBJETIVAS. RESPOSTAS SEM RODEIOS.</h2>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 0.9rem;" id="faq-list">
+
+                    <div class="faq-card" style="border: 2px solid var(--border-color); background: var(--bg-surface); box-shadow: var(--shadow-sm);">
+                        <button type="button" class="faq-btn" style="width: 100%; text-align: left; padding: 1.2rem 1.4rem; background: none; border: none; font-family: var(--font-sans); font-size: 1rem; font-weight: 800; text-transform: uppercase; color: var(--text-primary); cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
+                            <span>[ 01 ] Como funciona a calibração instantânea do painel?</span>
+                            <span class="faq-sym" style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 800; color: var(--accent-red);">−</span>
+                        </button>
+                        <div class="faq-body" style="padding: 0 1.4rem 1.25rem; color: var(--text-secondary); font-size: 0.94rem; line-height: 1.65; border-top: 1px solid var(--border-subtle); display: block;">
+                            Nos planos Tático (R$ 37), Arsenal (R$ 67) e Elite (R$ 97), a liberação ocorre <strong>instantaneamente</strong> logo após a confirmação do pagamento. Seu cronograma diário, metas de questões, flashcards e guia tático em PDF são compilados em ~15 segundos.
+                        </div>
+                    </div>
+
+                    <div class="faq-card" style="border: 2px solid var(--border-color); background: var(--bg-surface); box-shadow: var(--shadow-sm);">
+                        <button type="button" class="faq-btn" style="width: 100%; text-align: left; padding: 1.2rem 1.4rem; background: none; border: none; font-family: var(--font-sans); font-size: 1rem; font-weight: 800; text-transform: uppercase; color: var(--text-primary); cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
+                            <span>[ 02 ] É uma assinatura recorrente ou pagamento único?</span>
+                            <span class="faq-sym" style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 800; color: var(--accent-red);">+</span>
+                        </button>
+                        <div class="faq-body" style="padding: 0 1.4rem 1.25rem; color: var(--text-secondary); font-size: 0.94rem; line-height: 1.65; border-top: 1px solid var(--border-subtle); display: none;">
+                            <strong>Pagamento estritamente único por edital.</strong> Não há mensalidades automáticas nem renovações escondidas. O valor pago garante acesso completo até a realização da prova.
+                        </div>
+                    </div>
+
+                    <div class="faq-card" style="border: 2px solid var(--border-color); background: var(--bg-surface); box-shadow: var(--shadow-sm);">
+                        <button type="button" class="faq-btn" style="width: 100%; text-align: left; padding: 1.2rem 1.4rem; background: none; border: none; font-family: var(--font-sans); font-size: 1rem; font-weight: 800; text-transform: uppercase; color: var(--text-primary); cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
+                            <span>[ 03 ] Eu preciso configurar matérias manualmente do zero?</span>
+                            <span class="faq-sym" style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 800; color: var(--accent-red);">+</span>
+                        </button>
+                        <div class="faq-body" style="padding: 0 1.4rem 1.25rem; color: var(--text-secondary); font-size: 0.94rem; line-height: 1.65; border-top: 1px solid var(--border-subtle); display: none;">
+                            <strong>Zero configuração manual.</strong> Diferente de templates em branco no Notion onde você perde semanas cadastrando disciplinas, a entrega da CRIVOS vem 100% calibrada e pronta para execução imediata.
+                        </div>
+                    </div>
+
+                    <div class="faq-card" style="border: 2px solid var(--border-color); background: var(--bg-surface); box-shadow: var(--shadow-sm);">
+                        <button type="button" class="faq-btn" style="width: 100%; text-align: left; padding: 1.2rem 1.4rem; background: none; border: none; font-family: var(--font-sans); font-size: 1rem; font-weight: 800; text-transform: uppercase; color: var(--text-primary); cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
+                            <span>[ 04 ] E se minha rotina mudar no meio do caminho?</span>
+                            <span class="faq-sym" style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 800; color: var(--accent-red);">+</span>
+                        </button>
+                        <div class="faq-body" style="padding: 0 1.4rem 1.25rem; color: var(--text-secondary); font-size: 0.94rem; line-height: 1.65; border-top: 1px solid var(--border-subtle); display: none;">
+                            O cronograma é adaptativo e elástico. Caso atrase um dia por plantão ou imprevisto, o sistema reordena a fila priorizando os temas que concentram 80% dos pontos da prova. Além disso, você tem 7 dias de ajuste fino assistido.
+                        </div>
+                    </div>
+
+                    <div class="faq-card" style="border: 2px solid var(--border-color); background: var(--bg-surface); box-shadow: var(--shadow-sm);">
+                        <button type="button" class="faq-btn" style="width: 100%; text-align: left; padding: 1.2rem 1.4rem; background: none; border: none; font-family: var(--font-sans); font-size: 1rem; font-weight: 800; text-transform: uppercase; color: var(--text-primary); cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
+                            <span>[ 05 ] Serve para qualquer concurso público ou exame?</span>
+                            <span class="faq-sym" style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 800; color: var(--accent-red);">+</span>
+                        </button>
+                        <div class="faq-body" style="padding: 0 1.4rem 1.25rem; color: var(--text-secondary); font-size: 0.94rem; line-height: 1.65; border-top: 1px solid var(--border-subtle); display: none;">
+                            Sim. Mapeamos editais de todas as grandes bancas (CEBRASPE, FGV, FCC, VUNESP, CESGRANRIO, AOCP, IDECAN) em carreiras Fiscais, Tribunais, Policiais, Administrativas, Bancárias, Militares, além de OAB e ENEM.
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- 08. FINAL CONVERSION BANNER -->
+        <section style="padding: 4.8rem 0; background-color: var(--bg-dark-block); color: var(--text-on-dark); border-bottom: 2px solid var(--border-color); text-align: center;">
+            <div class="container" style="max-width: 820px;">
+                <span class="mono-tag red" style="margin-bottom: 1.2rem;">CALIBRAÇÃO INSTANTÂNEA // MOTOR CRIVOS</span>
+                <h2 style="color: var(--text-on-dark); font-size: clamp(2rem, 4vw, 3.2rem); margin: 0 auto 1.2rem; line-height: 1.05;">
+                    PARE DE ESTUDAR NO ESCURO. COMECE A EXECUTAR COM DADOS.
+                </h2>
+                <p style="color: #B5BAC5; font-size: 1.02rem; margin: 0 auto 2.2rem; line-height: 1.6;">
+                    Transforme seu edital publicado em uma rota diária exata até o domingo da prova, priorizada por peso estatístico e blindada contra o esquecimento.
+                </p>
+                <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                    <a href="#precos" class="btn btn-primary">Montar Meu Plano Agora →</a>
+                    <a href="https://demo.crivos.me" target="_blank" rel="noopener" class="btn btn-secondary">Explorar Demonstração Ao Vivo ↗</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 09. FOOTER INSTITUCIONAL -->
+        <footer style="padding: 3.5rem 0 2.5rem; background-color: var(--bg-primary); font-family: var(--font-mono); font-size: 0.78rem;">
+            <div class="container">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 2rem; padding-bottom: 2.5rem; border-bottom: 1px solid var(--border-color);">
+                    <div>
+                        <a href="#" class="brand" style="margin-bottom: 0.75rem;">
+                            <span class="brand-sq"></span>
+                            <span class="brand-name">CRIVOS</span>
+                        </a>
+                        <p style="color: var(--text-muted); max-width: 340px;">
+                            INTELIGÊNCIA PARA CONCURSOS E EXAMES.
+                        </p>
+                    </div>
+
+                    <div style="display: flex; gap: 1.75rem; flex-wrap: wrap;">
+                        <a href="#ferramentas" style="color: var(--text-secondary); text-decoration: none; font-weight: 700; text-transform: uppercase;">Ferramentas</a>
+                        <a href="#pilares" style="color: var(--text-secondary); text-decoration: none; font-weight: 700; text-transform: uppercase;">Arquitetura</a>
+                        <a href="#como-funciona" style="color: var(--text-secondary); text-decoration: none; font-weight: 700; text-transform: uppercase;">Como Funciona</a>
+                        <a href="#precos" style="color: var(--text-secondary); text-decoration: none; font-weight: 700; text-transform: uppercase;">Planos</a>
+                        <a href="https://demo.crivos.me" target="_blank" rel="noopener" style="color: var(--accent-red); text-decoration: none; font-weight: 800; text-transform: uppercase;">Demo Ao Vivo ↗</a>
+                        <a href="/login.html" style="color: var(--text-secondary); text-decoration: none; font-weight: 700; text-transform: uppercase;">Área do Candidato ↗</a>
+                    </div>
+                </div>
+
+                <div style="padding-top: 1.75rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; color: var(--text-muted);">
+                    <span>© 2026 CRIVOS (CRIVOS.ME) — TODOS OS DIREITOS RESERVADOS.</span>
+                    <a href="javascript:void(0)" onclick="openPrivacyModal()" style="color: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer;">POLÍTICA DE PRIVACIDADE</a>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- MODAL DE PRIVACIDADE -->
+    <div id="privacy-modal" style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(0,0,0,0.75); backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:16px;">
+        <div style="background:var(--bg-surface); color:var(--text-primary); border:2px solid var(--border-color); max-width:740px; width:100%; max-height:86vh; display:flex; flex-direction:column; box-shadow:8px 8px 0px #000000; position:relative;">
+            <div style="background:var(--bg-dark-block); color:var(--text-on-dark); padding:16px 20px; display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--border-color);">
+                <div style="font-family:var(--font-mono); font-size:12px; font-weight:800; letter-spacing:0.05em; display:flex; align-items:center; gap:8px;">
+                    <span style="display:inline-block; width:10px; height:10px; background:var(--accent-red);"></span>
+                    CRIVOS // PROTOCOLO DE PRIVACIDADE E DADOS (LGPD)
+                </div>
+                <button type="button" onclick="closePrivacyModal()" aria-label="Fechar" style="background:transparent; border:none; color:inherit; font-family:var(--font-mono); font-size:18px; font-weight:900; cursor:pointer; padding:0 6px;">✕</button>
+            </div>
+            <div style="padding:24px 22px; overflow-y:auto; font-size:13px; line-height:1.75; font-family:var(--font-sans);">
+                <p style="margin-top:0; font-family:var(--font-mono); font-size:11px; color:var(--text-muted); text-transform:uppercase;">
+                    Última Atualização: Outubro de 2026 // Em conformidade com a LGPD (Lei nº 13.709/2018)
+                </p>
+                <h4 style="font-family:var(--font-mono); font-size:13px; text-transform:uppercase; margin:16px 0 6px; color:var(--accent-red);">1. Coleta e Finalidade dos Dados</h4>
+                <p>A CRIVOS coleta apenas as informações necessárias para elaboração do seu sistema operacional de estudos. Os dados incluem nome, e-mail e rotina semanal declarada.</p>
+                <h4 style="font-family:var(--font-mono); font-size:13px; text-transform:uppercase; margin:16px 0 6px; color:var(--accent-red);">2. Tratamento e Sigilo</h4>
+                <p>Materiais submetidos por alunos são armazenados em nuvem segura com isolamento por usuário. Não vendemos, alugamos nem compartilhamos seus dados com terceiros.</p>
+                <h4 style="font-family:var(--font-mono); font-size:13px; text-transform:uppercase; margin:16px 0 6px; color:var(--accent-red);">3. Segurança Transacional</h4>
+                <p>Pagamentos são processados via Mercado Pago (PCI-DSS Compliance). A CRIVOS não tem acesso nem armazena números de cartões de crédito.</p>
+            </div>
+            <div style="padding:12px 20px; background:var(--bg-primary); border-top:1px solid var(--border-color); display:flex; justify-content:flex-end;">
+                <button type="button" onclick="closePrivacyModal()" class="btn btn-dark" style="padding:8px 18px; font-size:12px; font-family:var(--font-mono);">[ FECHAR ]</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FLOATING THEME TOGGLE -->
+    <button class="theme-floating-btn" id="theme-toggle" type="button" title="Alternar Modo Claro / Escuro" aria-label="Alternar Tema">
+        <span class="theme-icon-wrap" id="theme-icon">◐</span>
+    </button>
+
+    <script>
+        (function() {
+            // Theme Toggle
+            const themeBtn = document.getElementById('theme-toggle');
+            const themeIcon = document.getElementById('theme-icon');
+            const savedTheme = localStorage.getItem('crivos_theme');
+
+            function updateThemeIcon(isDark) {
+                if (themeIcon) themeIcon.textContent = isDark ? '◑' : '◐';
+            }
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                updateThemeIcon(true);
+            }
+            if (themeBtn) {
+                themeBtn.addEventListener('click', () => {
+                    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                    const nextIsDark = !isDark;
+                    if (nextIsDark) {
+                        document.documentElement.setAttribute('data-theme', 'dark');
+                        localStorage.setItem('crivos_theme', 'dark');
+                    } else {
+                        document.documentElement.removeAttribute('data-theme');
+                        localStorage.setItem('crivos_theme', 'light');
+                    }
+                    updateThemeIcon(nextIsDark);
+                });
+            }
+
+            // Mobile Drawer
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileDrawer = document.getElementById('mobile-drawer');
+            if (mobileMenuBtn && mobileDrawer) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    const isOpen = mobileDrawer.classList.contains('open');
+                    if (isOpen) {
+                        mobileDrawer.classList.remove('open');
+                        mobileMenuBtn.classList.remove('active');
+                        document.body.style.overflow = '';
+                    } else {
+                        mobileDrawer.classList.add('open');
+                        mobileMenuBtn.classList.add('active');
+                        document.body.style.overflow = 'hidden';
+                    }
+                });
+            }
+
+            // Scroll Progress
+            const scrollBar = document.getElementById('scroll-progress-bar');
+            window.addEventListener('scroll', () => {
+                const scrollTop = window.scrollY;
+                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+                if (scrollBar) scrollBar.style.width = `${pct}%`;
+            }, { passive: true });
+
+            // FAQ Accordion
+            const faqCards = document.querySelectorAll('.faq-card');
+            faqCards.forEach(card => {
+                const btn = card.querySelector('.faq-btn');
+                const body = card.querySelector('.faq-body');
+                const sym = card.querySelector('.faq-sym');
+                btn.addEventListener('click', () => {
+                    const isOpen = body.style.display === 'block';
+                    faqCards.forEach(c => {
+                        const b = c.querySelector('.faq-body');
+                        const s = c.querySelector('.faq-sym');
+                        if (b) b.style.display = 'none';
+                        if (s) s.textContent = '+';
+                    });
+                    if (!isOpen) {
+                        body.style.display = 'block';
+                        sym.textContent = '−';
+                    }
+                });
+            });
+
+            // Smooth Scroll without hash in address bar
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    const href = this.getAttribute('href');
+                    if (!href || href === '#') return;
+                    const targetEl = document.querySelector(href);
+                    if (targetEl) {
+                        e.preventDefault();
+                        if (mobileDrawer && mobileDrawer.classList.contains('open')) {
+                            mobileDrawer.classList.remove('open');
+                            if (mobileMenuBtn) mobileMenuBtn.classList.remove('active');
+                            document.body.style.overflow = '';
+                        }
+                        const offset = 68;
+                        const elPos = targetEl.getBoundingClientRect().top;
+                        const targetY = elPos + window.pageYOffset - offset;
+                        window.scrollTo({ top: targetY, behavior: 'smooth' });
+                        if (window.history && window.history.replaceState) {
+                            window.history.replaceState(null, null, window.location.pathname + window.location.search);
+                        }
+                    }
+                });
+            });
+
+            // Coordinate Canvas Background
+            const canvas = document.getElementById('coord-canvas');
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                let width = window.innerWidth;
+                let height = window.innerHeight;
+                let dpr = Math.min(window.devicePixelRatio || 1, 2);
+                let nodes = [];
+
+                function resizeCanvas() {
+                    width = window.innerWidth;
+                    height = window.innerHeight;
+                    dpr = Math.min(window.devicePixelRatio || 1, 2);
+                    canvas.width = width * dpr;
+                    canvas.height = height * dpr;
+                    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+                    const count = Math.max(25, Math.min(65, Math.floor((width * height) / 18000)));
+                    nodes = [];
+                    for (let i = 0; i < count; i++) {
+                        nodes.push({
+                            x: Math.random() * width,
+                            y: Math.random() * height,
+                            vx: (Math.random() - 0.5) * 0.35,
+                            vy: (Math.random() - 0.5) * 0.35,
+                            isRed: Math.random() > 0.82
+                        });
+                    }
+                }
+                resizeCanvas();
+                window.addEventListener('resize', resizeCanvas);
+
+                function drawCanvas() {
+                    ctx.clearRect(0, 0, width, height);
+                    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                    const gridColor = isDark ? 'rgba(244, 244, 240, 0.05)' : 'rgba(17, 17, 17, 0.06)';
+                    const nodeColor = isDark ? 'rgba(244, 244, 240, 0.35)' : 'rgba(17, 17, 17, 0.3)';
+                    const lineColor = isDark ? 'rgba(244, 244, 240, 0.12)' : 'rgba(17, 17, 17, 0.1)';
+
+                    // Subtle Swiss architectural grid
+                    const step = width < 768 ? 48 : 72;
+                    ctx.strokeStyle = gridColor;
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    for (let x = 0; x <= width; x += step) {
+                        ctx.moveTo(x, 0);
+                        ctx.lineTo(x, height);
+                    }
+                    for (let y = 0; y <= height; y += step) {
+                        ctx.moveTo(0, y);
+                        ctx.lineTo(width, y);
+                    }
+                    ctx.stroke();
+
+                    // Moving nodes
+                    for (let i = 0; i < nodes.length; i++) {
+                        const n = nodes[i];
+                        n.x += n.vx;
+                        n.y += n.vy;
+                        if (n.x < 0 || n.x > width) n.vx *= -1;
+                        if (n.y < 0 || n.y > height) n.vy *= -1;
+
+                        ctx.fillStyle = n.isRed ? '#D92B2B' : nodeColor;
+                        ctx.fillRect(n.x - 1.5, n.y - 1.5, n.isRed ? 4 : 3, n.isRed ? 4 : 3);
+
+                        for (let j = i + 1; j < nodes.length; j++) {
+                            const n2 = nodes[j];
+                            const dist = Math.hypot(n.x - n2.x, n.y - n2.y);
+                            if (dist < 130) {
+                                ctx.strokeStyle = lineColor;
+                                ctx.beginPath();
+                                ctx.moveTo(n.x, n.y);
+                                ctx.lineTo(n2.x, n2.y);
+                                ctx.stroke();
+                            }
+                        }
+                    }
+                    requestAnimationFrame(drawCanvas);
+                }
+                requestAnimationFrame(drawCanvas);
+            }
+        })();
+
+        // Privacy Modal Functions
+        function openPrivacyModal() {
+            const m = document.getElementById('privacy-modal');
+            if (m) {
+                m.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        function closePrivacyModal() {
+            const m = document.getElementById('privacy-modal');
+            if (m) {
+                m.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        }
+        window.addEventListener('click', (e) => {
+            const m = document.getElementById('privacy-modal');
+            if (m && e.target === m) closePrivacyModal();
+        });
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closePrivacyModal();
+        });
+    </script>
+</body>
+</html>
